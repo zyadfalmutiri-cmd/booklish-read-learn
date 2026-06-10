@@ -20,7 +20,7 @@ export const Route = createFileRoute("/quiz/$slug")({
 });
 
 function QuizPage() {
-  const { story } = Route.useLoaderData();
+  const { story } = Route.useLoaderData() as { story: import("@/lib/types").Story };
   const [answers, setAnswers] = useState<(number | null)[]>(() => story.quiz.map(() => null));
   const [submitted, setSubmitted] = useState(false);
   const [, setScores] = useLocalStore<ScoreMap>(storeKeys.quizScores, {});

@@ -22,7 +22,7 @@ export const Route = createFileRoute("/read/$slug")({
 });
 
 function ReadPage() {
-  const { story } = Route.useLoaderData();
+  const { story } = Route.useLoaderData() as { story: import("@/lib/types").Story };
   const [progress, setProgress] = useLocalStore<ProgressMap>(storeKeys.progress, {});
   const [settings, setSettings] = useSettings();
   const { markActivity } = useStreak();

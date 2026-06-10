@@ -24,7 +24,7 @@ export const Route = createFileRoute("/story/$slug")({
 });
 
 function StoryDetail() {
-  const { story } = Route.useLoaderData();
+  const { story } = Route.useLoaderData() as { story: import("@/lib/types").Story };
   const [bookmarks, setBookmarks] = useLocalStore<string[]>(storeKeys.bookmarks, []);
   const [progress] = useLocalStore<ProgressMap>(storeKeys.progress, {});
   const saved = bookmarks.includes(story.slug);
