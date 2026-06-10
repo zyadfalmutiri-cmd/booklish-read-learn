@@ -1,4 +1,4 @@
-import type { Story } from "./types";
+import type { Story } from "@/lib/types";
 import { theMissingKey } from "@/data/stories/the-missing-key";
 import { lightersFromTheLighthouse } from "@/data/stories/letters-from-the-lighthouse";
 import { echoesOfMars } from "@/data/stories/echoes-of-mars";

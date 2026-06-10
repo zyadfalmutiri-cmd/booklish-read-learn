@@ -1,0 +1,41 @@
+import type { Story } from "@/lib/types";
+
+export const lightersFromTheLighthouse: Story = {
+  slug: "letters-from-the-lighthouse",
+  title: "Letters from the Lighthouse",
+  genre: "romance",
+  level: "intermediate",
+  blurb: "A young woman finds a bundle of unsent letters in an abandoned lighthouse, and feels someone calling to her across the years.",
+  cover: "💌",
+  coverHue: "from-rose-200 to-rose-400",
+  minutes: 6,
+  paragraphs: [
+    "Nora arrived at the coast on a grey afternoon, with the wind tugging at her coat and the smell of salt thick in the air. The old lighthouse stood at the end of a narrow path, its white paint peeling like sunburned skin.",
+    "Her grandfather had kept the lighthouse for thirty years before he died, and the family had finally decided to sell it. Nora was here to clear it out. She did not expect to find anything that mattered.",
+    "Inside, the rooms were small and tidy. Dust drifted softly through bands of pale light. On the top floor, beside the great lamp, she discovered a wooden chest she had never seen before.",
+    "The chest was full of letters, tied with a faded blue ribbon. None of them had been sent. Each envelope was addressed, in careful handwriting, to a woman named Hana, somewhere far away in another country.",
+    "Nora sat down on the cold floor and began to read. The letters were quiet and patient. They described the sea, the colour of the clouds, the way the wind sounded against the glass at night. They never mentioned love, but somehow love was the only thing in them.",
+    "Years ago, she realised, her grandfather had loved someone he could not reach. He had written to her every winter for almost forty years. Every letter ended the same way: \"If the light still turns, I am still here.\"",
+    "Nora closed the chest gently. Outside, the sky was breaking open into thin lines of gold. She decided, in that moment, that she would not sell the lighthouse. She would learn to keep it instead. And tomorrow, she would begin to look for Hana.",
+  ],
+  vocab: {
+    tugging: { ar: "يجذب", def: "Pulling sharply.", example: "The child kept tugging at his mother's sleeve." },
+    peeling: { ar: "متقشّر", def: "Coming off in thin layers.", example: "The old paint was peeling from the door." },
+    abandoned: { ar: "مهجور", def: "Left and not used anymore.", example: "They explored an abandoned house." },
+    tidy: { ar: "مرتّب", def: "Neat and well organized.", example: "She kept her desk very tidy." },
+    drifted: { ar: "انجرف / تحرّك ببطء", def: "Moved slowly and gently.", example: "Snow drifted past the window." },
+    faded: { ar: "باهت", def: "Lost colour or strength over time.", example: "His jeans were faded from the sun." },
+    careful: { ar: "حذِر / دقيق", def: "Done with attention.", example: "She wrote in careful handwriting." },
+    patient: { ar: "صبور", def: "Able to wait calmly.", example: "He was patient with the children." },
+    reach: { ar: "يصل إلى", def: "To get to someone or something.", example: "I could not reach the top shelf." },
+    realised: { ar: "أدركَ", def: "Understood something suddenly.", example: "She realised she had forgotten her keys." },
+  },
+  quiz: [
+    { kind: "main-idea", q: "What is the story mostly about?", choices: ["A woman discovers her grandfather's silent, lifelong love through old letters.", "A storm destroys a lighthouse.", "A romance between two tourists.", "A famous painter's diary."], answer: 0 },
+    { kind: "event", q: "Why did Nora come to the lighthouse?", choices: ["To take photographs", "To clear it out so the family could sell it", "To meet her grandfather", "To repair the lamp"], answer: 1 },
+    { kind: "event", q: "Who were the letters written to?", choices: ["Nora", "A woman named Hana", "Her grandmother", "An old sailor"], answer: 1 },
+    { kind: "event", q: "What does Nora decide at the end?", choices: ["To sell the lighthouse quickly", "To burn the letters", "To keep the lighthouse and look for Hana", "To move abroad"], answer: 2 },
+    { kind: "vocab", q: "\"Faded\" in the story describes something that has…", choices: ["become brighter", "lost colour with time", "been thrown away", "been painted recently"], answer: 1 },
+    { kind: "vocab", q: "If someone is \"patient,\" they…", choices: ["get angry quickly", "can wait calmly", "are very loud", "are afraid of the dark"], answer: 1 },
+  ],
+};
