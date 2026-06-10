@@ -33,7 +33,6 @@ function QuizPage() {
     setSubmitted(true);
   };
 
-  const score = answers.reduce<number>((acc, a, i) => acc + (a === story.quiz[i].answer ? 1 : 0), 0);
   const allAnswered = answers.every((a) => a !== null);
 
   const saveMissedVocab = () => {
