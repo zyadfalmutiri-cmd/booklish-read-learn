@@ -26,8 +26,9 @@ function QuizPage() {
   const [, setScores] = useLocalStore<ScoreMap>(storeKeys.quizScores, {});
   const [, setVocab] = useLocalStore<SavedWord[]>(storeKeys.vocab, []);
 
+  const score = answers.reduce<number>((acc, a, i) => acc + (a === story.quiz[i].answer ? 1 : 0), 0);
+
   const submit = () => {
-    const score = answers.reduce((acc, a, i) => acc + (a === story.quiz[i].answer ? 1 : 0), 0);
     setScores((prev) => ({ ...prev, [story.slug]: { score, total: story.quiz.length, at: Date.now() } }));
     setSubmitted(true);
   };
