@@ -1,11 +1,12 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { BookmarkPlus, Languages, Sparkles, Loader2 } from "lucide-react";
+import { BookmarkPlus, Languages, Sparkles, Loader2, Check } from "lucide-react";
 import { tokenize, splitSentences } from "@/lib/tokenize";
 import type { Story, VocabEntry } from "@/lib/types";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useSettings } from "./theme";
-import { lookupLocal, lookupAI, preWarmCache, type WordLookup } from "@/lib/lookup";
+import { lookupLocal, lookupAI, preWarmCache, normalizeWord, type WordLookup } from "@/lib/lookup";
+import { recordWordTap } from "@/lib/stats";
 
 interface SavedWord {
   word: string;
@@ -19,10 +20,10 @@ interface SavedWord {
 export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct: number) => void }) {
   const [settings] = useSettings();
   const [vocabList, setVocabList] = useLocalStore<SavedWord[]>(storeKeys.vocab, []);
+  const [tappedWords] = useLocalStore<string[]>(storeKeys.tapped, []);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Pre-warm word cache for the whole story (dictionary + story vocab)
     preWarmCache(story.paragraphs.join(" "), story.vocab);
   }, [story]);
 
@@ -39,12 +40,20 @@ export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct
     return () => window.removeEventListener("scroll", onScroll);
   }, [onScrollPct]);
 
+  const tappedSet = useMemo(() => new Set(tappedWords), [tappedWords]);
+  const savedSet = useMemo(
+    () => new Set(vocabList.map((w) => normalizeWord(w.word))),
+    [vocabList],
+  );
+
   const fontSize = `${settings.fontScale}rem`;
   const showWordsAlways = settings.translateMode === "words";
 
   const saveWord = (word: string, entry: { ar: string; def: string; example: string }) => {
     setVocabList((prev) => {
-      if (prev.some((w) => w.word === word && w.slug === story.slug)) return prev;
+      if (prev.some((w) => normalizeWord(w.word) === normalizeWord(word) && w.slug === story.slug)) {
+        return prev;
+      }
       return [...prev, { word, ...entry, slug: story.slug, at: Date.now() }];
     });
   };
@@ -53,7 +62,7 @@ export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct
     <div ref={containerRef} className="reading-column px-4 pb-24 pt-6 sm:px-0" style={{ fontSize }}>
       <h1 className="mb-2 text-balance text-3xl font-semibold leading-tight sm:text-4xl">{story.title}</h1>
       <p className="mb-8 text-sm font-sans text-muted-foreground">
-        {story.minutes} min · {story.genre} · {story.level}
+        {story.minutes} min read · {story.genre} · {story.level}
       </p>
 
       {story.paragraphs.map((para, pi) => (
@@ -64,6 +73,8 @@ export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct
           translations={story.sentenceTranslations}
           translateMode={settings.translateMode}
           showWordsAlways={showWordsAlways}
+          tappedSet={tappedSet}
+          savedSet={savedSet}
           onSave={saveWord}
         />
       ))}
@@ -71,34 +82,23 @@ export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct
   );
 }
 
-function Paragraph({
-  paragraph,
-  vocab,
-  translations,
-  translateMode,
-  showWordsAlways,
-  onSave,
-}: {
+interface ParagraphProps {
   paragraph: string;
   vocab: Record<string, VocabEntry>;
   translations?: Record<string, string>;
   translateMode: "off" | "words" | "sentences";
   showWordsAlways: boolean;
+  tappedSet: Set<string>;
+  savedSet: Set<string>;
   onSave: (word: string, entry: { ar: string; def: string; example: string }) => void;
-}) {
-  const sentences = useMemo(() => splitSentences(paragraph), [paragraph]);
+}
+
+function Paragraph(props: ParagraphProps) {
+  const sentences = useMemo(() => splitSentences(props.paragraph), [props.paragraph]);
   return (
     <p className="mb-6">
       {sentences.map((s, i) => (
-        <Sentence
-          key={i}
-          sentence={s}
-          vocab={vocab}
-          translation={translations?.[s]}
-          translateMode={translateMode}
-          showWordsAlways={showWordsAlways}
-          onSave={onSave}
-        />
+        <Sentence key={i} sentence={s} {...props} />
       ))}
     </p>
   );
@@ -107,18 +107,13 @@ function Paragraph({
 function Sentence({
   sentence,
   vocab,
-  translation,
+  translations,
   translateMode,
   showWordsAlways,
+  tappedSet,
+  savedSet,
   onSave,
-}: {
-  sentence: string;
-  vocab: Record<string, VocabEntry>;
-  translation?: string;
-  translateMode: "off" | "words" | "sentences";
-  showWordsAlways: boolean;
-  onSave: (word: string, entry: { ar: string; def: string; example: string }) => void;
-}) {
+}: ParagraphProps & { sentence: string }) {
   const tokens = useMemo(() => tokenize(sentence), [sentence]);
   const [revealed, setRevealed] = useState(translateMode === "sentences");
 
@@ -126,18 +121,24 @@ function Sentence({
     setRevealed(translateMode === "sentences");
   }, [translateMode]);
 
+  const translation = translations?.[sentence];
+
   return (
     <span className="group/sentence relative">
       {tokens.map((t, i) => {
         if (t.kind !== "word") return <span key={i}>{t.text}</span>;
-        const hasStoryEntry = Boolean(t.key && vocab[t.key]);
+        const key = t.key ?? "";
+        const hasStoryEntry = Boolean(key && vocab[key]);
         return (
           <WordToken
             key={i}
             word={t.text}
+            normalized={key}
             storyVocab={vocab}
             sentence={sentence}
             highlight={showWordsAlways && hasStoryEntry}
+            tapped={tappedSet.has(key)}
+            saved={savedSet.has(key)}
             onSave={onSave}
           />
         );
@@ -146,7 +147,7 @@ function Sentence({
         type="button"
         aria-label="Translate sentence"
         onClick={() => setRevealed((r) => !r)}
-        className="ml-1 inline-flex h-4 w-4 translate-y-[2px] items-center justify-center rounded text-muted-foreground/50 opacity-0 transition-opacity hover:text-primary group-hover/sentence:opacity-100"
+        className="ml-1 inline-flex h-4 w-4 translate-y-[2px] items-center justify-center rounded text-muted-foreground/50 opacity-0 transition-opacity hover:text-primary focus:opacity-100 group-hover/sentence:opacity-100"
       >
         <Languages className="h-3.5 w-3.5" />
       </button>
@@ -161,15 +162,21 @@ function Sentence({
 
 function WordToken({
   word,
+  normalized,
   storyVocab,
   sentence,
   highlight,
+  tapped,
+  saved,
   onSave,
 }: {
   word: string;
+  normalized: string;
   storyVocab: Record<string, VocabEntry>;
   sentence: string;
   highlight: boolean;
+  tapped: boolean;
+  saved: boolean;
   onSave: (word: string, entry: { ar: string; def: string; example: string }) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -178,6 +185,7 @@ function WordToken({
 
   useEffect(() => {
     if (!open) return;
+    if (normalized) recordWordTap(normalized);
     const local = lookupLocal(word, storyVocab);
     if (local) {
       setResult(local);
@@ -195,7 +203,7 @@ function WordToken({
     return () => {
       cancelled = true;
     };
-  }, [open, word, sentence, storyVocab]);
+  }, [open, word, normalized, sentence, storyVocab]);
 
   const handleSave = () => {
     if (!result) return;
@@ -218,17 +226,27 @@ function WordToken({
             ? "Cached"
             : null;
 
+  const tokenClass = [
+    "word-token",
+    highlight ? "underline decoration-primary/40 decoration-dotted underline-offset-4" : "",
+    saved
+      ? "bg-primary/12 text-primary"
+      : tapped
+        ? "bg-accent/25"
+        : "hover:bg-accent/30",
+    open ? "bg-accent/50" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button
-          type="button"
-          className={`word-token ${highlight ? "underline decoration-primary/40 decoration-dotted underline-offset-4" : ""} ${open ? "bg-accent/40" : "hover:bg-accent/30"}`}
-        >
+        <button type="button" className={tokenClass}>
           {word}
         </button>
       </PopoverTrigger>
-      <PopoverContent side="top" className="w-72 animate-scale-in p-0">
+      <PopoverContent side="top" className="w-72 p-0 shadow-lg data-[state=open]:animate-scale-in">
         <div className="space-y-2 p-4">
           <div className="flex items-baseline justify-between gap-3">
             <span className="font-serif text-lg font-semibold text-foreground">{word}</span>
@@ -262,12 +280,12 @@ function WordToken({
         <div className="flex border-t border-border">
           <button
             type="button"
-            disabled={!result || loading}
+            disabled={!result || loading || saved}
             onClick={handleSave}
             className="flex flex-1 items-center justify-center gap-2 px-3 py-2 text-sm text-primary transition-colors hover:bg-muted disabled:opacity-40"
           >
-            <BookmarkPlus className="h-4 w-4" />
-            Save to vocab
+            {saved ? <Check className="h-4 w-4" /> : <BookmarkPlus className="h-4 w-4" />}
+            {saved ? "Saved" : "Save to vocab"}
           </button>
         </div>
       </PopoverContent>

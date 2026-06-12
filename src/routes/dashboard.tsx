@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Flame, BookOpen, GraduationCap, Sparkles } from "lucide-react";
+import { Flame, BookOpen, GraduationCap, Sparkles, Clock, Hand } from "lucide-react";
 import { stories } from "@/data/stories";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useStreak } from "@/lib/streak";
+import { useStats, formatDuration } from "@/lib/stats";
 
-type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boolean }>;
+type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boolean; readingSeconds?: number }>;
 interface ScoreMap { [slug: string]: { score: number; total: number; at: number } }
 interface SavedWord { word: string; slug: string; at: number }
 
@@ -17,6 +18,7 @@ function Dashboard() {
   const [progress] = useLocalStore<ProgressMap>(storeKeys.progress, {});
   const [scores] = useLocalStore<ScoreMap>(storeKeys.quizScores, {});
   const [vocab] = useLocalStore<SavedWord[]>(storeKeys.vocab, []);
+  const [stats] = useStats();
   const { streak } = useStreak();
 
   const finished = Object.values(progress).filter((p) => p.finished).length;
@@ -26,7 +28,6 @@ function Dashboard() {
     ? Math.round((scoreEntries.reduce((acc, s) => acc + s.score / s.total, 0) / scoreEntries.length) * 100)
     : 0;
 
-  // 14-day activity bars
   const today = new Date();
   const days = Array.from({ length: 14 }).map((_, i) => {
     const d = new Date(today);
@@ -40,11 +41,18 @@ function Dashboard() {
       <h1 className="mb-2 font-serif text-3xl">Your reading</h1>
       <p className="mb-8 text-sm text-muted-foreground">A quiet record of what you've read and learned.</p>
 
-      <section className="mb-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat icon={<Flame className="h-4 w-4" />} label="Current streak" value={`${streak.current} ${streak.current === 1 ? "day" : "days"}`} hint={`Longest: ${streak.longest}`} />
         <Stat icon={<BookOpen className="h-4 w-4" />} label="Stories finished" value={String(finished)} hint={`${stories.length - finished} to go`} />
-        <Stat icon={<Sparkles className="h-4 w-4" />} label="Words saved" value={String(vocab.length)} hint={vocab.length ? "Your vocab list" : "Tap a word to save"} />
-        <Stat icon={<GraduationCap className="h-4 w-4" />} label="Average quiz score" value={scoreEntries.length ? `${avgScorePct}%` : "—"} hint={`${scoreEntries.length} taken`} />
+        <Stat icon={<Sparkles className="h-4 w-4" />} label="Unique words" value={String(stats.uniqueWords.length)} hint={`${vocab.length} saved`} />
+        <Stat icon={<Clock className="h-4 w-4" />} label="Reading time" value={formatDuration(stats.readingSeconds)} hint="Active time only" />
+      </section>
+
+      <section className="mb-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Stat icon={<Hand className="h-4 w-4" />} label="Total taps" value={String(stats.totalTaps)} hint="Words you've looked up" />
+        <Stat icon={<GraduationCap className="h-4 w-4" />} label="Average quiz" value={scoreEntries.length ? `${avgScorePct}%` : "—"} hint={`${scoreEntries.length} taken`} />
+        <Stat icon={<BookOpen className="h-4 w-4" />} label="In progress" value={String(inProgress.length)} hint="Pick one up below" />
+        <Stat icon={<Sparkles className="h-4 w-4" />} label="Words saved" value={String(vocab.length)} hint={vocab.length ? "Open vocab list" : "Tap a word to save"} />
       </section>
 
       <section className="mb-10 rounded-xl border border-border bg-card p-5">
