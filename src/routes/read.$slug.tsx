@@ -1,13 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Minus, Plus, Languages } from "lucide-react";
+import { ArrowLeft, Minus, Plus, Languages, Clock } from "lucide-react";
 import { getStory } from "@/data/stories";
 import { Reader } from "@/components/booklish/reader";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useSettings } from "@/components/booklish/theme";
 import { useStreak } from "@/lib/streak";
+import { useReadingTimer } from "@/lib/stats";
 
-type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boolean }>;
+type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boolean; readingSeconds?: number }>;
 
 export const Route = createFileRoute("/read/$slug")({
   loader: ({ params }) => {
@@ -28,20 +29,26 @@ function ReadPage() {
   const { markActivity } = useStreak();
   const [pct, setPct] = useState(progress[story.slug]?.pct ?? 0);
 
+  useReadingTimer();
+
   useEffect(() => {
     markActivity();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    setProgress((prev) => ({
-      ...prev,
-      [story.slug]: {
-        pct: Math.max(pct, prev[story.slug]?.pct ?? 0),
-        lastAt: Date.now(),
-        finished: (prev[story.slug]?.finished ?? false) || pct >= 95,
-      },
-    }));
+    setProgress((prev) => {
+      const previous = prev[story.slug];
+      return {
+        ...prev,
+        [story.slug]: {
+          pct: Math.max(pct, previous?.pct ?? 0),
+          lastAt: Date.now(),
+          finished: (previous?.finished ?? false) || pct >= 95,
+          readingSeconds: previous?.readingSeconds ?? 0,
+        },
+      };
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pct]);
 
@@ -56,29 +63,33 @@ function ReadPage() {
     setSettings({ ...settings, translateMode: order[(idx + 1) % order.length] });
   };
 
+  const remaining = Math.max(0, Math.round(story.minutes * (1 - pct / 100)));
+
   return (
     <div className="min-h-screen">
-      {/* Reader toolbar */}
       <div className="sticky top-14 z-20 border-b border-border bg-background/85 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl items-center gap-2 px-4 py-2">
+        <div className="mx-auto flex max-w-3xl items-center gap-1.5 px-3 py-2 sm:gap-2 sm:px-4">
           <Link
             to="/story/$slug"
             params={{ slug: story.slug }}
-            className="grid h-8 w-8 place-items-center rounded-full border border-border hover:bg-muted"
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border hover:bg-muted"
             aria-label="Back"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
-          <div className="ml-1 flex-1 truncate text-sm text-muted-foreground">{story.title}</div>
-          <button onClick={() => adjustFont(-0.05)} className="grid h-8 w-8 place-items-center rounded-full border border-border hover:bg-muted" aria-label="Smaller text">
+          <div className="min-w-0 flex-1 truncate text-sm text-muted-foreground">{story.title}</div>
+          <span className="hidden items-center gap-1 text-xs text-muted-foreground sm:inline-flex">
+            <Clock className="h-3 w-3" /> {remaining} min left
+          </span>
+          <button onClick={() => adjustFont(-0.05)} className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border hover:bg-muted" aria-label="Smaller text">
             <Minus className="h-3.5 w-3.5" />
           </button>
-          <button onClick={() => adjustFont(0.05)} className="grid h-8 w-8 place-items-center rounded-full border border-border hover:bg-muted" aria-label="Larger text">
+          <button onClick={() => adjustFont(0.05)} className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border hover:bg-muted" aria-label="Larger text">
             <Plus className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={cycleTranslate}
-            className={`inline-flex h-8 items-center gap-1 rounded-full border px-3 text-xs transition-colors ${
+            className={`inline-flex h-8 shrink-0 items-center gap-1 rounded-full border px-2.5 text-xs transition-colors sm:px-3 ${
               settings.translateMode === "off"
                 ? "border-border hover:bg-muted"
                 : "border-primary bg-primary text-primary-foreground"
@@ -86,7 +97,9 @@ function ReadPage() {
             aria-label="Translation mode"
           >
             <Languages className="h-3.5 w-3.5" />
-            {settings.translateMode === "off" ? "Off" : settings.translateMode === "words" ? "Words" : "Sent."}
+            <span className="hidden sm:inline">
+              {settings.translateMode === "off" ? "Off" : settings.translateMode === "words" ? "Words" : "Sent."}
+            </span>
           </button>
         </div>
         <div className="h-0.5 w-full bg-border/60">

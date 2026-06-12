@@ -1,41 +1,22 @@
 import { useEffect, useState, useCallback } from "react";
+import { activeAdapter } from "./storage/adapter";
 
-const PREFIX = "booklish.";
-
-function read<T>(key: string, fallback: T): T {
-  if (typeof window === "undefined") return fallback;
-  try {
-    const raw = window.localStorage.getItem(PREFIX + key);
-    if (raw == null) return fallback;
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-function write<T>(key: string, value: T) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(PREFIX + key, JSON.stringify(value));
-    window.dispatchEvent(new CustomEvent("booklish:store", { detail: { key } }));
-  } catch {
-    /* ignore */
-  }
-}
-
+/**
+ * React hook backed by the active storage adapter. Components never talk to
+ * localStorage directly — they go through this hook so a future cloud
+ * adapter can plug in without changing UI code.
+ */
 export function useLocalStore<T>(key: string, fallback: T) {
   const [value, setValue] = useState<T>(fallback);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    setValue(read<T>(key, fallback));
+    setValue(activeAdapter.get<T>(key, fallback));
     setHydrated(true);
-    const onChange = (e: Event) => {
-      const detail = (e as CustomEvent).detail as { key: string } | undefined;
-      if (detail?.key === key) setValue(read<T>(key, fallback));
-    };
-    window.addEventListener("booklish:store", onChange);
-    return () => window.removeEventListener("booklish:store", onChange);
+    const unsub = activeAdapter.subscribe(key, () => {
+      setValue(activeAdapter.get<T>(key, fallback));
+    });
+    return unsub;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
@@ -43,7 +24,7 @@ export function useLocalStore<T>(key: string, fallback: T) {
     (v: T | ((prev: T) => T)) => {
       setValue((prev) => {
         const next = typeof v === "function" ? (v as (p: T) => T)(prev) : v;
-        write(key, next);
+        activeAdapter.set(key, next);
         return next;
       });
     },
@@ -54,10 +35,12 @@ export function useLocalStore<T>(key: string, fallback: T) {
 }
 
 export const storeKeys = {
-  progress: "progress", // Record<slug, { pct: number; lastAt: number; finished: boolean }>
-  vocab: "vocab", // Array<{ word: string; ar: string; def: string; example: string; slug: string; at: number }>
-  bookmarks: "bookmarks", // string[] slugs
-  settings: "settings", // { theme: 'light'|'dark'; fontScale: number; translateMode: 'off'|'words'|'sentences' }
-  quizScores: "quizScores", // Record<slug, { score: number; total: number; at: number }>
-  streak: "streak", // { lastDay: string; current: number; longest: number; days: string[] }
+  progress: "progress",     // Record<slug, { pct; lastAt; finished; readingSeconds }>
+  vocab: "vocab",           // SavedWord[]
+  bookmarks: "bookmarks",   // string[] slugs
+  settings: "settings",     // { theme; fontScale; translateMode }
+  quizScores: "quizScores", // Record<slug, { score; total; at }>
+  streak: "streak",         // { lastDay; current; longest; days }
+  stats: "stats",           // { totalTaps; uniqueWords[]; readingSeconds; lastSessionAt }
+  tapped: "tappedWords",    // string[] (normalized word keys)
 } as const;
