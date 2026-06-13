@@ -13,6 +13,7 @@ const genreLabel: Record<Story["genre"], string> = {
   "sci-fi": "Sci-Fi",
   adventure: "Adventure",
   drama: "Drama",
+  "non-fiction": "Non-Fiction",
 };
 
 export function StoryCard({ story }: { story: Story }) {
