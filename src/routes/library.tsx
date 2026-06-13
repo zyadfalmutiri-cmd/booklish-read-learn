@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { stories } from "@/data/stories";
 import { StoryCard, genreLabel, levelLabel } from "@/components/booklish/story-card";
-import type { Genre, Level } from "@/lib/types";
+import type { Category, Genre, Level } from "@/lib/types";
 
 export const Route = createFileRoute("/library")({
   head: () => ({
@@ -15,12 +15,18 @@ export const Route = createFileRoute("/library")({
   component: Library,
 });
 
-const GENRES: Genre[] = ["mystery", "romance", "sci-fi", "adventure", "drama"];
+const GENRES: Genre[] = ["mystery", "romance", "sci-fi", "adventure", "drama", "non-fiction"];
 const LEVELS: Level[] = ["beginner", "intermediate", "advanced"];
+const CATEGORIES: { value: Category; label: string }[] = [
+  { value: "short", label: "Short" },
+  { value: "fiction", label: "Fiction" },
+  { value: "non-fiction", label: "Non-Fiction" },
+];
 
 function Library() {
   const [genre, setGenre] = useState<Genre | "all">("all");
   const [level, setLevel] = useState<Level | "all">("all");
+  const [category, setCategory] = useState<Category | "all">("all");
   const [q, setQ] = useState("");
 
   const filtered = useMemo(() => {
