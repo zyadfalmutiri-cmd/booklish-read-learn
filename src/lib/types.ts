@@ -27,5 +27,6 @@ export interface Story {
   paragraphs: string[];
   vocab: Record<string, VocabEntry>;
   sentenceTranslations?: Record<string, string>;
+  tags?: Category[];
   quiz: QuizQuestion[];
 }
