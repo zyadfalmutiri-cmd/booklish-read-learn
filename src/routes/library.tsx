@@ -71,6 +71,14 @@ function Library() {
             </FilterChip>
           ))}
         </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <FilterChip active={category === "all"} onClick={() => setCategory("all")}>All types</FilterChip>
+          {CATEGORIES.map((c) => (
+            <FilterChip key={c.value} active={category === c.value} onClick={() => setCategory(c.value)}>
+              {c.label}
+            </FilterChip>
+          ))}
+        </div>
       </div>
 
       {filtered.length === 0 ? (
