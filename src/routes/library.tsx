@@ -34,9 +34,10 @@ function Library() {
     return stories.filter((s) =>
       (genre === "all" || s.genre === genre) &&
       (level === "all" || s.level === level) &&
+      (category === "all" || (s.tags ?? []).includes(category)) &&
       (term === "" || s.title.toLowerCase().includes(term) || s.blurb.toLowerCase().includes(term))
     );
-  }, [genre, level, q]);
+  }, [genre, level, category, q]);
 
   return (
     <main className="mx-auto max-w-5xl px-4 pb-24 pt-8">
