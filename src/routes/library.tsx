@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { stories } from "@/data/stories";
 import { StoryCard, genreLabel, levelLabel } from "@/components/booklish/story-card";
-import type { Genre, Level } from "@/lib/types";
+import type { Category, Genre, Level } from "@/lib/types";
 
 export const Route = createFileRoute("/library")({
   head: () => ({
@@ -15,12 +15,18 @@ export const Route = createFileRoute("/library")({
   component: Library,
 });
 
-const GENRES: Genre[] = ["mystery", "romance", "sci-fi", "adventure", "drama"];
+const GENRES: Genre[] = ["mystery", "romance", "sci-fi", "adventure", "drama", "non-fiction"];
 const LEVELS: Level[] = ["beginner", "intermediate", "advanced"];
+const CATEGORIES: { value: Category; label: string }[] = [
+  { value: "short", label: "Short" },
+  { value: "fiction", label: "Fiction" },
+  { value: "non-fiction", label: "Non-Fiction" },
+];
 
 function Library() {
   const [genre, setGenre] = useState<Genre | "all">("all");
   const [level, setLevel] = useState<Level | "all">("all");
+  const [category, setCategory] = useState<Category | "all">("all");
   const [q, setQ] = useState("");
 
   const filtered = useMemo(() => {
@@ -28,9 +34,10 @@ function Library() {
     return stories.filter((s) =>
       (genre === "all" || s.genre === genre) &&
       (level === "all" || s.level === level) &&
+      (category === "all" || (s.tags ?? []).includes(category)) &&
       (term === "" || s.title.toLowerCase().includes(term) || s.blurb.toLowerCase().includes(term))
     );
-  }, [genre, level, q]);
+  }, [genre, level, category, q]);
 
   return (
     <main className="mx-auto max-w-5xl px-4 pb-24 pt-8">
@@ -61,6 +68,14 @@ function Library() {
           {LEVELS.map((l) => (
             <FilterChip key={l} active={level === l} onClick={() => setLevel(l)}>
               {levelLabel[l]}
+            </FilterChip>
+          ))}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <FilterChip active={category === "all"} onClick={() => setCategory("all")}>All types</FilterChip>
+          {CATEGORIES.map((c) => (
+            <FilterChip key={c.value} active={category === c.value} onClick={() => setCategory(c.value)}>
+              {c.label}
             </FilterChip>
           ))}
         </div>

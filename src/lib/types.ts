@@ -1,5 +1,6 @@
 export type Level = "beginner" | "intermediate" | "advanced";
-export type Genre = "mystery" | "romance" | "sci-fi" | "adventure" | "drama";
+export type Genre = "mystery" | "romance" | "sci-fi" | "adventure" | "drama" | "non-fiction";
+export type Category = "short" | "fiction" | "non-fiction";
 
 export interface VocabEntry {
   ar: string;
@@ -26,5 +27,6 @@ export interface Story {
   paragraphs: string[];
   vocab: Record<string, VocabEntry>;
   sentenceTranslations?: Record<string, string>;
+  tags?: Category[];
   quiz: QuizQuestion[];
 }
