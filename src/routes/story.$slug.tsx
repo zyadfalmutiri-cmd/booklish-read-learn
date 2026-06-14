@@ -46,39 +46,42 @@ function StoryDetail() {
         <span aria-hidden>·</span>
         <span>{levelLabel[story.level]}</span>
         <span aria-hidden>·</span>
-        <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" /> {story.minutes} min</span>
+        <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" /> {story.minutes} دقيقة</span>
       </div>
 
       <h1 className="mb-4 font-serif text-3xl leading-tight sm:text-4xl">{story.title}</h1>
-      <p className="mb-8 text-base text-muted-foreground">{story.blurb}</p>
+      <p className="mb-8 text-base text-muted-foreground text-right" dir="rtl">{story.blurb}</p>
 
       <div className="mb-10 flex flex-wrap items-center gap-3">
         <Link
           to="/read/$slug"
           params={{ slug: story.slug }}
           className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          dir="rtl"
         >
-          {pct > 0 ? `Continue reading (${pct}%)` : "Start reading"} <ArrowRight className="h-4 w-4" />
+          {pct > 0 ? `متابعة القراءة (${pct}%)` : "ابدأ القراءة"} <ArrowRight className="h-4 w-4 rotate-180" />
         </Link>
         <button
           onClick={toggle}
           className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm transition-colors hover:bg-muted"
+          dir="rtl"
         >
-          {saved ? <><BookmarkCheck className="h-4 w-4 text-primary" /> Saved</> : <><Bookmark className="h-4 w-4" /> Bookmark</>}
+          {saved ? <><BookmarkCheck className="h-4 w-4 text-primary" /> تم الحفظ</> : <><Bookmark className="h-4 w-4" /> حفظ القصة</>}
         </button>
         {pct >= 80 && (
           <Link
             to="/quiz/$slug"
             params={{ slug: story.slug }}
             className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm transition-colors hover:bg-muted"
+            dir="rtl"
           >
-            Take quiz
+            أداء الاختبار
           </Link>
         )}
       </div>
 
       <section>
-        <h2 className="mb-3 font-serif text-lg">Key vocabulary in this story</h2>
+        <h2 className="mb-3 font-serif text-lg text-right" dir="rtl">أهم المفردات في هذه القصة</h2>
         <ul className="grid gap-2 sm:grid-cols-2">
           {vocabSample.map(([word, v]) => (
             <li key={word} className="rounded-lg border border-border bg-card p-3">
