@@ -18,9 +18,9 @@ export const Route = createFileRoute("/library")({
 const GENRES: Genre[] = ["mystery", "romance", "sci-fi", "adventure", "drama", "non-fiction"];
 const LEVELS: Level[] = ["beginner", "intermediate", "advanced"];
 const CATEGORIES: { value: Category; label: string }[] = [
-  { value: "short", label: "Short" },
-  { value: "fiction", label: "Fiction" },
-  { value: "non-fiction", label: "Non-Fiction" },
+  { value: "short", label: "قصيرة" },
+  { value: "fiction", label: "خيال" },
+  { value: "non-fiction", label: "واقعية" },
 ];
 
 function Library() {
@@ -43,36 +43,44 @@ function Library() {
     <main className="mx-auto max-w-5xl px-4 pb-24 pt-8">
       <div className="mb-8 flex flex-col gap-4">
         <div>
-          <h1 className="font-serif text-3xl">Library</h1>
-          <p className="text-sm text-muted-foreground">{stories.length} stories across genres and reading levels.</p>
+          <h1 className="font-serif text-3xl text-right" dir="rtl">المكتبة</h1>
+          <p className="text-sm text-muted-foreground text-right" dir="rtl">{stories.length} قصة بمختلف التصنيفات والمستويات.</p>
         </div>
         <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search stories…"
-            className="w-full rounded-lg border border-border bg-card py-2.5 pl-9 pr-3 text-sm outline-none ring-ring/50 focus:ring-2"
+            placeholder="ابحث عن قصة..."
+            dir="rtl"
+            className="w-full rounded-lg border border-border bg-card py-2.5 pr-9 pl-3 text-sm outline-none ring-ring/50 focus:ring-2 text-right"
           />
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <FilterChip active={genre === "all"} onClick={() => setGenre("all")}>All genres</FilterChip>
+        <div className="flex flex-wrap items-center gap-2 justify-end" dir="rtl">
+          <FilterChip active={genre === "all"} onClick={() => setGenre("all")}>كل التصنيفات</FilterChip>
           {GENRES.map((g) => (
             <FilterChip key={g} active={genre === g} onClick={() => setGenre(g)}>
-              {genreLabel[g]}
+              {genreLabel[g] === "Mystery" ? "غموض" : 
+               genreLabel[g] === "Romance" ? "رومانسية" :
+               genreLabel[g] === "Sci-Fi" ? "خيال علمي" :
+               genreLabel[g] === "Adventure" ? "مغامرة" :
+               genreLabel[g] === "Drama" ? "دراما" :
+               genreLabel[g] === "Non-Fiction" ? "واقعي" : genreLabel[g]}
             </FilterChip>
           ))}
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <FilterChip active={level === "all"} onClick={() => setLevel("all")}>All levels</FilterChip>
+        <div className="flex flex-wrap items-center gap-2 justify-end" dir="rtl">
+          <FilterChip active={level === "all"} onClick={() => setLevel("all")}>كل المستويات</FilterChip>
           {LEVELS.map((l) => (
             <FilterChip key={l} active={level === l} onClick={() => setLevel(l)}>
-              {levelLabel[l]}
+              {levelLabel[l] === "Beginner" ? "مبتدئ" :
+               levelLabel[l] === "Intermediate" ? "متوسط" :
+               levelLabel[l] === "Advanced" ? "متقدم" : levelLabel[l]}
             </FilterChip>
           ))}
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <FilterChip active={category === "all"} onClick={() => setCategory("all")}>All types</FilterChip>
+        <div className="flex flex-wrap items-center gap-2 justify-end" dir="rtl">
+          <FilterChip active={category === "all"} onClick={() => setCategory("all")}>كل الأنواع</FilterChip>
           {CATEGORIES.map((c) => (
             <FilterChip key={c.value} active={category === c.value} onClick={() => setCategory(c.value)}>
               {c.label}
@@ -82,7 +90,7 @@ function Library() {
       </div>
 
       {filtered.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">No stories match those filters yet.</p>
+        <p className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground" dir="rtl">لا توجد قصص تطابق هذه الفلاتر حالياً.</p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((s) => <StoryCard key={s.slug} story={s} />)}
