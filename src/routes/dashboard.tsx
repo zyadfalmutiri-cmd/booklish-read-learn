@@ -38,25 +38,25 @@ function Dashboard() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 pb-24 pt-8">
-      <h1 className="mb-2 font-serif text-3xl">Your reading</h1>
-      <p className="mb-8 text-sm text-muted-foreground">A quiet record of what you've read and learned.</p>
+      <h1 className="mb-2 font-serif text-3xl text-right" dir="rtl">سجل القراءة</h1>
+      <p className="mb-8 text-sm text-muted-foreground text-right" dir="rtl">سجل هادئ لما قرأته وتعلمته.</p>
 
       <section className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat icon={<Flame className="h-4 w-4" />} label="Current streak" value={`${streak.current} ${streak.current === 1 ? "day" : "days"}`} hint={`Longest: ${streak.longest}`} />
-        <Stat icon={<BookOpen className="h-4 w-4" />} label="Stories finished" value={String(finished)} hint={`${stories.length - finished} to go`} />
-        <Stat icon={<Sparkles className="h-4 w-4" />} label="Unique words" value={String(stats.uniqueWords.length)} hint={`${vocab.length} saved`} />
-        <Stat icon={<Clock className="h-4 w-4" />} label="Reading time" value={formatDuration(stats.readingSeconds)} hint="Active time only" />
+        <Stat icon={<Flame className="h-4 w-4" />} label="أيام متتالية" value={`${streak.current} ${streak.current === 1 ? "يوم" : "أيام"}`} hint={`الأطول: ${streak.longest}`} />
+        <Stat icon={<BookOpen className="h-4 w-4" />} label="قصص مكتملة" value={String(finished)} hint={`بقي ${stories.length - finished} قصص`} />
+        <Stat icon={<Sparkles className="h-4 w-4" />} label="كلمات فريدة" value={String(stats.uniqueWords.length)} hint={`${vocab.length} محفوظة`} />
+        <Stat icon={<Clock className="h-4 w-4" />} label="وقت القراءة" value={formatDuration(stats.readingSeconds)} hint="الوقت النشط فقط" />
       </section>
 
       <section className="mb-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat icon={<Hand className="h-4 w-4" />} label="Total taps" value={String(stats.totalTaps)} hint="Words you've looked up" />
-        <Stat icon={<GraduationCap className="h-4 w-4" />} label="Average quiz" value={scoreEntries.length ? `${avgScorePct}%` : "—"} hint={`${scoreEntries.length} taken`} />
-        <Stat icon={<BookOpen className="h-4 w-4" />} label="In progress" value={String(inProgress.length)} hint="Pick one up below" />
-        <Stat icon={<Sparkles className="h-4 w-4" />} label="Words saved" value={String(vocab.length)} hint={vocab.length ? "Open vocab list" : "Tap a word to save"} />
+        <Stat icon={<Hand className="h-4 w-4" />} label="إجمالي النقرات" value={String(stats.totalTaps)} hint="كلمات بحثت عنها" />
+        <Stat icon={<GraduationCap className="h-4 w-4" />} label="متوسط الاختبار" value={scoreEntries.length ? `${avgScorePct}%` : "—"} hint={`أديت ${scoreEntries.length} اختباراً`} />
+        <Stat icon={<BookOpen className="h-4 w-4" />} label="قيد القراءة" value={String(inProgress.length)} hint="تابع إحداها بالأسفل" />
+        <Stat icon={<Sparkles className="h-4 w-4" />} label="كلمات محفوظة" value={String(vocab.length)} hint={vocab.length ? "افتح القائمة" : "انقر لحفظ كلمة"} />
       </section>
 
       <section className="mb-10 rounded-xl border border-border bg-card p-5">
-        <h2 className="mb-4 font-serif text-lg">Last 14 days</h2>
+        <h2 className="mb-4 font-serif text-lg text-right" dir="rtl">آخر 14 يوماً</h2>
         <div className="flex items-end gap-1.5">
           {days.map((d) => (
             <div key={d.key} className="flex flex-1 flex-col items-center gap-1">
@@ -69,7 +69,7 @@ function Dashboard() {
 
       {inProgress.length > 0 && (
         <section className="mb-10">
-          <h2 className="mb-3 font-serif text-lg">In progress</h2>
+          <h2 className="mb-3 font-serif text-lg text-right" dir="rtl">قيد القراءة</h2>
           <ul className="space-y-2">
             {inProgress.map(([slug, p]) => {
               const s = stories.find((x) => x.slug === slug);
@@ -99,7 +99,7 @@ function Dashboard() {
 
       {scoreEntries.length > 0 && (
         <section>
-          <h2 className="mb-3 font-serif text-lg">Quiz history</h2>
+          <h2 className="mb-3 font-serif text-lg text-right" dir="rtl">سجل الاختبارات</h2>
           <ul className="divide-y divide-border rounded-xl border border-border bg-card">
             {Object.entries(scores)
               .sort((a, b) => b[1].at - a[1].at)
