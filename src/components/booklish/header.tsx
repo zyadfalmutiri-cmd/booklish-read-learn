@@ -15,9 +15,9 @@ export function Header() {
           <span>Booklish</span>
         </Link>
         <nav className="ml-2 flex flex-1 items-center gap-1 text-sm sm:gap-4 sm:text-[15px]">
-          <NavItem to="/library">Library</NavItem>
-          <NavItem to="/dashboard">Dashboard</NavItem>
-          <NavItem to="/vocab">Vocab</NavItem>
+          <NavItem to="/library">المكتبة</NavItem>
+          <NavItem to="/dashboard">الإحصائيات</NavItem>
+          <NavItem to="/vocab">كلماتي</NavItem>
         </nav>
         <button
           aria-label="Toggle theme"
