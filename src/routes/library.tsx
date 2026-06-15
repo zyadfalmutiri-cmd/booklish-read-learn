@@ -2,8 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { stories } from "@/data/stories";
-import { StoryCard, genreLabel, levelLabel } from "@/components/booklish/story-card";
+import { StoryCard } from "@/components/booklish/story-card";
 import type { Category, Genre, Level } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
 export const Route = createFileRoute("/library")({
   head: () => ({
@@ -17,13 +18,10 @@ export const Route = createFileRoute("/library")({
 
 const GENRES: Genre[] = ["mystery", "romance", "sci-fi", "adventure", "drama", "non-fiction"];
 const LEVELS: Level[] = ["beginner", "intermediate", "advanced"];
-const CATEGORIES: { value: Category; label: string }[] = [
-  { value: "short", label: "قصيرة" },
-  { value: "fiction", label: "خيال" },
-  { value: "non-fiction", label: "واقعية" },
-];
+const CATEGORIES: Category[] = ["short", "fiction", "non-fiction"];
 
 function Library() {
+  const { t, dir } = useT();
   const [genre, setGenre] = useState<Genre | "all">("all");
   const [level, setLevel] = useState<Level | "all">("all");
   const [category, setCategory] = useState<Category | "all">("all");
@@ -39,58 +37,52 @@ function Library() {
     );
   }, [genre, level, category, q]);
 
+  const isRtl = dir === "rtl";
+
   return (
     <main className="mx-auto max-w-5xl px-4 pb-24 pt-8">
       <div className="mb-8 flex flex-col gap-4">
         <div>
-          <h1 className="font-serif text-3xl text-right" dir="rtl">المكتبة</h1>
-          <p className="text-sm text-muted-foreground text-right" dir="rtl">{stories.length} قصة بمختلف التصنيفات والمستويات.</p>
+          <h1 className="font-serif text-3xl">{t("library.title")}</h1>
+          <p className="text-sm text-muted-foreground">{stories.length} {t("library.subtitle")}</p>
         </div>
         <div className="relative">
-          <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className={`pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground ${isRtl ? "right-3" : "left-3"}`} />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="ابحث عن قصة..."
-            dir="rtl"
-            className="w-full rounded-lg border border-border bg-card py-2.5 pr-9 pl-3 text-sm outline-none ring-ring/50 focus:ring-2 text-right"
+            placeholder={t("common.searchPlaceholder")}
+            className={`w-full rounded-lg border border-border bg-card py-2.5 text-sm outline-none ring-ring/50 focus:ring-2 ${isRtl ? "pr-9 pl-3 text-right" : "pl-9 pr-3 text-left"}`}
           />
         </div>
-        <div className="flex flex-wrap items-center gap-2 justify-end" dir="rtl">
-          <FilterChip active={genre === "all"} onClick={() => setGenre("all")}>كل التصنيفات</FilterChip>
+        <div className={`flex flex-wrap items-center gap-2 ${isRtl ? "justify-end" : "justify-start"}`}>
+          <FilterChip active={genre === "all"} onClick={() => setGenre("all")}>{t("common.allCategories")}</FilterChip>
           {GENRES.map((g) => (
             <FilterChip key={g} active={genre === g} onClick={() => setGenre(g)}>
-              {genreLabel[g] === "Mystery" ? "غموض" : 
-               genreLabel[g] === "Romance" ? "رومانسية" :
-               genreLabel[g] === "Sci-Fi" ? "خيال علمي" :
-               genreLabel[g] === "Adventure" ? "مغامرة" :
-               genreLabel[g] === "Drama" ? "دراما" :
-               genreLabel[g] === "Non-Fiction" ? "واقعي" : genreLabel[g]}
+              {t(`genre.${g}`)}
             </FilterChip>
           ))}
         </div>
-        <div className="flex flex-wrap items-center gap-2 justify-end" dir="rtl">
-          <FilterChip active={level === "all"} onClick={() => setLevel("all")}>كل المستويات</FilterChip>
+        <div className={`flex flex-wrap items-center gap-2 ${isRtl ? "justify-end" : "justify-start"}`}>
+          <FilterChip active={level === "all"} onClick={() => setLevel("all")}>{t("common.allLevels")}</FilterChip>
           {LEVELS.map((l) => (
             <FilterChip key={l} active={level === l} onClick={() => setLevel(l)}>
-              {levelLabel[l] === "Beginner" ? "مبتدئ" :
-               levelLabel[l] === "Intermediate" ? "متوسط" :
-               levelLabel[l] === "Advanced" ? "متقدم" : levelLabel[l]}
+              {t(`level.${l}`)}
             </FilterChip>
           ))}
         </div>
-        <div className="flex flex-wrap items-center gap-2 justify-end" dir="rtl">
-          <FilterChip active={category === "all"} onClick={() => setCategory("all")}>كل الأنواع</FilterChip>
+        <div className={`flex flex-wrap items-center gap-2 ${isRtl ? "justify-end" : "justify-start"}`}>
+          <FilterChip active={category === "all"} onClick={() => setCategory("all")}>{t("common.allTypes")}</FilterChip>
           {CATEGORIES.map((c) => (
-            <FilterChip key={c.value} active={category === c.value} onClick={() => setCategory(c.value)}>
-              {c.label}
+            <FilterChip key={c} active={category === c} onClick={() => setCategory(c)}>
+              {t(`category.${c}`)}
             </FilterChip>
           ))}
         </div>
       </div>
 
       {filtered.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground" dir="rtl">لا توجد قصص تطابق هذه الفلاتر حالياً.</p>
+        <p className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">{t("common.noMatch")}</p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((s) => <StoryCard key={s.slug} story={s} />)}

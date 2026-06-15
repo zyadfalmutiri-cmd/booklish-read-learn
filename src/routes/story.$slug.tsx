@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Bookmark, BookmarkCheck, Clock, ArrowRight } from "lucide-react";
 import { getStory } from "@/data/stories";
 import { useLocalStore, storeKeys } from "@/lib/store";
-import { genreLabel, levelLabel } from "@/components/booklish/story-card";
+import { useT } from "@/lib/i18n";
 
 type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boolean }>;
 
@@ -27,8 +27,10 @@ function StoryDetail() {
   const { story } = Route.useLoaderData() as { story: import("@/lib/types").Story };
   const [bookmarks, setBookmarks] = useLocalStore<string[]>(storeKeys.bookmarks, []);
   const [progress] = useLocalStore<ProgressMap>(storeKeys.progress, {});
+  const { t, dir } = useT();
   const saved = bookmarks.includes(story.slug);
   const pct = progress[story.slug]?.pct ?? 0;
+  const arrowClass = dir === "rtl" ? "h-4 w-4 rotate-180" : "h-4 w-4";
 
   const toggle = () =>
     setBookmarks((prev) => (prev.includes(story.slug) ? prev.filter((s) => s !== story.slug) : [...prev, story.slug]));
@@ -42,46 +44,43 @@ function StoryDetail() {
       </div>
 
       <div className="mb-2 flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
-        <span>{genreLabel[story.genre]}</span>
+        <span>{t(`genre.${story.genre}`)}</span>
         <span aria-hidden>·</span>
-        <span>{levelLabel[story.level]}</span>
+        <span>{t(`level.${story.level}`)}</span>
         <span aria-hidden>·</span>
-        <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" /> {story.minutes} دقيقة</span>
+        <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" /> {story.minutes} {t("common.minutes")}</span>
       </div>
 
       <h1 className="mb-4 font-serif text-3xl leading-tight sm:text-4xl">{story.title}</h1>
-      <p className="mb-8 text-base text-muted-foreground text-right" dir="rtl">{story.blurb}</p>
+      <p className="mb-8 text-base text-muted-foreground">{story.blurb}</p>
 
       <div className="mb-10 flex flex-wrap items-center gap-3">
         <Link
           to="/read/$slug"
           params={{ slug: story.slug }}
           className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          dir="rtl"
         >
-          {pct > 0 ? `متابعة القراءة (${pct}%)` : "ابدأ القراءة"} <ArrowRight className="h-4 w-4 rotate-180" />
+          {pct > 0 ? `${t("story.continue")} (${pct}%)` : t("story.start")} <ArrowRight className={arrowClass} />
         </Link>
         <button
           onClick={toggle}
           className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm transition-colors hover:bg-muted"
-          dir="rtl"
         >
-          {saved ? <><BookmarkCheck className="h-4 w-4 text-primary" /> تم الحفظ</> : <><Bookmark className="h-4 w-4" /> حفظ القصة</>}
+          {saved ? <><BookmarkCheck className="h-4 w-4 text-primary" /> {t("story.bookmarked")}</> : <><Bookmark className="h-4 w-4" /> {t("story.bookmark")}</>}
         </button>
         {pct >= 80 && (
           <Link
             to="/quiz/$slug"
             params={{ slug: story.slug }}
             className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm transition-colors hover:bg-muted"
-            dir="rtl"
           >
-            أداء الاختبار
+            {t("story.takeQuiz")}
           </Link>
         )}
       </div>
 
       <section>
-        <h2 className="mb-3 font-serif text-lg text-right" dir="rtl">أهم المفردات في هذه القصة</h2>
+        <h2 className="mb-3 font-serif text-lg">{t("story.keyVocab")}</h2>
         <ul className="grid gap-2 sm:grid-cols-2">
           {vocabSample.map(([word, v]) => (
             <li key={word} className="rounded-lg border border-border bg-card p-3">

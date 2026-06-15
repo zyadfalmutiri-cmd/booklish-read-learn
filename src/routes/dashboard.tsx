@@ -4,6 +4,7 @@ import { stories } from "@/data/stories";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useStreak } from "@/lib/streak";
 import { useStats, formatDuration } from "@/lib/stats";
+import { useT } from "@/lib/i18n";
 
 type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boolean; readingSeconds?: number }>;
 interface ScoreMap { [slug: string]: { score: number; total: number; at: number } }
@@ -20,6 +21,7 @@ function Dashboard() {
   const [vocab] = useLocalStore<SavedWord[]>(storeKeys.vocab, []);
   const [stats] = useStats();
   const { streak } = useStreak();
+  const { t } = useT();
 
   const finished = Object.values(progress).filter((p) => p.finished).length;
   const inProgress = Object.entries(progress).filter(([, p]) => !p.finished && p.pct > 0);
@@ -38,25 +40,25 @@ function Dashboard() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 pb-24 pt-8">
-      <h1 className="mb-2 font-serif text-3xl text-right" dir="rtl">سجل القراءة</h1>
-      <p className="mb-8 text-sm text-muted-foreground text-right" dir="rtl">سجل هادئ لما قرأته وتعلمته.</p>
+      <h1 className="mb-2 font-serif text-3xl">{t("dash.title")}</h1>
+      <p className="mb-8 text-sm text-muted-foreground">{t("dash.subtitle")}</p>
 
       <section className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat icon={<Flame className="h-4 w-4" />} label="أيام متتالية" value={`${streak.current} ${streak.current === 1 ? "يوم" : "أيام"}`} hint={`الأطول: ${streak.longest}`} />
-        <Stat icon={<BookOpen className="h-4 w-4" />} label="قصص مكتملة" value={String(finished)} hint={`بقي ${stories.length - finished} قصص`} />
-        <Stat icon={<Sparkles className="h-4 w-4" />} label="كلمات فريدة" value={String(stats.uniqueWords.length)} hint={`${vocab.length} محفوظة`} />
-        <Stat icon={<Clock className="h-4 w-4" />} label="وقت القراءة" value={formatDuration(stats.readingSeconds)} hint="الوقت النشط فقط" />
+        <Stat icon={<Flame className="h-4 w-4" />} label={t("dash.streakDays")} value={`${streak.current} ${streak.current === 1 ? t("common.day") : t("common.days")}`} hint={`${t("dash.longest")}: ${streak.longest}`} />
+        <Stat icon={<BookOpen className="h-4 w-4" />} label={t("dash.finished")} value={String(finished)} hint={`${stories.length - finished} ${t("dash.remaining")}`} />
+        <Stat icon={<Sparkles className="h-4 w-4" />} label={t("dash.uniqueWords")} value={String(stats.uniqueWords.length)} hint={`${vocab.length} ${t("dash.saved")}`} />
+        <Stat icon={<Clock className="h-4 w-4" />} label={t("dash.readingTime")} value={formatDuration(stats.readingSeconds)} hint={t("dash.activeOnly")} />
       </section>
 
       <section className="mb-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat icon={<Hand className="h-4 w-4" />} label="إجمالي النقرات" value={String(stats.totalTaps)} hint="كلمات بحثت عنها" />
-        <Stat icon={<GraduationCap className="h-4 w-4" />} label="متوسط الاختبار" value={scoreEntries.length ? `${avgScorePct}%` : "—"} hint={`أديت ${scoreEntries.length} اختباراً`} />
-        <Stat icon={<BookOpen className="h-4 w-4" />} label="قيد القراءة" value={String(inProgress.length)} hint="تابع إحداها بالأسفل" />
-        <Stat icon={<Sparkles className="h-4 w-4" />} label="كلمات محفوظة" value={String(vocab.length)} hint={vocab.length ? "افتح القائمة" : "انقر لحفظ كلمة"} />
+        <Stat icon={<Hand className="h-4 w-4" />} label={t("dash.totalTaps")} value={String(stats.totalTaps)} hint={t("dash.tapsHint")} />
+        <Stat icon={<GraduationCap className="h-4 w-4" />} label={t("dash.quizAvg")} value={scoreEntries.length ? `${avgScorePct}%` : "—"} hint={`${t("dash.tookN")} ${scoreEntries.length} ${t("dash.attempts")}`} />
+        <Stat icon={<BookOpen className="h-4 w-4" />} label={t("dash.inProgress")} value={String(inProgress.length)} hint={t("dash.continueBelow")} />
+        <Stat icon={<Sparkles className="h-4 w-4" />} label={t("dash.savedWords")} value={String(vocab.length)} hint={vocab.length ? t("dash.openList") : t("dash.tapToSave")} />
       </section>
 
       <section className="mb-10 rounded-xl border border-border bg-card p-5">
-        <h2 className="mb-4 font-serif text-lg text-right" dir="rtl">آخر 14 يوماً</h2>
+        <h2 className="mb-4 font-serif text-lg">{t("dash.last14")}</h2>
         <div className="flex items-end gap-1.5">
           {days.map((d) => (
             <div key={d.key} className="flex flex-1 flex-col items-center gap-1">
@@ -69,7 +71,7 @@ function Dashboard() {
 
       {inProgress.length > 0 && (
         <section className="mb-10">
-          <h2 className="mb-3 font-serif text-lg text-right" dir="rtl">قيد القراءة</h2>
+          <h2 className="mb-3 font-serif text-lg">{t("dash.inProgress")}</h2>
           <ul className="space-y-2">
             {inProgress.map(([slug, p]) => {
               const s = stories.find((x) => x.slug === slug);
@@ -99,7 +101,7 @@ function Dashboard() {
 
       {scoreEntries.length > 0 && (
         <section>
-          <h2 className="mb-3 font-serif text-lg text-right" dir="rtl">سجل الاختبارات</h2>
+          <h2 className="mb-3 font-serif text-lg">{t("dash.quizHistory")}</h2>
           <ul className="divide-y divide-border rounded-xl border border-border bg-card">
             {Object.entries(scores)
               .sort((a, b) => b[1].at - a[1].at)

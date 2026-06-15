@@ -1,22 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import type { Story } from "@/lib/types";
-
-const levelLabel: Record<Story["level"], string> = {
-  beginner: "Beginner",
-  intermediate: "Intermediate",
-  advanced: "Advanced",
-};
-
-const genreLabel: Record<Story["genre"], string> = {
-  mystery: "Mystery",
-  romance: "Romance",
-  "sci-fi": "Sci-Fi",
-  adventure: "Adventure",
-  drama: "Drama",
-  "non-fiction": "Non-Fiction",
-};
+import { useT } from "@/lib/i18n";
 
 export function StoryCard({ story }: { story: Story }) {
+  const { t } = useT();
   return (
     <Link
       to="/story/$slug"
@@ -28,11 +15,11 @@ export function StoryCard({ story }: { story: Story }) {
       </div>
       <div className="space-y-2 p-4">
         <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
-          <span>{genreLabel[story.genre]}</span>
+          <span>{t(`genre.${story.genre}`)}</span>
           <span aria-hidden>·</span>
-          <span>{levelLabel[story.level]}</span>
+          <span>{t(`level.${story.level}`)}</span>
           <span aria-hidden>·</span>
-          <span>{story.minutes} min</span>
+          <span>{story.minutes} {t("common.minutes")}</span>
         </div>
         <h3 className="font-serif text-lg leading-snug text-foreground group-hover:text-primary">{story.title}</h3>
         <p className="line-clamp-2 text-sm text-muted-foreground">{story.blurb}</p>
@@ -41,4 +28,17 @@ export function StoryCard({ story }: { story: Story }) {
   );
 }
 
-export { genreLabel, levelLabel };
+// Legacy English-only labels still referenced by a couple of files.
+export const genreLabel: Record<Story["genre"], string> = {
+  mystery: "Mystery",
+  romance: "Romance",
+  "sci-fi": "Sci-Fi",
+  adventure: "Adventure",
+  drama: "Drama",
+  "non-fiction": "Non-Fiction",
+};
+export const levelLabel: Record<Story["level"], string> = {
+  beginner: "Beginner",
+  intermediate: "Intermediate",
+  advanced: "Advanced",
+};
