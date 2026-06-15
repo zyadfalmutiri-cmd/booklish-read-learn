@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VocabRouteImport } from './routes/vocab'
+import { Route as ReviewRouteImport } from './routes/review'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
@@ -20,6 +21,11 @@ import { Route as QuizSlugRouteImport } from './routes/quiz.$slug'
 const VocabRoute = VocabRouteImport.update({
   id: '/vocab',
   path: '/vocab',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReviewRoute = ReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LibraryRoute = LibraryRouteImport.update({
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/library': typeof LibraryRoute
+  '/review': typeof ReviewRoute
   '/vocab': typeof VocabRoute
   '/quiz/$slug': typeof QuizSlugRoute
   '/read/$slug': typeof ReadSlugRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/library': typeof LibraryRoute
+  '/review': typeof ReviewRoute
   '/vocab': typeof VocabRoute
   '/quiz/$slug': typeof QuizSlugRoute
   '/read/$slug': typeof ReadSlugRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/library': typeof LibraryRoute
+  '/review': typeof ReviewRoute
   '/vocab': typeof VocabRoute
   '/quiz/$slug': typeof QuizSlugRoute
   '/read/$slug': typeof ReadSlugRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/library'
+    | '/review'
     | '/vocab'
     | '/quiz/$slug'
     | '/read/$slug'
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/library'
+    | '/review'
     | '/vocab'
     | '/quiz/$slug'
     | '/read/$slug'
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/library'
+    | '/review'
     | '/vocab'
     | '/quiz/$slug'
     | '/read/$slug'
@@ -115,6 +127,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
   LibraryRoute: typeof LibraryRoute
+  ReviewRoute: typeof ReviewRoute
   VocabRoute: typeof VocabRoute
   QuizSlugRoute: typeof QuizSlugRoute
   ReadSlugRoute: typeof ReadSlugRoute
@@ -128,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/vocab'
       fullPath: '/vocab'
       preLoaderRoute: typeof VocabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/review': {
+      id: '/review'
+      path: '/review'
+      fullPath: '/review'
+      preLoaderRoute: typeof ReviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/library': {
@@ -179,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
   LibraryRoute: LibraryRoute,
+  ReviewRoute: ReviewRoute,
   VocabRoute: VocabRoute,
   QuizSlugRoute: QuizSlugRoute,
   ReadSlugRoute: ReadSlugRoute,
