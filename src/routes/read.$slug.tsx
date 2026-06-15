@@ -7,6 +7,7 @@ import { useLocalStore, storeKeys } from "@/lib/store";
 import { useSettings } from "@/components/booklish/theme";
 import { useStreak } from "@/lib/streak";
 import { useReadingTimer } from "@/lib/stats";
+import { useT } from "@/lib/i18n";
 
 type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boolean; readingSeconds?: number }>;
 
@@ -28,7 +29,9 @@ function ReadPage() {
   const [settings, setSettings] = useSettings();
   const { markActivity } = useStreak();
   const [pct, setPct] = useState(progress[story.slug]?.pct ?? 0);
-  const [isFocusMode, setIsFocusMode] = useState(false);
+  const { t } = useT();
+  const isFocusMode = settings.focusMode;
+  const setFocusMode = (v: boolean) => setSettings({ ...settings, focusMode: v });
 
   useReadingTimer();
 
@@ -80,12 +83,12 @@ function ReadPage() {
           </Link>
           <div className="min-w-0 flex-1 truncate text-sm text-muted-foreground">{story.title}</div>
           <span className="hidden items-center gap-1 text-xs text-muted-foreground sm:inline-flex">
-            <Clock className="h-3 w-3" /> {remaining} min left
+            <Clock className="h-3 w-3" /> {remaining} {t("common.minLeft")}
           </span>
-          <button onClick={() => adjustFont(-0.05)} className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border hover:bg-muted" aria-label="Smaller text">
+          <button onClick={() => adjustFont(-0.05)} className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border hover:bg-muted" aria-label={t("read.smaller")}>
             <Minus className="h-3.5 w-3.5" />
           </button>
-          <button onClick={() => adjustFont(0.05)} className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border hover:bg-muted" aria-label="Larger text">
+          <button onClick={() => adjustFont(0.05)} className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border hover:bg-muted" aria-label={t("read.larger")}>
             <Plus className="h-3.5 w-3.5" />
           </button>
           <button
@@ -95,20 +98,20 @@ function ReadPage() {
                 ? "border-border hover:bg-muted"
                 : "border-primary bg-primary text-primary-foreground"
             }`}
-            aria-label="Translation mode"
+            aria-label={t("read.translateMode")}
           >
             <Languages className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">
-              {settings.translateMode === "off" ? "Off" : settings.translateMode === "words" ? "Words" : "Sent."}
+              {settings.translateMode === "off" ? t("read.tm.off") : settings.translateMode === "words" ? t("read.tm.words") : t("read.tm.sentences")}
             </span>
           </button>
           <button
-            onClick={() => setIsFocusMode(!isFocusMode)}
+            onClick={() => setFocusMode(!isFocusMode)}
             className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border transition-colors ${
               isFocusMode ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-muted"
             }`}
-            aria-label="Focus mode"
-            title={isFocusMode ? "Exit Focus Mode" : "Enter Focus Mode"}
+            aria-label={isFocusMode ? t("read.focusOff") : t("read.focusOn")}
+            title={isFocusMode ? t("read.focusOff") : t("read.focusOn")}
           >
             {isFocusMode ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
           </button>
@@ -124,13 +127,13 @@ function ReadPage() {
         {!isFocusMode && (
           <div className="reading-column px-4 pb-16">
             <div className="mt-8 rounded-xl border border-border bg-card p-5 text-center font-sans">
-              <p className="text-sm text-muted-foreground">Finished the story?</p>
+              <p className="text-sm text-muted-foreground">{t("read.finishedQ")}</p>
               <Link
                 to="/quiz/$slug"
                 params={{ slug: story.slug }}
                 className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
               >
-                Take the comprehension quiz
+                {t("read.takeQuiz")}
               </Link>
             </div>
           </div>

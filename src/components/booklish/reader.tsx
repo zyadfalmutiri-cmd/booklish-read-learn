@@ -15,6 +15,8 @@ interface SavedWord {
   example: string;
   slug: string;
   at: number;
+  level?: number;
+  nextReview?: number;
 }
 
 export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct: number) => void }) {
@@ -54,7 +56,8 @@ export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct
       if (prev.some((w) => normalizeWord(w.word) === normalizeWord(word) && w.slug === story.slug)) {
         return prev;
       }
-      return [...prev, { word, ...entry, slug: story.slug, at: Date.now() }];
+      // Initialize SRS fields so the word becomes immediately due for review.
+      return [...prev, { word, ...entry, slug: story.slug, at: Date.now(), level: 0, nextReview: Date.now() }];
     });
   };
 
