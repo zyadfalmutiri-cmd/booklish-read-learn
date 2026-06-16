@@ -1,15 +1,26 @@
-import { Link } from "@tanstack/react-router";
-import { Moon, Sun, BookOpen, Languages } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Moon, Sun, BookOpen, Languages, LogOut, LogIn, User } from "lucide-react";
 import { useSettings } from "./theme";
 import { useT } from "@/lib/i18n";
+import { useAuth, signOut } from "@/hooks/use-auth";
+import { toast } from "sonner";
 
 export function Header() {
   const [settings, setSettings, hydrated] = useSettings();
   const { t, lang } = useT();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
   const toggleTheme = () =>
     setSettings({ ...settings, theme: settings.theme === "dark" ? "light" : "dark" });
   const toggleLang = () =>
     setSettings({ ...settings, uiLanguage: settings.uiLanguage === "ar" ? "en" : "ar" });
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success(lang === "ar" ? "تم تسجيل الخروج" : "Signed out");
+    navigate({ to: "/" });
+  };
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur">
@@ -40,6 +51,24 @@ export function Header() {
         >
           {hydrated && settings.theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </button>
+        {user ? (
+          <button
+            onClick={handleSignOut}
+            aria-label={lang === "ar" ? "تسجيل الخروج" : "Sign out"}
+            title={user.email ?? ""}
+            className="grid h-9 w-9 place-items-center rounded-full border border-border text-foreground transition-colors hover:bg-muted"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        ) : (
+          <Link
+            to="/auth"
+            aria-label={lang === "ar" ? "تسجيل الدخول" : "Sign in"}
+            className="grid h-9 w-9 place-items-center rounded-full border border-border text-foreground transition-colors hover:bg-muted"
+          >
+            <LogIn className="h-4 w-4" />
+          </Link>
+        )}
       </div>
     </header>
   );
