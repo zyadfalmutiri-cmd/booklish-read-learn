@@ -14,7 +14,183 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      progress: {
+        Row: {
+          completed: boolean
+          created_at: string
+          id: string
+          last_read_at: string
+          percent_complete: number
+          reading_seconds: number
+          story_slug: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          id?: string
+          last_read_at?: string
+          percent_complete?: number
+          reading_seconds?: number
+          story_slug: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          id?: string
+          last_read_at?: string
+          percent_complete?: number
+          reading_seconds?: number
+          story_slug?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      quiz_results: {
+        Row: {
+          created_at: string
+          id: string
+          score: number
+          story_slug: string
+          total: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          score: number
+          story_slug: string
+          total: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          score?: number
+          story_slug?: string
+          total?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      saved_words: {
+        Row: {
+          arabic_meaning: string | null
+          created_at: string
+          english_definition: string | null
+          example_sentence: string | null
+          id: string
+          next_review: string
+          srs_level: number
+          story_slug: string | null
+          updated_at: string
+          user_id: string
+          word: string
+        }
+        Insert: {
+          arabic_meaning?: string | null
+          created_at?: string
+          english_definition?: string | null
+          example_sentence?: string | null
+          id?: string
+          next_review?: string
+          srs_level?: number
+          story_slug?: string | null
+          updated_at?: string
+          user_id: string
+          word: string
+        }
+        Update: {
+          arabic_meaning?: string | null
+          created_at?: string
+          english_definition?: string | null
+          example_sentence?: string | null
+          id?: string
+          next_review?: string
+          srs_level?: number
+          story_slug?: string | null
+          updated_at?: string
+          user_id?: string
+          word?: string
+        }
+        Relationships: []
+      }
+      streaks: {
+        Row: {
+          current_streak: number
+          last_active: string | null
+          longest_streak: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          current_streak?: number
+          last_active?: string | null
+          longest_streak?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          current_streak?: number
+          last_active?: string | null
+          longest_streak?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +199,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      subscription_plan: "free" | "premium"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +326,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      subscription_plan: ["free", "premium"],
+    },
   },
 } as const
