@@ -37,6 +37,7 @@
 
   --font-serif: "Lora", Georgia, serif;
   --font-sans: "Inter", system-ui, sans-serif;
+  --font-arabic: "Noto Naskh Arabic", "Segoe UI", Tahoma, sans-serif;
 }
 
 :root {
@@ -105,9 +106,29 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Arabic typography: apply Noto Naskh Arabic to any Arabic-tagged content
+     and to the whole document when the UI is set to Arabic. English keeps
+     its own serif/sans stack. */
+  html[lang="ar"], html[lang="ar"] body {
+    font-family: var(--font-arabic);
+  }
+  :lang(ar) {
+    font-family: var(--font-arabic);
+    line-height: 1.8;
+  }
+
+  /* Keep the English reading column in serif even under an Arabic UI. */
+  html[lang="ar"] .reading-column,
+  html[lang="ar"] .reading-column * {
+    font-family: var(--font-serif);
   }
 
   .font-serif { font-family: var(--font-serif); }
+  .font-arabic { font-family: var(--font-arabic); }
 }
 
 @utility reading-column {
