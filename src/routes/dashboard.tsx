@@ -10,9 +10,15 @@ type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boole
 interface ScoreMap { [slug: string]: { score: number; total: number; at: number } }
 interface SavedWord { word: string; slug: string; at: number }
 
+import { RequireAuth } from "@/components/booklish/require-auth";
+
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Booklish" }] }),
-  component: Dashboard,
+  component: () => (
+    <RequireAuth>
+      <Dashboard />
+    </RequireAuth>
+  ),
 });
 
 function Dashboard() {
