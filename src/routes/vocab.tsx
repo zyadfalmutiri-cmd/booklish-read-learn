@@ -18,9 +18,15 @@ interface SavedWord {
   nextReview?: number;
 }
 
+import { RequireAuth } from "@/components/booklish/require-auth";
+
 export const Route = createFileRoute("/vocab")({
   head: () => ({ meta: [{ title: "Saved Words — Booklish" }] }),
-  component: Vocab,
+  component: () => (
+    <RequireAuth>
+      <Vocab />
+    </RequireAuth>
+  ),
 });
 
 function Vocab() {

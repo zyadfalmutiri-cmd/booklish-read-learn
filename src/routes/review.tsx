@@ -17,9 +17,15 @@ interface SavedWord {
   nextReview?: number;
 }
 
+import { RequireAuth } from "@/components/booklish/require-auth";
+
 export const Route = createFileRoute("/review")({
   head: () => ({ meta: [{ title: "Review — Booklish" }] }),
-  component: Review,
+  component: () => (
+    <RequireAuth>
+      <Review />
+    </RequireAuth>
+  ),
 });
 
 function Review() {
