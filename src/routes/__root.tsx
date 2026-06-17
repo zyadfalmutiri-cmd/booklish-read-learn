@@ -97,7 +97,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-title", content: "Booklish" },
       { name: "mobile-web-app-capable", content: "yes" },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+    ],
   }),
   errorComponent: ErrorComponent,
   notFoundComponent: NotFoundComponent,
@@ -105,27 +108,31 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootComponent() {
+  const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    void import("../lib/pwa-register").then((m) => m.registerPWA?.());
+  }, []);
+
   return (
-    <RootDocument>
+    <QueryClientProvider client={queryClient}>
+      <ThemeSync />
+      <Header />
       <Outlet />
-    </RootDocument>
+      <Toaster />
+    </QueryClientProvider>
   );
 }
 
-function RootDocument({ children }: { children: ReactNode }) {
+function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html suppressHydrationWarning>
       <head>
+        <ScriptOnce>{THEME_INIT_SCRIPT}</ScriptOnce>
         <HeadContent />
       </head>
       <body>
-        <ScriptOnce>{THEME_INIT_SCRIPT}</ScriptOnce>
-        <ThemeSync />
-        <QueryClientProvider client={new QueryClient()}>
-          <Header />
-          {children}
-          <Toaster />
-        </QueryClientProvider>
+        {children}
         <Scripts />
       </body>
     </html>
