@@ -75,7 +75,7 @@ function Home() {
           {t("home.sub")}
         </p>
 
-        {/* plan toggle */}
+        {/* اختيار الخطة */}
         <div className="mb-4 flex gap-2">
           <button
             onClick={() => setPlan("monthly")}
@@ -115,7 +115,7 @@ function Home() {
           {/* زر الاشتراك */}
           <button
             onClick={openCheckout}
-            className="rounded-full bg-black px-5 py-2.5 text-sm text-white"
+            className="inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm text-white hover:bg-black/80"
           >
             اشترك الآن
           </button>
@@ -128,7 +128,7 @@ function Home() {
           <Link
             to="/read/$slug"
             params={{ slug: continueStory.slug }}
-            className="flex items-center justify-between rounded-xl border p-4"
+            className="flex items-center justify-between rounded-xl border p-4 hover:bg-muted"
           >
             <div className="flex items-center gap-4">
               <div
@@ -145,6 +145,7 @@ function Home() {
                 </div>
               </div>
             </div>
+
             <ArrowRight className={arrowClass} />
           </Link>
         </section>
