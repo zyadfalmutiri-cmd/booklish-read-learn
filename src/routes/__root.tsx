@@ -97,4 +97,37 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-title", content: "Booklish" },
       { name: "mobile-web-app-capable", content: "yes" },
     ],
-    
+    links: [{ rel: "stylesheet", href: appCss }],
+  }),
+  errorComponent: ErrorComponent,
+  notFoundComponent: NotFoundComponent,
+  component: RootComponent,
+});
+
+function RootComponent() {
+  return (
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
+  );
+}
+
+function RootDocument({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <ScriptOnce>{THEME_INIT_SCRIPT}</ScriptOnce>
+        <ThemeSync />
+        <QueryClientProvider client={new QueryClient()}>
+          <Header />
+          {children}
+          <Toaster />
+        </QueryClientProvider>
+        <Scripts />
+      </body>
+    </html>
+  );
+}
