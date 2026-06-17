@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { stories } from "@/data/stories";
 import { StoryCard } from "@/components/booklish/story-card";
 import { useLocalStore, storeKeys } from "@/lib/store";
@@ -12,7 +13,11 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Booklish — Learn English by Reading" },
-      { name: "description", content: "Read short stories. Tap any word for an Arabic + English explanation. Track your progress as you go." },
+      {
+        name: "description",
+        content:
+          "Read short stories. Tap any word for an Arabic + English explanation. Track your progress as you go.",
+      },
     ],
   }),
   component: Home,
@@ -23,11 +28,15 @@ function Home() {
   const { streak } = useStreak();
   const { t, dir } = useT();
 
+  const [plan, setPlan] = useState<"monthly" | "yearly">("monthly");
+
   const continueEntry = Object.entries(progress)
     .filter(([, v]) => !v.finished && v.pct > 0)
     .sort((a, b) => b[1].lastAt - a[1].lastAt)[0];
 
-  const continueStory = continueEntry ? stories.find((s) => s.slug === continueEntry[0]) : undefined;
+  const continueStory = continueEntry
+    ? stories.find((s) => s.slug === continueEntry[0])
+    : undefined;
 
   const featured = stories.slice(0, 3);
   const arrowClass = dir === "rtl" ? "h-4 w-4 rotate-180" : "h-4 w-4";
@@ -41,7 +50,10 @@ function Home() {
     window.Paddle.Checkout.open({
       items: [
         {
-          priceId: "REPLACE_WITH_PRICE_ID",
+          priceId:
+            plan === "yearly"
+              ? "pri_01kv81w9m1eh8sbg8e368437tw"
+              : "pri_01kv81ssg7zcd77mdsjqhbqxh9",
           quantity: 1,
         },
       ],
@@ -63,25 +75,47 @@ function Home() {
           {t("home.sub")}
         </p>
 
+        {/* plan toggle */}
+        <div className="mb-4 flex gap-2">
+          <button
+            onClick={() => setPlan("monthly")}
+            className={`px-3 py-1 rounded-full border ${
+              plan === "monthly" ? "bg-black text-white" : ""
+            }`}
+          >
+            Monthly
+          </button>
+
+          <button
+            onClick={() => setPlan("yearly")}
+            className={`px-3 py-1 rounded-full border ${
+              plan === "yearly" ? "bg-black text-white" : ""
+            }`}
+          >
+            Yearly
+          </button>
+        </div>
+
         <div className="flex flex-wrap items-center gap-3">
           <Link
             to="/library"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground"
           >
             {t("home.browse")} <ArrowRight className={arrowClass} />
           </Link>
 
           <Link
             to="/dashboard"
-            className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+            className="inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm"
           >
-            <Flame className="h-4 w-4 text-primary" /> {streak.current} {t("home.streakLabel")}
+            <Flame className="h-4 w-4 text-primary" /> {streak.current}{" "}
+            {t("home.streakLabel")}
           </Link>
 
           {/* زر الاشتراك */}
           <button
             onClick={openCheckout}
-            className="inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-medium text-white hover:bg-black/80"
+            className="rounded-full bg-black px-5 py-2.5 text-sm text-white"
           >
             اشترك الآن
           </button>
@@ -94,28 +128,32 @@ function Home() {
           <Link
             to="/read/$slug"
             params={{ slug: continueStory.slug }}
-            className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted"
+            className="flex items-center justify-between rounded-xl border p-4"
           >
-            <div className="flex min-w-0 items-center gap-4">
-              <div className={`grid h-14 w-14 shrink-0 place-items-center rounded-lg bg-gradient-to-br ${continueStory.coverHue} text-2xl`}>
+            <div className="flex items-center gap-4">
+              <div
+                className={`grid h-14 w-14 place-items-center rounded-lg ${continueStory.coverHue}`}
+              >
                 {continueStory.cover}
               </div>
-              <div className="min-w-0">
-                <div className="truncate font-serif text-lg">{continueStory.title}</div>
+              <div>
+                <div className="font-serif text-lg">
+                  {continueStory.title}
+                </div>
                 <div className="text-xs text-muted-foreground">
                   {t("home.readPct")} {continueEntry![1].pct}%
                 </div>
               </div>
             </div>
-            <ArrowRight className={`shrink-0 text-muted-foreground ${arrowClass}`} />
+            <ArrowRight className={arrowClass} />
           </Link>
         </section>
       )}
 
       <section>
-        <div className="mb-4 flex items-baseline justify-between">
+        <div className="mb-4 flex justify-between">
           <h2 className="font-serif text-xl">{t("home.featured")}</h2>
-          <Link to="/library" className="text-sm text-primary hover:underline">
+          <Link to="/library" className="text-sm text-primary">
             {t("home.viewAll")} →
           </Link>
         </div>
