@@ -8,17 +8,30 @@ import { theLastTrainHome } from "@/data/stories/the-last-train-home";
 import { theCoffeeBeanJourney } from "@/data/stories/the-coffee-bean-journey";
 import { theNightBus } from "@/data/stories/the-night-bus";
 import { whyWeDream } from "@/data/stories/why-we-dream";
-
-/**
- * Single source of truth for stories. To add a new story:
- *   1. Create a file in src/data/stories/ exporting a `Story`.
- *   2. Import it here and add it to the array.
- * Tags drive library categories — keep them in sync with the `Category` type.
- */
+import { theLostDog } from "@/data/stories/the-lost-dog";
+import { aNewFriend } from "@/data/stories/a-new-friend";
+import { theRainyAfternoon } from "@/data/stories/the-rainy-afternoon";
+import { theBlueBicycle } from "@/data/stories/the-blue-bicycle";
+import { grandmothersRecipe } from "@/data/stories/grandmothers-recipe";
+import { firstDay } from "@/data/stories/first-day";
+import { theKindStranger } from "@/data/stories/the-kind-stranger";
+import { theBrokenWindow } from "@/data/stories/the-broken-window";
+import { theLittleBird } from "@/data/stories/the-little-bird";
+import { aBirthdaySurprise } from "@/data/stories/a-birthday-surprise";
+import { theEmptyHouse } from "@/data/stories/the-empty-house";
+import { aLetterFromParis } from "@/data/stories/a-letter-from-paris";
+import { lostInTheCity } from "@/data/stories/lost-in-the-city";
+import { theMarathon } from "@/data/stories/the-marathon";
+import { theOldPhotograph } from "@/data/stories/the-old-photograph";
+import { aStrangeDiscovery } from "@/data/stories/a-strange-discovery";
+import { theMusician } from "@/data/stories/the-musician";
+import { theLastLibrary } from "@/data/stories/the-last-library";
+import { theInheritance } from "@/data/stories/the-inheritance";
+import { betweenTwoWorlds } from "@/data/stories/between-two-worlds";
+import { theClockTower } from "@/data/stories/the-clock-tower";
 
 function withDefaults(story: Story): Story {
   const tags: Category[] = story.tags ?? [];
-  // Auto-tag fiction for non-non-fiction genres, and short for ≤5 min reads.
   const merged = new Set<Category>(tags);
   if (story.genre !== "non-fiction") merged.add("fiction");
   if (story.minutes <= 5) merged.add("short");
@@ -26,6 +39,7 @@ function withDefaults(story: Story): Story {
 }
 
 export const stories: Story[] = [
+  // Original 9
   theMissingKey,
   theNightBus,
   theRiversEdge,
@@ -35,6 +49,30 @@ export const stories: Story[] = [
   thePainterUpstairs,
   theLastTrainHome,
   whyWeDream,
+  // New beginner (10)
+  theLostDog,
+  aNewFriend,
+  theRainyAfternoon,
+  theBlueBicycle,
+  grandmothersRecipe,
+  firstDay,
+  theKindStranger,
+  theBrokenWindow,
+  theLittleBird,
+  aBirthdaySurprise,
+  // New intermediate (7)
+  theEmptyHouse,
+  aLetterFromParis,
+  lostInTheCity,
+  theMarathon,
+  theOldPhotograph,
+  aStrangeDiscovery,
+  theMusician,
+  // New advanced (4)
+  theLastLibrary,
+  theInheritance,
+  betweenTwoWorlds,
+  theClockTower,
 ].map(withDefaults);
 
 export function getStory(slug: string): Story | undefined {

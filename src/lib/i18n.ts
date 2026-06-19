@@ -33,8 +33,8 @@ const DICT: Dict = {
     en: "Learn English the way readers do — one story at a time.",
   },
   "home.sub": {
-    ar: "يحوّل Booklish القصص القصيرة والروايات إلى دروس لغوية. انقر على أي كلمة للحصول على معناها بالعربية، وتعريفها بالإنجليزية، ومثال عليها — دون مغادرة الصفحة أبداً.",
-    en: "Booklish turns short stories and novels into language lessons. Tap any word for an Arabic meaning, an English definition, and an example — without ever leaving the page.",
+    ar: "يحوّل Booklish القصص القصيرة إلى دروس لغوية. انقر على أي كلمة للحصول على معناها بالعربية وتعريفها بالإنجليزية.",
+    en: "Booklish turns short stories into language lessons. Tap any word for an Arabic meaning and an English definition.",
   },
   "home.browse": { ar: "تصفح المكتبة", en: "Browse the library" },
   "home.streakLabel": { ar: "متتالية", en: "streak" },
@@ -42,6 +42,16 @@ const DICT: Dict = {
   "home.featured": { ar: "قصص مختارة", en: "Featured stories" },
   "home.viewAll": { ar: "عرض الكل", en: "View all" },
   "home.readPct": { ar: "تمت قراءة", en: "Read" },
+
+  // XP & Levels
+  "xp.level": { ar: "المستوى", en: "Level" },
+  "xp.xpToNext": { ar: "XP للمستوى التالي", en: "XP to next level" },
+  "xp.level.beginner": { ar: "مبتدئ", en: "Beginner" },
+  "xp.level.intermediate": { ar: "متوسط", en: "Intermediate" },
+  "xp.level.advanced": { ar: "متقدم", en: "Advanced" },
+  "xp.goal.daily": { ar: "هدف اليوم", en: "Daily goal" },
+  "xp.goal.words": { ar: "احفظ كلمات اليوم", en: "Save today's words" },
+  "xp.goal.read": { ar: "اقرأ اليوم", en: "Read today" },
 
   // Library
   "library.title": { ar: "المكتبة", en: "Library" },
@@ -85,6 +95,18 @@ const DICT: Dict = {
   "read.focusOn": { ar: "وضع التركيز", en: "Focus mode" },
   "read.focusOff": { ar: "إنهاء وضع التركيز", en: "Exit focus mode" },
 
+  // Word popover
+  "word.meaning": { ar: "المعنى", en: "Meaning" },
+  "word.definition": { ar: "التعريف", en: "Definition" },
+  "word.example": { ar: "مثال", en: "Example" },
+  "word.saveVocab": { ar: "حفظ في القاموس", en: "Save to vocab" },
+  "word.saved": { ar: "محفوظة ✓", en: "Saved ✓" },
+  "word.type.noun": { ar: "اسم", en: "noun" },
+  "word.type.verb": { ar: "فعل", en: "verb" },
+  "word.type.adjective": { ar: "صفة", en: "adj." },
+  "word.type.adverb": { ar: "ظرف", en: "adv." },
+  "word.type.phrase": { ar: "عبارة", en: "phrase" },
+
   // Dashboard
   "dash.title": { ar: "سجل القراءة", en: "Reading log" },
   "dash.subtitle": { ar: "سجل هادئ لما قرأته وتعلمته.", en: "A quiet record of what you've read and learned." },
@@ -116,7 +138,7 @@ const DICT: Dict = {
   "vocab.wordCountPlural": { ar: "كلمات", en: "words" },
   "vocab.searchPh": { ar: "ابحث عن كلمة، معنى أو تعريف...", en: "Search a word, meaning, or definition…" },
   "vocab.empty": { ar: "قائمة كلماتك فارغة.", en: "Your word list is empty." },
-  "vocab.emptyHint": { ar: "أثناء القراءة، اضغط على أي كلمة واختر «حفظ الكلمة».", en: "While reading, tap a word and choose “Save to vocab”." },
+  "vocab.emptyHint": { ar: "أثناء القراءة، اضغط على أي كلمة واختر «حفظ الكلمة».", en: "While reading, tap a word and choose Save to vocab." },
   "vocab.browse": { ar: "تصفح المكتبة", en: "Browse library" },
   "vocab.fromStory": { ar: "من قصة", en: "From" },
   "vocab.delete": { ar: "حذف", en: "Delete" },
@@ -139,6 +161,7 @@ const DICT: Dict = {
   "quiz.saveMissed": { ar: "احفظ الكلمات الخاطئة", en: "Save missed words to vocab" },
   "quiz.tryAgain": { ar: "حاول مجدداً", en: "Try again" },
   "quiz.backLibrary": { ar: "العودة للمكتبة", en: "Back to library" },
+  "quiz.xpEarned": { ar: "نقاط XP مكتسبة", en: "XP earned" },
 
   // Review (SRS)
   "review.title": { ar: "مراجعة الكلمات", en: "Word review" },

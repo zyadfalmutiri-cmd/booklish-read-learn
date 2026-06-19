@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Check, RotateCcw, Volume2, VolumeX, BookOpen } from "lucide-react";
+import { ArrowLeft, Check, RotateCcw, Volume2, VolumeX, BookOpen, Zap } from "lucide-react";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useT } from "@/lib/i18n";
 import { isDue, schedule, formatInterval, SRS_INTERVALS_MS, type Grade } from "@/lib/srs";
 import { useSpeaking } from "@/lib/tts";
+import { useXp, XP_REWARDS } from "@/lib/xp";
 
 interface SavedWord {
   word: string;
@@ -31,8 +32,8 @@ export const Route = createFileRoute("/review")({
 function Review() {
   const [vocab, setVocab] = useLocalStore<SavedWord[]>(storeKeys.vocab, []);
   const { t } = useT();
+  const { addXp } = useXp();
 
-  // Snapshot the due queue at session start so promoted cards don't reappear immediately.
   const [queue] = useState<string[]>(() =>
     vocab.filter((v) => isDue(v)).map((v) => `${v.slug}:${v.word}`),
   );
@@ -40,6 +41,7 @@ function Review() {
   const [revealed, setRevealed] = useState(false);
   const [reviewed, setReviewed] = useState(0);
   const [correct, setCorrect] = useState(0);
+  const [xpEarned, setXpEarned] = useState(0);
 
   const currentId = queue[idx];
   const current = useMemo(
@@ -56,7 +58,11 @@ function Review() {
       ),
     );
     setReviewed((n) => n + 1);
-    if (g !== "again") setCorrect((n) => n + 1);
+    if (g !== "again") {
+      setCorrect((n) => n + 1);
+      addXp(XP_REWARDS.reviewGood, `review:${current.word}`);
+      setXpEarned((n) => n + XP_REWARDS.reviewGood);
+    }
     setRevealed(false);
     setIdx((i) => i + 1);
   };
@@ -83,9 +89,15 @@ function Review() {
           <Check className="h-7 w-7" />
         </div>
         <h1 className="mb-2 font-serif text-2xl">{t("review.done")}</h1>
-        <p className="mb-8 text-sm text-muted-foreground">
+        <p className="mb-3 text-sm text-muted-foreground">
           {reviewed} {t("review.reviewed")} · {correct} {t("review.correct")}
         </p>
+        {xpEarned > 0 && (
+          <div className="mb-6 inline-flex items-center gap-1.5 rounded-full bg-yellow-500/10 px-4 py-1.5 text-sm font-medium text-yellow-700 dark:text-yellow-400">
+            <Zap className="h-4 w-4" />
+            +{xpEarned} XP
+          </div>
+        )}
         <div className="flex flex-wrap justify-center gap-3">
           <Link to="/vocab" className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted">
             {t("nav.vocab")}
@@ -99,7 +111,6 @@ function Review() {
   }
 
   if (!current) {
-    // Card removed mid-session — skip.
     setIdx((i) => i + 1);
     return null;
   }
@@ -122,6 +133,11 @@ function Review() {
             <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
           </div>
         </div>
+        {xpEarned > 0 && (
+          <div className="flex items-center gap-1 text-xs font-medium text-yellow-600 dark:text-yellow-400">
+            <Zap className="h-3.5 w-3.5" />+{xpEarned}
+          </div>
+        )}
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-8 text-center">

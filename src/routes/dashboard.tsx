@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Flame, BookOpen, GraduationCap, Sparkles, Clock, Hand } from "lucide-react";
+import { Flame, BookOpen, GraduationCap, Sparkles, Clock, Hand, Zap } from "lucide-react";
 import { stories } from "@/data/stories";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useStreak } from "@/lib/streak";
 import { useStats, formatDuration } from "@/lib/stats";
 import { useT } from "@/lib/i18n";
+import { useXp, LEVELS } from "@/lib/xp";
 
 type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boolean; readingSeconds?: number }>;
 interface ScoreMap { [slug: string]: { score: number; total: number; at: number } }
@@ -27,7 +28,9 @@ function Dashboard() {
   const [vocab] = useLocalStore<SavedWord[]>(storeKeys.vocab, []);
   const [stats] = useStats();
   const { streak } = useStreak();
-  const { t } = useT();
+  const { xp, level, progress: lvlProgress, xpToNext } = useXp();
+  const { t, lang } = useT();
+  const ar = lang === "ar";
 
   const finished = Object.values(progress).filter((p) => p.finished).length;
   const inProgress = Object.entries(progress).filter(([, p]) => !p.finished && p.pct > 0);
@@ -49,8 +52,34 @@ function Dashboard() {
       <h1 className="mb-2 font-serif text-3xl">{t("dash.title")}</h1>
       <p className="mb-8 text-sm text-muted-foreground">{t("dash.subtitle")}</p>
 
+      {/* XP Level bar */}
+      <section className="mb-6 rounded-xl border border-border bg-card p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Zap className="h-4 w-4 text-yellow-500" />
+            <span className="font-medium">{level.icon} {ar ? level.nameAr : level.nameEn}</span>
+            <span className="text-sm text-muted-foreground tabular-nums">{xp} XP</span>
+          </div>
+          {xpToNext > 0 && (
+            <span className="text-xs text-muted-foreground">
+              {xpToNext} {t("xp.xpToNext")}
+            </span>
+          )}
+        </div>
+        <div className="mb-2 h-2 w-full overflow-hidden rounded-full bg-muted">
+          <div className="h-full rounded-full bg-yellow-500 transition-all duration-500" style={{ width: `${lvlProgress}%` }} />
+        </div>
+        <div className="flex justify-between text-[11px] text-muted-foreground">
+          {LEVELS.map((l) => (
+            <span key={l.name} className={xp >= l.minXp ? "text-yellow-600 font-medium" : ""}>
+              {l.icon} {ar ? l.nameAr : l.nameEn}
+            </span>
+          ))}
+        </div>
+      </section>
+
       <section className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat icon={<Flame className="h-4 w-4" />} label={t("dash.streakDays")} value={`${streak.current} ${streak.current === 1 ? t("common.day") : t("common.days")}`} hint={`${t("dash.longest")}: ${streak.longest}`} />
+        <Stat icon={<Flame className="h-4 w-4 text-orange-500" />} label={t("dash.streakDays")} value={`${streak.current} ${streak.current === 1 ? t("common.day") : t("common.days")}`} hint={`${t("dash.longest")}: ${streak.longest}`} />
         <Stat icon={<BookOpen className="h-4 w-4" />} label={t("dash.finished")} value={String(finished)} hint={`${stories.length - finished} ${t("dash.remaining")}`} />
         <Stat icon={<Sparkles className="h-4 w-4" />} label={t("dash.uniqueWords")} value={String(stats.uniqueWords.length)} hint={`${vocab.length} ${t("dash.saved")}`} />
         <Stat icon={<Clock className="h-4 w-4" />} label={t("dash.readingTime")} value={formatDuration(stats.readingSeconds)} hint={t("dash.activeOnly")} />

@@ -90,3 +90,40 @@ body {
 html[dir="rtl"] body {
   font-family: "Segoe UI", Tahoma, system-ui, sans-serif;
 }
+
+.reading-column {
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.85;
+}
+
+.word-token {
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 0 1px;
+  transition: background-color 0.1s;
+  display: inline;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.18s ease-out both;
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.14s ease-out both;
+}
+
+.focus-mode-active .reading-column {
+  padding-top: 3rem;
+}

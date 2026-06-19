@@ -1,0 +1,2 @@
+- [RTL + English reader fix](rtl-reader-fix.md) — English story content needs dir="ltr" on its container when UI lang is Arabic.
+- [XP system](xp-system.md) — XP/levels in src/lib/xp.ts; rewards granted in reader, review, and quiz routes.

@@ -1,9 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { Check, X, RotateCcw, BookmarkPlus } from "lucide-react";
+import { Check, X, RotateCcw, BookmarkPlus, Zap } from "lucide-react";
 import { getStory } from "@/data/stories";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useT } from "@/lib/i18n";
+import { useXp, XP_REWARDS } from "@/lib/xp";
 
 interface ScoreMap { [slug: string]: { score: number; total: number; at: number } }
 interface SavedWord { word: string; ar: string; def: string; example: string; slug: string; at: number; level?: number; nextReview?: number }
@@ -23,15 +24,22 @@ export const Route = createFileRoute("/quiz/$slug")({
 function QuizPage() {
   const { story } = Route.useLoaderData() as { story: import("@/lib/types").Story };
   const { t } = useT();
+  const { addXp } = useXp();
   const [answers, setAnswers] = useState<(number | null)[]>(() => story.quiz.map(() => null));
   const [submitted, setSubmitted] = useState(false);
   const [, setScores] = useLocalStore<ScoreMap>(storeKeys.quizScores, {});
   const [, setVocab] = useLocalStore<SavedWord[]>(storeKeys.vocab, []);
+  const [xpEarned, setXpEarned] = useState(0);
 
   const score = answers.reduce<number>((acc, a, i) => acc + (a === story.quiz[i].answer ? 1 : 0), 0);
 
   const submit = () => {
     setScores((prev) => ({ ...prev, [story.slug]: { score, total: story.quiz.length, at: Date.now() } }));
+    const earned = score * XP_REWARDS.quizCorrect;
+    if (earned > 0) {
+      addXp(earned, `quiz:${story.slug}`);
+      setXpEarned(earned);
+    }
     setSubmitted(true);
   };
 
@@ -117,6 +125,12 @@ function QuizPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             {score === story.quiz.length ? t("quiz.perfect") : score >= story.quiz.length / 2 ? t("quiz.nice") : t("quiz.reread")}
           </p>
+          {xpEarned > 0 && (
+            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-yellow-500/10 px-4 py-1.5 text-sm font-medium text-yellow-700 dark:text-yellow-400">
+              <Zap className="h-4 w-4" />
+              +{xpEarned} XP {t("quiz.xpEarned")}
+            </div>
+          )}
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             <button
               onClick={saveMissedVocab}
@@ -125,7 +139,7 @@ function QuizPage() {
               <BookmarkPlus className="h-4 w-4" /> {t("quiz.saveMissed")}
             </button>
             <button
-              onClick={() => { setAnswers(story.quiz.map(() => null)); setSubmitted(false); }}
+              onClick={() => { setAnswers(story.quiz.map(() => null)); setSubmitted(false); setXpEarned(0); }}
               className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
             >
               <RotateCcw className="h-4 w-4" /> {t("quiz.tryAgain")}

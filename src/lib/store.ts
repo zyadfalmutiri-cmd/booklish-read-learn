@@ -1,11 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { activeAdapter } from "./storage/adapter";
 
-/**
- * React hook backed by the active storage adapter. Components never talk to
- * localStorage directly — they go through this hook so a future cloud
- * adapter can plug in without changing UI code.
- */
 export function useLocalStore<T>(key: string, fallback: T) {
   const [value, setValue] = useState<T>(fallback);
   const [hydrated, setHydrated] = useState(false);
@@ -35,12 +30,13 @@ export function useLocalStore<T>(key: string, fallback: T) {
 }
 
 export const storeKeys = {
-  progress: "progress",     // Record<slug, { pct; lastAt; finished; readingSeconds }>
-  vocab: "vocab",           // SavedWord[]
-  bookmarks: "bookmarks",   // string[] slugs
-  settings: "settings",     // { theme; fontScale; translateMode }
-  quizScores: "quizScores", // Record<slug, { score; total; at }>
-  streak: "streak",         // { lastDay; current; longest; days }
-  stats: "stats",           // { totalTaps; uniqueWords[]; readingSeconds; lastSessionAt }
-  tapped: "tappedWords",    // string[] (normalized word keys)
+  progress: "progress",
+  vocab: "vocab",
+  bookmarks: "bookmarks",
+  settings: "settings",
+  quizScores: "quizScores",
+  streak: "streak",
+  stats: "stats",
+  tapped: "tappedWords",
+  xp: "xp",
 } as const;
