@@ -16,6 +16,7 @@ import { Header } from "../components/booklish/header";
 import { ThemeSync } from "../components/booklish/theme";
 import { THEME_INIT_SCRIPT } from "../lib/theme-init";
 import { Toaster } from "../components/ui/sonner";
+import { usePaddle } from "../lib/paddle";
 
 declare const Paddle: any;
 
@@ -116,6 +117,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  usePaddle();
 
   useEffect(() => {
     void import("../lib/pwa-register").then((m) => m.registerPWA?.());
