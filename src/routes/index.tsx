@@ -4,8 +4,9 @@ import { stories } from "@/data/stories";
 import { StoryCard } from "@/components/booklish/story-card";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useStreak } from "@/lib/streak";
-import { ArrowRight, Flame } from "lucide-react";
+import { Flame } from "lucide-react";
 import { useT } from "@/lib/i18n";
+import { PRICE_IDS } from "@/lib/paddle";
 
 type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boolean }>;
 
@@ -32,21 +33,19 @@ function Home() {
   const arrowClass = dir === "rtl" ? "h-4 w-4 rotate-180" : "h-4 w-4";
 
   const openCheckout = () => {
+    const priceId = plan === "yearly" ? PRICE_IDS.yearly : PRICE_IDS.monthly;
+
     if (!window.Paddle) {
-      alert("Paddle not loaded");
+      alert("Paddle لم يتم تحميله. تأكد من إضافة VITE_PADDLE_CLIENT_TOKEN في Secrets.");
+      return;
+    }
+    if (!priceId) {
+      alert(`يرجى إضافة ${plan === "yearly" ? "VITE_PADDLE_PRICE_YEARLY" : "VITE_PADDLE_PRICE_MONTHLY"} في Secrets.`);
       return;
     }
 
     window.Paddle.Checkout.open({
-      items: [
-        {
-          priceId:
-            plan === "yearly"
-              ? "pri_01kv81w9m1eh8sbg8e368437tw"
-              : "pri_01kv81ssg7zcd77mdsjqhbqxh9",
-          quantity: 1,
-        },
-      ],
+      items: [{ priceId, quantity: 1 }],
     });
   };
 

@@ -23,10 +23,10 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Start application"
+args = "Booklish"
 
 [[workflows.workflow]]
-name = "Start application"
+name = "Booklish"
 author = "agent"
 
 [[workflows.workflow.tasks]]
