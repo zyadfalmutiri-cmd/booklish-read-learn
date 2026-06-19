@@ -13,7 +13,8 @@ export default defineConfig({
   vite: {
     server: {
       host: "0.0.0.0",
-      port: process.env.PORT || 3000,
+      port: 5000,
+      strictPort: true,
     },
     plugins: [
       VitePWA({

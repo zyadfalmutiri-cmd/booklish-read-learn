@@ -53,11 +53,6 @@ function Home() {
   return (
     <main className="mx-auto max-w-5xl px-4 pb-24 pt-10 sm:pt-16">
 
-      {/* 🔴 DEBUG BLOCK (لازم يظهر لو الصفحة صحيحة) */}
-      <div style={{ padding: 20, background: "red", color: "white" }}>
-        DEBUG ACTIVE
-      </div>
-
       <section className="mb-12 sm:mb-20">
         <p className="mb-3 text-xs uppercase tracking-[0.2em] text-primary">
           {t("home.kicker")}
