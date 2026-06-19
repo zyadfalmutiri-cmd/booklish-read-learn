@@ -11,12 +11,16 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
+    server: {
+      host: "0.0.0.0",
+      port: process.env.PORT || 3000,
+    },
     plugins: [
       VitePWA({
         registerType: "autoUpdate",
         injectRegister: null,
         filename: "sw.js",
-        manifest: false, // we ship public/manifest.webmanifest ourselves
+        manifest: false,
         devOptions: { enabled: false },
         workbox: {
           globPatterns: ["**/*.{js,css,html,ico,png,svg,webmanifest,woff,woff2}"],
