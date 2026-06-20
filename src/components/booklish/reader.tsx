@@ -9,16 +9,7 @@ import { lookupLocal, lookupAI, preWarmCache, normalizeWord, type WordLookup } f
 import { recordWordTap } from "@/lib/stats";
 import { useXp, XP_REWARDS } from "@/lib/xp";
 
-interface SavedWord {
-  word: string;
-  ar: string;
-  def: string;
-  example: string;
-  slug: string;
-  at: number;
-  level?: number;
-  nextReview?: number;
-}
+import type { SavedWord } from "@/lib/types";
 
 export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct: number) => void }) {
   const [settings] = useSettings();
@@ -300,7 +291,7 @@ function WordToken({
             </div>
           )}
 
-          {!loading && !result && !loading && (
+          {!loading && !result && (
             <div className="text-sm text-muted-foreground">Tap again to look up.</div>
           )}
         </div>

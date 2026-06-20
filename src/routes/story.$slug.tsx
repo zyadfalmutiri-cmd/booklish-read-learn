@@ -51,8 +51,8 @@ function StoryDetail() {
         <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" /> {story.minutes} {t("common.minutes")}</span>
       </div>
 
-      <h1 className="mb-4 font-serif text-3xl leading-tight sm:text-4xl">{story.title}</h1>
-      <p className="mb-8 text-base text-muted-foreground">{story.blurb}</p>
+      <h1 className="mb-4 font-serif text-3xl leading-tight sm:text-4xl" dir="ltr">{story.title}</h1>
+      <p className="mb-8 text-base text-muted-foreground" dir="ltr">{story.blurb}</p>
 
       <div className="mb-10 flex flex-wrap items-center gap-3">
         <Link

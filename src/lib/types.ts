@@ -8,6 +8,17 @@ export interface VocabEntry {
   example: string;
 }
 
+export interface SavedWord {
+  word: string;
+  ar: string;
+  def: string;
+  example: string;
+  slug: string;
+  at: number;
+  level?: number;
+  nextReview?: number;
+}
+
 export interface QuizQuestion {
   q: string;
   choices: string[];

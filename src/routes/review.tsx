@@ -7,17 +7,7 @@ import { isDue, schedule, formatInterval, SRS_INTERVALS_MS, type Grade } from "@
 import { useSpeaking } from "@/lib/tts";
 import { useXp, XP_REWARDS } from "@/lib/xp";
 
-interface SavedWord {
-  word: string;
-  ar: string;
-  def: string;
-  example: string;
-  slug: string;
-  at: number;
-  level?: number;
-  nextReview?: number;
-}
-
+import type { SavedWord } from "@/lib/types";
 import { RequireAuth } from "@/components/booklish/require-auth";
 
 export const Route = createFileRoute("/review")({

@@ -6,8 +6,9 @@ import { useLocalStore, storeKeys } from "@/lib/store";
 import { useT } from "@/lib/i18n";
 import { useXp, XP_REWARDS } from "@/lib/xp";
 
+import type { SavedWord } from "@/lib/types";
+
 interface ScoreMap { [slug: string]: { score: number; total: number; at: number } }
-interface SavedWord { word: string; ar: string; def: string; example: string; slug: string; at: number; level?: number; nextReview?: number }
 
 export const Route = createFileRoute("/quiz/$slug")({
   loader: ({ params }) => {

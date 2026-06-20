@@ -12,6 +12,8 @@ export interface WordLookup {
 }
 
 const CACHE_KEY = "booklish.wordCache";
+const MAX_CACHE_ENTRIES = 500;
+
 type CacheShape = Record<string, { en: string; ar: string; example?: string; timestamp: number }>;
 
 const dict = dictionary as Record<string, { en: string; ar: string }>;
@@ -28,9 +30,17 @@ function readCache(): CacheShape {
 function writeCache(cache: CacheShape) {
   if (typeof window === "undefined") return;
   try {
+    // Prune oldest entries if over the size limit
+    const entries = Object.entries(cache);
+    if (entries.length > MAX_CACHE_ENTRIES) {
+      const pruned = entries
+        .sort((a, b) => (b[1].timestamp ?? 0) - (a[1].timestamp ?? 0))
+        .slice(0, MAX_CACHE_ENTRIES);
+      cache = Object.fromEntries(pruned);
+    }
     window.localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
   } catch {
-    /* ignore */
+    /* quota or serialization issue — ignore */
   }
 }
 

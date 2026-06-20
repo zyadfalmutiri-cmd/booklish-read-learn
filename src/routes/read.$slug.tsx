@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Minus, Plus, Languages, Clock, Maximize2, Minimize2 } from "lucide-react";
 import { getStory } from "@/data/stories";
 import { Reader } from "@/components/booklish/reader";
@@ -8,6 +8,7 @@ import { useSettings } from "@/components/booklish/theme";
 import { useStreak } from "@/lib/streak";
 import { useReadingTimer } from "@/lib/stats";
 import { useT } from "@/lib/i18n";
+import { useXp, XP_REWARDS } from "@/lib/xp";
 
 type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boolean; readingSeconds?: number }>;
 
@@ -25,13 +26,21 @@ export const Route = createFileRoute("/read/$slug")({
 
 function ReadPage() {
   const { story } = Route.useLoaderData() as { story: import("@/lib/types").Story };
-  const [progress, setProgress] = useLocalStore<ProgressMap>(storeKeys.progress, {});
+  const [progress, setProgress, progressHydrated] = useLocalStore<ProgressMap>(storeKeys.progress, {});
   const [settings, setSettings] = useSettings();
   const { markActivity } = useStreak();
-  const [pct, setPct] = useState(progress[story.slug]?.pct ?? 0);
+  const [pct, setPct] = useState(0);
   const { t } = useT();
+  const { addXp } = useXp();
   const isFocusMode = settings.focusMode;
   const setFocusMode = (v: boolean) => setSettings({ ...settings, focusMode: v });
+
+  // Track whether we've already granted finish XP this session
+  const finishXpGranted = useRef(false);
+
+  // Reading-time XP: track active seconds, grant 2 XP per minute read
+  const readStartRef = useRef<number>(Date.now());
+  const xpMinutesGranted = useRef(0);
 
   useReadingTimer();
 
@@ -40,7 +49,49 @@ function ReadPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Reading-time XP grants (mirrors the stats reading timer pattern)
   useEffect(() => {
+    const grantXpForTime = () => {
+      const elapsed = (Date.now() - readStartRef.current) / 1000;
+      const minutesRead = Math.floor(elapsed / 60);
+      const newMinutes = minutesRead - xpMinutesGranted.current;
+      if (newMinutes > 0) {
+        addXp(newMinutes * XP_REWARDS.readMinute, "reading");
+        xpMinutesGranted.current = minutesRead;
+      }
+      readStartRef.current = Date.now();
+    };
+
+    const resume = () => { readStartRef.current = Date.now(); };
+    const onVisibility = () => { if (document.hidden) grantXpForTime(); else resume(); };
+
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("blur", grantXpForTime);
+    window.addEventListener("focus", resume);
+    const interval = window.setInterval(grantXpForTime, 60_000);
+
+    return () => {
+      grantXpForTime(); // flush on unmount
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("blur", grantXpForTime);
+      window.removeEventListener("focus", resume);
+      window.clearInterval(interval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Save scroll progress + grant finish XP once hydrated
+  useEffect(() => {
+    if (!progressHydrated) return;
+
+    const alreadyFinished = progress[story.slug]?.finished ?? false;
+
+    // Grant finish XP only the first time in this session
+    if (pct >= 95 && !alreadyFinished && !finishXpGranted.current) {
+      finishXpGranted.current = true;
+      addXp(XP_REWARDS.finishStory, `finish:${story.slug}`);
+    }
+
     setProgress((prev) => {
       const previous = prev[story.slug];
       return {
@@ -54,7 +105,7 @@ function ReadPage() {
       };
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pct]);
+  }, [pct, progressHydrated]);
 
   const adjustFont = (delta: number) => {
     const next = Math.min(1.3, Math.max(0.85, +(settings.fontScale + delta).toFixed(2)));

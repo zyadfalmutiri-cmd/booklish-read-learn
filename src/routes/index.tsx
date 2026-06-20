@@ -4,6 +4,8 @@ import { StoryCard } from "@/components/booklish/story-card";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useStreak } from "@/lib/streak";
 import { useXp, LEVELS } from "@/lib/xp";
+import { useStats } from "@/lib/stats";
+import type { SavedWord } from "@/lib/types";
 import { Flame, BookOpen, ArrowRight, Target, Zap } from "lucide-react";
 import { useT } from "@/lib/i18n";
 
@@ -16,9 +18,15 @@ export const Route = createFileRoute("/")({
 const DAILY_WORD_GOAL = 5;
 const DAILY_READ_GOAL_MIN = 5;
 
+function todayString() {
+  const d = new Date();
+  return d.toDateString();
+}
+
 function Home() {
   const [progress] = useLocalStore<ProgressMap>(storeKeys.progress, {});
-  const [vocab] = useLocalStore<any[]>(storeKeys.vocab, []);
+  const [vocab] = useLocalStore<SavedWord[]>(storeKeys.vocab, []);
+  const [stats] = useStats();
   const { streak } = useStreak();
   const { xp, level, progress: lvlProgress, xpToNext } = useXp();
   const { t, lang, dir } = useT();
@@ -31,11 +39,17 @@ function Home() {
   const continueStory = continueEntry ? stories.find((s) => s.slug === continueEntry[0]) : undefined;
 
   const finishedCount = Object.values(progress).filter((p) => p.finished).length;
-  const todayWords = vocab.filter((v) => {
-    const today = new Date();
-    const d = new Date(v.at);
-    return d.toDateString() === today.toDateString();
-  }).length;
+
+  const todayStr = todayString();
+  const todayWords = vocab.filter((v) => new Date(v.at).toDateString() === todayStr).length;
+
+  // Reading minutes today: use actual reading seconds from stats if session was today
+  const sessionIsToday = stats.lastSessionAt
+    ? new Date(stats.lastSessionAt).toDateString() === todayStr
+    : false;
+  // We don't have per-day breakdown, so use a simple "read today" heuristic
+  // If the user has an active session today, show a non-zero progress on the goal
+  const readMinutesToday = sessionIsToday ? DAILY_READ_GOAL_MIN : 0;
 
   const featured = stories.filter((s) => s.level === "beginner").slice(0, 3);
   const arrowClass = dir === "rtl" ? "h-4 w-4 rotate-180" : "h-4 w-4";
@@ -125,7 +139,7 @@ function Home() {
         <div className="grid gap-3 sm:grid-cols-2">
           <GoalBar
             label={ar ? `اقرأ ${DAILY_READ_GOAL_MIN} دقائق` : `Read ${DAILY_READ_GOAL_MIN} minutes`}
-            current={streak.days.includes(new Date().toISOString().slice(0, 10)) ? DAILY_READ_GOAL_MIN : 0}
+            current={readMinutesToday}
             max={DAILY_READ_GOAL_MIN}
             color="bg-primary"
           />
