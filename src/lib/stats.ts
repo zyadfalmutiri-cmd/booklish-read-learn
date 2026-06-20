@@ -7,6 +7,7 @@ export interface Stats {
   uniqueWords: string[]; // normalized
   readingSeconds: number;
   lastSessionAt: number | null;
+  dailyMinutes: Record<string, number>; // "Mon Jun 20 2026" → minutes
 }
 
 const DEFAULT_STATS: Stats = {
@@ -14,6 +15,7 @@ const DEFAULT_STATS: Stats = {
   uniqueWords: [],
   readingSeconds: 0,
   lastSessionAt: null,
+  dailyMinutes: {},
 };
 
 export function useStats() {
@@ -41,10 +43,17 @@ export function recordWordTap(normalized: string) {
 export function addReadingSeconds(seconds: number) {
   if (seconds <= 0) return;
   const current = activeAdapter.get<Stats>(storeKeys.stats, DEFAULT_STATS);
+  const todayKey = new Date().toDateString();
+  const existing = current.dailyMinutes ?? {};
+  const addedMinutes = seconds / 60;
   activeAdapter.set<Stats>(storeKeys.stats, {
     ...current,
     readingSeconds: current.readingSeconds + Math.round(seconds),
     lastSessionAt: Date.now(),
+    dailyMinutes: {
+      ...existing,
+      [todayKey]: (existing[todayKey] ?? 0) + addedMinutes,
+    },
   });
 }
 

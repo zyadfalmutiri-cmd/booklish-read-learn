@@ -7,26 +7,12 @@ import { useT } from "@/lib/i18n";
 import { useSpeaking } from "@/lib/tts";
 import { isDue } from "@/lib/srs";
 
-interface SavedWord {
-  word: string;
-  ar: string;
-  def: string;
-  example: string;
-  slug: string;
-  at: number;
-  level?: number;
-  nextReview?: number;
-}
-
-import { RequireAuth } from "@/components/booklish/require-auth";
+import type { SavedWord } from "@/lib/types";
+import { SyncBanner } from "@/components/booklish/sync-banner";
 
 export const Route = createFileRoute("/vocab")({
   head: () => ({ meta: [{ title: "Saved Words — Booklish" }] }),
-  component: () => (
-    <RequireAuth>
-      <Vocab />
-    </RequireAuth>
-  ),
+  component: Vocab,
 });
 
 function Vocab() {
@@ -49,6 +35,7 @@ function Vocab() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
+      <SyncBanner />
       <h1 className="mb-2 font-serif text-3xl">{t("vocab.title")}</h1>
       <p className="mb-6 text-sm text-muted-foreground">
         {t("vocab.subPrefix")} {vocab.length} {countWord}.

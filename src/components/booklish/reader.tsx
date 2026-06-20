@@ -1,15 +1,14 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, Fragment } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { BookmarkPlus, Languages, Sparkles, Loader2, Check, Volume2 } from "lucide-react";
 import { tokenize, splitSentences } from "@/lib/tokenize";
-import type { Story, VocabEntry } from "@/lib/types";
+import type { Story, VocabEntry, SavedWord } from "@/lib/types";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useSettings } from "./theme";
 import { lookupLocal, lookupAI, preWarmCache, normalizeWord, type WordLookup } from "@/lib/lookup";
 import { recordWordTap } from "@/lib/stats";
 import { useXp, XP_REWARDS } from "@/lib/xp";
-
-import type { SavedWord } from "@/lib/types";
+import { storyScenes } from "@/data/illustrations";
 
 export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct: number) => void }) {
   const [settings] = useSettings();
@@ -54,6 +53,12 @@ export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct
     });
   };
 
+  const scenes = storyScenes[story.slug] ?? [];
+  const sceneMap = useMemo(
+    () => new Map(scenes.map((s) => [s.afterParagraph, s])),
+    [scenes],
+  );
+
   return (
     <div ref={containerRef} dir="ltr" className="reading-column px-4 pb-24 pt-6 sm:px-0" style={{ fontSize }}>
       <h1 className="mb-2 text-balance text-3xl font-semibold leading-tight sm:text-4xl">{story.title}</h1>
@@ -62,19 +67,43 @@ export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct
       </p>
 
       {story.paragraphs.map((para, pi) => (
-        <Paragraph
-          key={pi}
-          paragraph={para}
-          vocab={story.vocab}
-          translations={story.sentenceTranslations}
-          translateMode={settings.translateMode}
-          showWordsAlways={showWordsAlways}
-          tappedSet={tappedSet}
-          savedSet={savedSet}
-          onSave={saveWord}
-        />
+        <Fragment key={pi}>
+          <Paragraph
+            paragraph={para}
+            vocab={story.vocab}
+            translations={story.sentenceTranslations}
+            translateMode={settings.translateMode}
+            showWordsAlways={showWordsAlways}
+            tappedSet={tappedSet}
+            savedSet={savedSet}
+            onSave={saveWord}
+          />
+          {sceneMap.has(pi) && <StoryImage {...sceneMap.get(pi)!} />}
+        </Fragment>
       ))}
     </div>
+  );
+}
+
+function StoryImage({ src, alt, caption }: { src: string; alt: string; caption?: string }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+  return (
+    <figure className="my-8 overflow-hidden rounded-2xl border border-border/50 bg-muted/30 shadow-sm">
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        onError={() => setFailed(true)}
+        className="h-44 w-full object-cover sm:h-56"
+      />
+      {caption && (
+        <figcaption className="px-4 py-2 text-center font-sans text-xs italic text-muted-foreground">
+          {caption}
+        </figcaption>
+      )}
+    </figure>
   );
 }
 

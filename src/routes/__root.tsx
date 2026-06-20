@@ -16,6 +16,7 @@ import { Header } from "../components/booklish/header";
 import { ThemeSync } from "../components/booklish/theme";
 import { THEME_INIT_SCRIPT } from "../lib/theme-init";
 import { Toaster } from "../components/ui/sonner";
+import { useCloudSync } from "../lib/sync";
 
 function NotFoundComponent() {
   return (
@@ -118,6 +119,8 @@ function RootComponent() {
   useEffect(() => {
     void import("../lib/pwa-register").then((m) => m.registerPWA?.());
   }, []);
+
+  useCloudSync();
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -43,13 +43,8 @@ function Home() {
   const todayStr = todayString();
   const todayWords = vocab.filter((v) => new Date(v.at).toDateString() === todayStr).length;
 
-  // Reading minutes today: use actual reading seconds from stats if session was today
-  const sessionIsToday = stats.lastSessionAt
-    ? new Date(stats.lastSessionAt).toDateString() === todayStr
-    : false;
-  // We don't have per-day breakdown, so use a simple "read today" heuristic
-  // If the user has an active session today, show a non-zero progress on the goal
-  const readMinutesToday = sessionIsToday ? DAILY_READ_GOAL_MIN : 0;
+  // Reading minutes today: use per-day tracking from stats
+  const readMinutesToday = Math.floor((stats.dailyMinutes ?? {})[todayStr] ?? 0);
 
   const featured = stories.filter((s) => s.level === "beginner").slice(0, 3);
   const arrowClass = dir === "rtl" ? "h-4 w-4 rotate-180" : "h-4 w-4";

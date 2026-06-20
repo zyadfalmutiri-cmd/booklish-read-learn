@@ -26,6 +26,13 @@ export interface QuizQuestion {
   kind: "main-idea" | "event" | "vocab";
 }
 
+export interface StoryScene {
+  afterParagraph: number;
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
 export interface Story {
   slug: string;
   title: string;

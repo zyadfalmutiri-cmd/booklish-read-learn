@@ -8,15 +8,10 @@ import { useSpeaking } from "@/lib/tts";
 import { useXp, XP_REWARDS } from "@/lib/xp";
 
 import type { SavedWord } from "@/lib/types";
-import { RequireAuth } from "@/components/booklish/require-auth";
 
 export const Route = createFileRoute("/review")({
   head: () => ({ meta: [{ title: "Review — Booklish" }] }),
-  component: () => (
-    <RequireAuth>
-      <Review />
-    </RequireAuth>
-  ),
+  component: Review,
 });
 
 function Review() {

@@ -9,6 +9,8 @@ import { useStreak } from "@/lib/streak";
 import { useReadingTimer } from "@/lib/stats";
 import { useT } from "@/lib/i18n";
 import { useXp, XP_REWARDS } from "@/lib/xp";
+import { StoryCompletion } from "@/components/booklish/story-completion";
+import type { SavedWord } from "@/lib/types";
 
 type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boolean; readingSeconds?: number }>;
 
@@ -27,29 +29,48 @@ export const Route = createFileRoute("/read/$slug")({
 function ReadPage() {
   const { story } = Route.useLoaderData() as { story: import("@/lib/types").Story };
   const [progress, setProgress, progressHydrated] = useLocalStore<ProgressMap>(storeKeys.progress, {});
+  const [vocabList, , vocabHydrated] = useLocalStore<SavedWord[]>(storeKeys.vocab, []);
   const [settings, setSettings] = useSettings();
   const { markActivity } = useStreak();
   const [pct, setPct] = useState(0);
   const { t } = useT();
-  const { addXp } = useXp();
+  const { addXp, xp } = useXp();
   const isFocusMode = settings.focusMode;
   const setFocusMode = (v: boolean) => setSettings({ ...settings, focusMode: v });
 
-  // Track whether we've already granted finish XP this session
+  // ── Finish XP (once per session) ───────────────────────────────────────
   const finishXpGranted = useRef(false);
 
-  // Reading-time XP: track active seconds, grant 2 XP per minute read
+  // ── Reading-time XP ────────────────────────────────────────────────────
   const readStartRef = useRef<number>(Date.now());
   const xpMinutesGranted = useRef(0);
 
+  // ── Session stats for completion screen ────────────────────────────────
+  const sessionStartAt = useRef(Date.now());
+  const vocabAtStart = useRef<number | null>(null);
+  const xpAtStart = useRef<number | null>(null);
+  const sessionInitialized = useRef(false);
+  const [showCompletion, setShowCompletion] = useState(false);
+
   useReadingTimer();
+
+  // Capture session baseline once local data is hydrated
+  useEffect(() => {
+    if (!sessionInitialized.current && vocabHydrated) {
+      sessionInitialized.current = true;
+      vocabAtStart.current = vocabList.length;
+      xpAtStart.current = xp;
+    }
+    // We intentionally only run this when vocabHydrated first becomes true
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vocabHydrated]);
 
   useEffect(() => {
     markActivity();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Reading-time XP grants (mirrors the stats reading timer pattern)
+  // Reading-time XP grants (pauses on tab hide / window blur)
   useEffect(() => {
     const grantXpForTime = () => {
       const elapsed = (Date.now() - readStartRef.current) / 1000;
@@ -71,7 +92,7 @@ function ReadPage() {
     const interval = window.setInterval(grantXpForTime, 60_000);
 
     return () => {
-      grantXpForTime(); // flush on unmount
+      grantXpForTime();
       document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("blur", grantXpForTime);
       window.removeEventListener("focus", resume);
@@ -80,16 +101,16 @@ function ReadPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Save scroll progress + grant finish XP once hydrated
+  // Save scroll progress + grant finish XP + show completion overlay
   useEffect(() => {
     if (!progressHydrated) return;
 
     const alreadyFinished = progress[story.slug]?.finished ?? false;
 
-    // Grant finish XP only the first time in this session
     if (pct >= 95 && !alreadyFinished && !finishXpGranted.current) {
       finishXpGranted.current = true;
       addXp(XP_REWARDS.finishStory, `finish:${story.slug}`);
+      setShowCompletion(true);
     }
 
     setProgress((prev) => {
@@ -119,6 +140,11 @@ function ReadPage() {
   };
 
   const remaining = Math.max(0, Math.round(story.minutes * (1 - pct / 100)));
+
+  // Completion screen stats
+  const readingSeconds = Math.round((Date.now() - sessionStartAt.current) / 1000);
+  const newWords = Math.max(0, vocabList.length - (vocabAtStart.current ?? vocabList.length));
+  const xpEarned = Math.max(0, xp - (xpAtStart.current ?? xp));
 
   return (
     <div className="min-h-screen">
@@ -190,6 +216,17 @@ function ReadPage() {
           </div>
         )}
       </div>
+
+      {showCompletion && (
+        <StoryCompletion
+          storySlug={story.slug}
+          storyTitle={story.title}
+          readingSeconds={readingSeconds}
+          newWords={newWords}
+          xpEarned={xpEarned}
+          onDismiss={() => setShowCompletion(false)}
+        />
+      )}
     </div>
   );
 }

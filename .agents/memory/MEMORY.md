@@ -1,2 +1,3 @@
-- [RTL + English reader fix](rtl-reader-fix.md) — English story content needs dir="ltr" on its container when UI lang is Arabic.
-- [XP system](xp-system.md) — XP/levels in src/lib/xp.ts; rewards granted in reader, review, and quiz routes.
+- [Cloud sync architecture](cloud-sync.md) — Supabase tables already existed (saved_words, progress, streaks, quiz_results); sync service lives in src/lib/sync.ts, mounted once in __root.tsx via useCloudSync().
+- [Story illustrations system](illustrations.md) — storyScenes map in src/data/illustrations.ts keyed by slug; Reader renders StoryImage after each matching paragraph; uses onError to hide failed images gracefully.
+- [Auth strategy](auth-strategy.md) — RequireAuth removed from vocab/review/dashboard; SyncBanner shown to guests instead; reading + saving words works fully offline/without auth.
