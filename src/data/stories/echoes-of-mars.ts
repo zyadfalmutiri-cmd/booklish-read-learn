@@ -1,0 +1,40 @@
+import type { Story } from "@/lib/types";
+
+export const echoesOfMars: Story = {
+  slug: "echoes-of-mars",
+  title: "Echoes of Mars",
+  genre: "sci-fi",
+  level: "intermediate",
+  blurb: "On the third day of the storm, the lonely engineer of Outpost Six receives a transmission that should not exist.",
+  cover: "🪐",
+  coverHue: "from-orange-200 to-rose-400",
+  minutes: 6,
+  paragraphs: [
+    "The dust storm had lasted three days. Outpost Six trembled gently every few minutes, as if the planet itself were breathing against its thin metal walls. Inside, the engineer Iris listened to the wind and waited.",
+    "She was the only person here. The supply ship would not return for another four months. To keep busy, she ran tests, recorded data, and talked to the small green plants in her tiny lab. They were the only living things she could see.",
+    "On the third night, the long-range receiver suddenly woke up. A signal was coming in from somewhere on the surface, weak but clear. Iris stared at the screen. There was no other base on this side of the planet. There should be no one out there.",
+    "She translated the message. It was short, and very strange. \"If you can hear me, please answer. I have been walking for two days. The storm is loud. I am tired but I am not afraid.\"",
+    "Iris answered immediately. \"I hear you. Who are you? Where are you?\" She waited. The seconds felt like long, cold minutes. Then the reply came. \"My name is Iris. I think I am you.\"",
+    "She did not move for a long time. Outside, the dust began to fall. The wind grew softer. On her screen, a small dot was approaching her outpost, slowly but steadily, as if it had always known the way home.",
+  ],
+  vocab: {
+    trembled: { ar: "ارتجف", def: "Shook slightly.", example: "Her hands trembled from the cold." },
+    outpost: { ar: "موقع متقدّم / مركز نائي", def: "A small base far from a main settlement.", example: "The soldiers lived at a remote outpost." },
+    engineer: { ar: "مهندس", def: "A person who designs or maintains machines.", example: "She is an engineer at the space agency." },
+    supply: { ar: "إمدادات", def: "Things provided for use, like food or fuel.", example: "The truck delivers our supply of water." },
+    signal: { ar: "إشارة", def: "A radio or electronic message.", example: "The signal was too weak to hear." },
+    receiver: { ar: "جهاز استقبال", def: "A device that picks up signals.", example: "The radio receiver crackled with static." },
+    translated: { ar: "ترجم", def: "Changed from one language or code into another.", example: "He translated the letter into Arabic." },
+    approaching: { ar: "يقترب", def: "Coming closer.", example: "A car was approaching the gate." },
+    steadily: { ar: "بثبات", def: "In a smooth, continuous way.", example: "The rain fell steadily all night." },
+    immediately: { ar: "على الفور", def: "Right away; with no delay.", example: "She answered the call immediately." },
+  },
+  quiz: [
+    { kind: "main-idea", q: "What is the central idea of the story?", choices: ["A lonely engineer on Mars receives an impossible signal — from herself.", "Astronauts repair a broken spaceship.", "A storm destroys an outpost.", "Scientists discover a new planet."], answer: 0 },
+    { kind: "event", q: "How long had the dust storm lasted at the start?", choices: ["A few hours", "Three days", "One week", "One month"], answer: 1 },
+    { kind: "event", q: "What did the message say at first?", choices: ["\"Send help immediately.\"", "\"I am walking. I am tired but not afraid.\"", "\"Return to Earth.\"", "\"The storm has stopped.\""], answer: 1 },
+    { kind: "event", q: "What does the dot on the screen seem to do at the end?", choices: ["Disappear", "Move away from the outpost", "Approach the outpost steadily", "Split into many dots"], answer: 2 },
+    { kind: "vocab", q: "An \"outpost\" is…", choices: ["a busy city", "a small distant base", "a kind of vehicle", "a planet"], answer: 1 },
+    { kind: "vocab", q: "If something happens \"steadily,\" it happens…", choices: ["suddenly and once", "in a smooth, continuous way", "very rarely", "by accident"], answer: 1 },
+  ],
+};

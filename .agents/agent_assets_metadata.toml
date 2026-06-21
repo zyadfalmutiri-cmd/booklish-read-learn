@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "I6OQfdshH0TVD_3IpSzKJ"
+uri = "file://booklish-project.zip"
+type = "unspecified"
+title = "Booklish — كامل ملفات المشروع"
