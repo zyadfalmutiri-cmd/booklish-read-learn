@@ -10,7 +10,7 @@ interface LookupResult {
 export const lookupWordAI = createServerFn({ method: "POST" })
   .inputValidator(z.object({ word: z.string().min(1).max(60), context: z.string().max(400).optional() }))
   .handler(async ({ data }): Promise<LookupResult> => {
-    const apiKey = process.env.LOVABLE_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return { en: "No explanation available yet.", ar: "—", source: "none" };
 
     const word = data.word.trim().toLowerCase();
@@ -19,23 +19,26 @@ export const lookupWordAI = createServerFn({ method: "POST" })
     const user = data.context ? `Word: "${word}"\nContext: "${data.context}"` : `Word: "${word}"`;
 
     try {
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [
-            { role: "system", content: sys },
-            { role: "user", content: user },
-          ],
-          response_format: { type: "json_object" },
-        }),
-      });
+      const res = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`,
+            "x-goog-api-key": apiKey,
+          },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: `${sys}\n\n${user}` }] }],
+            generationConfig: { responseMimeType: "application/json" },
+          }),
+        },
+      );
       if (!res.ok) {
         return { en: "No explanation available yet.", ar: "—", source: "none" };
       }
       const json = await res.json();
-      const content = json?.choices?.[0]?.message?.content ?? "{}";
+      const content = json?.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
       const parsed = JSON.parse(content);
       const en = typeof parsed.en === "string" && parsed.en.trim() ? parsed.en.trim() : "";
       const ar = typeof parsed.ar === "string" && parsed.ar.trim() ? parsed.ar.trim() : "";
