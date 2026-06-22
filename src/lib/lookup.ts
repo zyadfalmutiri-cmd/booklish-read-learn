@@ -30,7 +30,6 @@ function readCache(): CacheShape {
 function writeCache(cache: CacheShape) {
   if (typeof window === "undefined") return;
   try {
-    // Prune oldest entries if over the size limit
     const entries = Object.entries(cache);
     if (entries.length > MAX_CACHE_ENTRIES) {
       const pruned = entries
@@ -83,26 +82,40 @@ export function lookupLocal(
   return null;
 }
 
+// ── Rate-limit queue: max 1 concurrent AI request, 400ms gap between calls ──
+let _aiQueue = Promise.resolve();
+function enqueueAI<T>(fn: () => Promise<T>): Promise<T> {
+  const next = _aiQueue.then(() => fn()).then(
+    (v) => { _aiQueue = Promise.resolve(); return v; },
+    (e) => { _aiQueue = Promise.resolve(); throw e; },
+  );
+  _aiQueue = next.then(() => new Promise((r) => setTimeout(r, 400)));
+  return next;
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 /** Async AI fallback. Caches result. */
 export async function lookupAI(word: string, context?: string): Promise<WordLookup> {
   const key = normalizeWord(word);
-  try {
-    const res = await lookupWordAI({ data: { word: key, context } });
-    if (res.source === "ai") {
-      const entry = { en: res.en, ar: res.ar };
-      setCache(key, entry);
-      return { word: key, ...entry, timestamp: Date.now(), source: "ai" };
+  return enqueueAI(async () => {
+    try {
+      const res = await lookupWordAI({ data: { word: key, context } });
+      if (res.source === "ai") {
+        const entry = { en: res.en, ar: res.ar };
+        setCache(key, entry);
+        return { word: key, ...entry, timestamp: Date.now(), source: "ai" as const };
+      }
+      return { word: key, en: res.en, ar: res.ar, timestamp: Date.now(), source: "none" as const };
+    } catch {
+      return {
+        word: key,
+        en: "No explanation available yet.",
+        ar: "—",
+        timestamp: Date.now(),
+        source: "none" as const,
+      };
     }
-    return { word: key, en: res.en, ar: res.ar, timestamp: Date.now(), source: "none" };
-  } catch {
-    return {
-      word: key,
-      en: "No explanation available yet.",
-      ar: "—",
-      timestamp: Date.now(),
-      source: "none",
-    };
-  }
+  });
 }
 
 /** Pre-warm cache with all dictionary/story entries that appear in the given text. */
