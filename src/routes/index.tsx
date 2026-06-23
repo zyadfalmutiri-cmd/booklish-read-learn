@@ -1,4 +1,5 @@
 import { useSubscription } from "@/hooks/use-subscription";
+import { useAuth } from "@/hooks/use-auth";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { stories } from "@/data/stories";
 import { StoryCard } from "@/components/booklish/story-card";
@@ -32,6 +33,7 @@ function Home() {
   const { xp, level, progress: lvlProgress, xpToNext } = useXp();
   const { t, lang, dir } = useT();
   const { isPro, loading: subLoading } = useSubscription();
+  const { user } = useAuth();
   const ar = lang === "ar";
 
   const continueEntry = Object.entries(progress)
@@ -51,9 +53,11 @@ function Home() {
   const arrowClass = dir === "rtl" ? "h-4 w-4 rotate-180" : "h-4 w-4";
 
   const openCheckout = (priceId: string) => {
-    if (typeof window !== "undefined" && (window as any).Paddle) {
+    if (typeof window !== "undefined" && (window as any).Paddle && user) {
       (window as any).Paddle.Checkout.open({
         items: [{ priceId, quantity: 1 }],
+        customer: { email: user.email },
+        customData: { user_id: user.id },
       });
     }
   };
