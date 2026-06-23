@@ -91,6 +91,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/manifest.webmanifest" },
     ],
+    scripts: [
+      { src: "https://cdn.paddle.com/paddle/v2/paddle.js" },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -118,6 +121,15 @@ function RootComponent() {
 
   useEffect(() => {
     void import("../lib/pwa-register").then((m) => m.registerPWA?.());
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && (window as any).Paddle) {
+      (window as any).Paddle.Environment.set("sandbox");
+      (window as any).Paddle.Initialize({
+        token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
+      });
+    }
   }, []);
 
   useCloudSync();
