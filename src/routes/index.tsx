@@ -31,6 +31,7 @@ function Home() {
   const { streak } = useStreak();
   const { xp, level, progress: lvlProgress, xpToNext } = useXp();
   const { t, lang, dir } = useT();
+  const { isPro, loading: subLoading } = useSubscription();
   const ar = lang === "ar";
 
   const continueEntry = Object.entries(progress)
@@ -44,11 +45,18 @@ function Home() {
   const todayStr = todayString();
   const todayWords = vocab.filter((v) => new Date(v.at).toDateString() === todayStr).length;
 
-  // Reading minutes today: use per-day tracking from stats
   const readMinutesToday = Math.floor((stats.dailyMinutes ?? {})[todayStr] ?? 0);
 
   const featured = stories.filter((s) => s.level === "beginner").slice(0, 3);
   const arrowClass = dir === "rtl" ? "h-4 w-4 rotate-180" : "h-4 w-4";
+
+  const openCheckout = (priceId: string) => {
+    if (typeof window !== "undefined" && (window as any).Paddle) {
+      (window as any).Paddle.Checkout.open({
+        items: [{ priceId, quantity: 1 }],
+      });
+    }
+  };
 
   return (
     <main className="mx-auto max-w-5xl px-4 pb-24 pt-8 sm:pt-14">
@@ -103,6 +111,37 @@ function Home() {
           label={ar ? "كلمات اليوم" : "Words today"}
         />
       </section>
+
+      {/* Pricing Banner */}
+      {!subLoading && !isPro && (
+        <section className="mb-8 rounded-xl border border-primary/30 bg-primary/5 p-5">
+          <div className="mb-1 text-xs uppercase tracking-widest text-primary">
+            {ar ? "ترقية" : "Upgrade"}
+          </div>
+          <h2 className="mb-1 font-serif text-xl">
+            {ar ? "افتح كل القصص 📚" : "Unlock all stories 📚"}
+          </h2>
+          <p className="mb-4 text-sm text-muted-foreground">
+            {ar
+              ? "اشترك للوصول لجميع القصص والمستويات بدون حدود"
+              : "Subscribe to access all stories and levels without limits"}
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => openCheckout(import.meta.env.VITE_PADDLE_MONTHLY_PRICE_ID)}
+              className="rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              {ar ? "شهري — $5" : "Monthly — $5"}
+            </button>
+            <button
+              onClick={() => openCheckout(import.meta.env.VITE_PADDLE_YEARLY_PRICE_ID)}
+              className="rounded-full border border-border px-5 py-2.5 text-sm font-medium hover:bg-muted transition-colors"
+            >
+              {ar ? "سنوي — $30" : "Yearly — $30"}
+            </button>
+          </div>
+        </section>
+      )}
 
       {/* XP Progress */}
       <section className="mb-8 rounded-xl border border-border bg-card p-4">
