@@ -8,9 +8,8 @@ import { useStreak } from "@/lib/streak";
 import { useXp, LEVELS } from "@/lib/xp";
 import { useStats } from "@/lib/stats";
 import type { SavedWord } from "@/lib/types";
-import { Flame, BookOpen, ArrowRight, Target, Zap, Mic, MicOff, Volume2 } from "lucide-react";
+import { Flame, BookOpen, ArrowRight, Target, Zap } from "lucide-react";
 import { useT } from "@/lib/i18n";
-import { useState, useRef, useEffect } from "react";
 
 type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boolean }>;
 
@@ -24,149 +23,6 @@ const DAILY_READ_GOAL_MIN = 5;
 function todayString() {
   const d = new Date();
   return d.toDateString();
-}
-
-function VoiceAssistant({ ar }: { ar: boolean }) {
-  const [listening, setListening] = useState(false);
-  const [thinking, setThinking] = useState(false);
-  const [transcript, setTranscript] = useState("");
-  const [reply, setReply] = useState("");
-  const [suggestedStories, setSuggestedStories] = useState<typeof stories>([]);
-  const recognitionRef = useRef<any>(null);
-
-  const speak = (text: string) => {
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = ar ? "ar-SA" : "en-US";
-    window.speechSynthesis.speak(utter);
-  };
-
-  const startListening = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert(ar ? "المتصفح لا يدعم التعرف على الصوت" : "Browser doesn't support voice recognition");
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = ar ? "ar-SA" : "en-US";
-    recognition.interimResults = false;
-    recognitionRef.current = recognition;
-
-    recognition.onresult = async (e: any) => {
-      const text = e.results[0][0].transcript;
-      setTranscript(text);
-      setListening(false);
-      setThinking(true);
-
-      try {
-        const storyList = stories.map(s => `- ${s.title} (${s.level})`).join("\n");
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
-          },
-          body: JSON.stringify({
-            model: "google/gemini-2.5-flash:free",
-            messages: [
-              {
-                role: "system",
-                content: `You are a helpful English learning assistant for Arabic speakers. 
-Here are the available stories:\n${storyList}\n
-When the user asks for story recommendations, suggest 1-3 stories by their exact titles.
-Reply in ${ar ? "Arabic" : "English"} in 2-3 sentences. End with the story titles you recommend wrapped in [SUGGEST: title1, title2].`
-              },
-              { role: "user", content: text }
-            ]
-          })
-        });
-
-        const data = await response.json();
-        const message = data.choices?.[0]?.message?.content || "";
-
-        const match = message.match(/\[SUGGEST:\s*([^\]]+)\]/);
-        if (match) {
-          const titles = match[1].split(",").map((t: string) => t.trim());
-          const found = stories.filter(s => titles.some(t => s.title.toLowerCase().includes(t.toLowerCase())));
-          setSuggestedStories(found);
-        }
-
-        const cleanReply = message.replace(/\[SUGGEST:[^\]]+\]/, "").trim();
-        setReply(cleanReply);
-        speak(cleanReply);
-      } catch {
-        setReply(ar ? "حدث خطأ، حاول مرة أخرى" : "Something went wrong, try again");
-      } finally {
-        setThinking(false);
-      }
-    };
-
-    recognition.onend = () => setListening(false);
-    recognition.start();
-    setListening(true);
-    setReply("");
-    setSuggestedStories([]);
-    setTranscript("");
-  };
-
-  const stopListening = () => {
-    recognitionRef.current?.stop();
-    setListening(false);
-  };
-
-  return (
-    <section className="mb-8 rounded-xl border border-border bg-card p-5">
-      <div className="mb-3 flex items-center gap-2">
-        <Volume2 className="h-4 w-4 text-primary" />
-        <h2 className="font-serif text-lg">{ar ? "مساعد القراءة الصوتي" : "Voice Reading Assistant"}</h2>
-      </div>
-      <p className="mb-4 text-sm text-muted-foreground">
-        {ar ? "تحدث معي واقترح لك قصة تناسبك" : "Talk to me and I'll suggest a story for you"}
-      </p>
-
-      <button
-        onClick={listening ? stopListening : startListening}
-        disabled={thinking}
-        className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-colors ${
-          listening
-            ? "bg-red-500 text-white hover:bg-red-600 animate-pulse"
-            : "bg-primary text-primary-foreground hover:bg-primary/90"
-        } disabled:opacity-50`}
-      >
-        {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-        {thinking
-          ? (ar ? "جاري التفكير..." : "Thinking...")
-          : listening
-          ? (ar ? "اضغط للإيقاف" : "Tap to stop")
-          : (ar ? "ابدأ التحدث" : "Start talking")}
-      </button>
-
-      {transcript && (
-        <p className="mt-3 text-sm text-muted-foreground">
-          🎤 {transcript}
-        </p>
-      )}
-
-      {reply && (
-        <div className="mt-3 rounded-lg bg-muted p-3 text-sm">
-          {reply}
-        </div>
-      )}
-
-      {suggestedStories.length > 0 && (
-        <div className="mt-4">
-          <p className="mb-2 text-xs font-medium text-primary uppercase tracking-wide">
-            {ar ? "القصص المقترحة" : "Suggested Stories"}
-          </p>
-          <div className="grid gap-3">
-            {suggestedStories.map(s => (
-              <StoryCard key={s.slug} story={s} />
-            ))}
-          </div>
-        </div>
-      )}
-    </section>
-  );
 }
 
 function Home() {
@@ -259,9 +115,6 @@ function Home() {
           label={ar ? "كلمات اليوم" : "Words today"}
         />
       </section>
-
-      {/* Voice Assistant */}
-      <VoiceAssistant ar={ar} />
 
       {/* Pricing Banner */}
       {!subLoading && !isPro && (
