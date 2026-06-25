@@ -70,7 +70,8 @@ function VoiceAssistant({ ar }: { ar: boolean }) {
           "X-Title": "Booklish",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash:free",
+model: "google/gemini-2.0-flash-exp:free",
+
           messages: [
             {
               role: "system",
