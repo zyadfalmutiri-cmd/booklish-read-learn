@@ -107,9 +107,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "mobile-web-app-capable", content: "yes" },
     ],
     links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "manifest", href: "/manifest.webmanifest" },
-    ],
+  { rel: "stylesheet", href: appCss },
+  { rel: "manifest", href: "/manifest.webmanifest" },
+  { rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
+],
     scripts: [{ src: "https://cdn.paddle.com/paddle/v2/paddle.js" }],
   }),
 
