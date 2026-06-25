@@ -3,6 +3,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: 'KawkabMono';
+  src: url('/fonts/KawkabMono-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 :root {
   --background: oklch(0.98 0.005 85);
   --foreground: oklch(0.18 0.02 60);
@@ -87,8 +94,10 @@ body {
   font-family: Georgia, "Times New Roman", serif;
 }
 
-html[dir="rtl"] body {
-  font-family: "Segoe UI", Tahoma, system-ui, sans-serif;
+html[dir="rtl"] body,
+html[dir="rtl"] *,
+[dir="rtl"] {
+  font-family: 'KawkabMono', 'Segoe UI', Tahoma, system-ui, sans-serif;
 }
 
 .reading-column {
