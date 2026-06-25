@@ -70,7 +70,7 @@ function VoiceAssistant({ ar }: { ar: boolean }) {
           "X-Title": "Booklish",
         },
         body: JSON.stringify({
-model: "mistralai/mistral-7b-instruct:free",
+model: "openrouter/auto",
 
           messages: [
             {
