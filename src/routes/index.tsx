@@ -50,10 +50,10 @@ function VoiceAssistant({ ar }: { ar: boolean }) {
     setSuggestedStories([]);
 
     try {
-      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-      
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
       if (!apiKey) {
-        setReply("خطأ: مفتاح API غير موجود - VITE_OPENROUTER_API_KEY");
+        setReply("خطأ: مفتاح API غير موجود - VITE_GEMINI_API_KEY");
         return;
       }
 
@@ -61,33 +61,31 @@ function VoiceAssistant({ ar }: { ar: boolean }) {
         .map((s) => `- ${s.title} (${s.level}, ${s.genre})`)
         .join("\n");
 
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${apiKey}`,
-          "HTTP-Referer": "https://booklish.vercel.app",
-          "X-Title": "Booklish",
-        },
-        body: JSON.stringify({
-model: "openrouter/auto",
-
-          messages: [
-            {
-              role: "system",
-              content: `You are a helpful English learning assistant for Arabic speakers in Booklish app.
+      const systemPrompt = `You are a helpful English learning assistant for Arabic speakers in Booklish app.
 Available stories:
 ${storyList}
 
 Suggest 1-3 stories based on user interest or level.
 Reply in Arabic in 2-3 friendly sentences.
 If suggesting stories, end with: [SUGGEST: Title1, Title2]
-Use exact English titles from the list.`,
-            },
-            { role: "user", content: text },
-          ],
-        }),
-      });
+Use exact English titles from the list.`;
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  { text: systemPrompt + "\n\nUser: " + text }
+                ]
+              }
+            ]
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errText = await response.text();
@@ -96,7 +94,7 @@ Use exact English titles from the list.`,
       }
 
       const data = await response.json();
-      const message = data.choices?.[0]?.message?.content || "";
+      const message = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
       const match = message.match(/\[SUGGEST:\s*([^\]]+)\]/);
       if (match) {
