@@ -304,4 +304,233 @@ function Home() {
   const finishedCount = Object.values(progress).filter((p) => p.finished).length;
   const todayStr = todayString();
   const todayWords = vocab.filter((v) => new Date(v.at).toDateString() === todayStr).length;
-  const readMinutesToday = Math.floor((stats.dailyMin
+  const readMinutesToday = Math.floor((stats.dailyMinutes ?? {})[todayStr] ?? 0);
+  const featured = stories.filter((s) => s.level === "beginner").slice(0, 3);
+  const arrowClass = dir === "rtl" ? "h-4 w-4 rotate-180" : "h-4 w-4";
+
+  const openCheckout = (priceId: string) => {
+    if (typeof window !== "undefined" && (window as any).Paddle && user) {
+      (window as any).Paddle.Checkout.open({
+        items: [{ priceId, quantity: 1 }],
+        customer: { email: user.email },
+        customData: { user_id: user.id },
+      });
+    }
+  };
+
+  return (
+    <main className="mx-auto max-w-5xl px-4 pb-24 pt-8 sm:pt-14">
+
+      {/* Hero */}
+      <section className="mb-10 sm:mb-14">
+        <p className="mb-3 text-xs uppercase tracking-[0.2em] text-primary">{t("home.kicker")}</p>
+        <h1 className="mb-5 max-w-2xl font-serif text-3xl leading-[1.1] tracking-tight sm:text-5xl">
+          {t("home.title")}
+        </h1>
+        <p className="mb-7 max-w-xl text-base text-muted-foreground">{t("home.sub")}</p>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            to="/library"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            <BookOpen className="h-4 w-4" />
+            {t("home.browse")}
+            <ArrowRight className={arrowClass} />
+          </Link>
+          <Link
+            to="/review"
+            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          >
+            {ar ? "راجع كلماتك" : "Review words"}
+          </Link>
+        </div>
+      </section>
+
+      {/* Stats Row */}
+      <section className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <StatCard
+          icon={<Flame className="h-4 w-4 text-orange-500" />}
+          value={String(streak.current)}
+          label={ar ? "أيام متتالية" : "Day streak"}
+        />
+        <StatCard
+          icon={<BookOpen className="h-4 w-4 text-primary" />}
+          value={String(finishedCount)}
+          label={ar ? "قصص مكتملة" : "Stories done"}
+        />
+        <StatCard
+          icon={<Zap className="h-4 w-4 text-yellow-500" />}
+          value={`${xp} XP`}
+          label={`${level.icon} ${ar ? level.nameAr : level.nameEn}`}
+        />
+        <StatCard
+          icon={<Target className="h-4 w-4 text-emerald-500" />}
+          value={`${todayWords}/${DAILY_WORD_GOAL}`}
+          label={ar ? "كلمات اليوم" : "Words today"}
+        />
+      </section>
+
+      {/* Voice Assistant */}
+      <VoiceAssistant ar={ar} />
+
+      {/* Continue Reading */}
+      {continueStory && (
+        <section className="mb-8">
+          <h2 className="mb-3 font-serif text-xl">{t("home.continue")}</h2>
+          <Link
+            to="/read/$slug"
+            params={{ slug: continueStory.slug }}
+            className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4 transition-all hover:shadow-md hover:-translate-y-0.5"
+          >
+            <div className={`grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-gradient-to-br ${continueStory.coverHue} text-2xl shadow-sm`}>
+              {continueStory.cover}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="mb-1 truncate font-serif text-base">{continueStory.title}</div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div className="h-full bg-primary" style={{ width: `${continueEntry![1].pct}%` }} />
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                {continueEntry![1].pct}% {t("home.readPct")}
+              </div>
+            </div>
+            <ArrowRight className={`${arrowClass} shrink-0 text-muted-foreground`} />
+          </Link>
+        </section>
+      )}
+
+      {/* Daily Goal */}
+      <section className="mb-8 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+        <div className="border-b border-border px-4 py-3">
+          <h2 className="text-sm font-medium">{ar ? "هدف اليوم" : "Daily goal"}</h2>
+        </div>
+        <div className="p-4 grid gap-4 sm:grid-cols-2">
+          <GoalBar
+            label={ar ? `اقرأ ${DAILY_READ_GOAL_MIN} دقائق` : `Read ${DAILY_READ_GOAL_MIN} minutes`}
+            current={readMinutesToday}
+            max={DAILY_READ_GOAL_MIN}
+            color="bg-primary"
+          />
+          <GoalBar
+            label={ar ? `احفظ ${DAILY_WORD_GOAL} كلمات` : `Save ${DAILY_WORD_GOAL} words`}
+            current={Math.min(todayWords, DAILY_WORD_GOAL)}
+            max={DAILY_WORD_GOAL}
+            color="bg-emerald-500"
+          />
+        </div>
+      </section>
+
+      {/* XP Progress */}
+      <section className="mb-8 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+        <div className="border-b border-border px-4 py-3">
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-medium">{level.icon} {ar ? level.nameAr : level.nameEn}</span>
+            {xpToNext > 0 && (
+              <span className="text-xs text-muted-foreground">
+                {ar ? `${xpToNext} XP للمستوى التالي` : `${xpToNext} XP to next level`}
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="p-4">
+          <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70 transition-all duration-500"
+              style={{ width: `${lvlProgress}%` }}
+            />
+          </div>
+          <div className="mt-3 flex justify-between text-[11px] text-muted-foreground">
+            {LEVELS.map((l) => (
+              <span key={l.name} className={xp >= l.minXp ? "text-primary font-medium" : ""}>
+                {l.icon}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Stories */}
+      <section className="mb-8">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="font-serif text-xl">{t("home.featured")}</h2>
+          <Link to="/library" className="text-sm text-primary hover:underline">
+            {t("home.viewAll")}
+          </Link>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {featured.map((s) => (
+            <StoryCard key={s.slug} story={s} />
+          ))}
+        </div>
+      </section>
+
+      {/* Pricing Banner */}
+      {!subLoading && !isPro && (
+        <section className="mb-8 overflow-hidden rounded-2xl border border-primary/30 shadow-sm">
+          <div className="bg-gradient-to-br from-primary/15 via-primary/8 to-transparent p-5">
+            <div className="mb-1 text-xs uppercase tracking-widest text-primary font-medium">
+              {ar ? "ترقية" : "Upgrade"}
+            </div>
+            <h2 className="mb-2 font-serif text-xl font-medium">
+              {ar ? "افتح كل القصص" : "Unlock all stories"}
+            </h2>
+            <ul className="mb-4 space-y-1 text-sm text-muted-foreground list-none">
+              <li>{ar ? "- جميع القصص والمستويات" : "- All stories and levels"}</li>
+              <li>{ar ? "- حفظ كلمات بلا حدود" : "- Unlimited word saving"}</li>
+              <li>{ar ? "- بدون إعلانات" : "- Ad-free experience"}</li>
+            </ul>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => openCheckout(import.meta.env.VITE_PADDLE_MONTHLY_PRICE_ID)}
+                className="rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors shadow-md shadow-primary/20"
+              >
+                {ar ? "شهري - $5" : "Monthly - $5"}
+              </button>
+              <div className="relative">
+                <button
+                  onClick={() => openCheckout(import.meta.env.VITE_PADDLE_YEARLY_PRICE_ID)}
+                  className="rounded-full border-2 border-primary px-5 py-2.5 text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
+                >
+                  {ar ? "سنوي - $30" : "Yearly - $30"}
+                </button>
+                <span className="absolute -top-2 -right-2 rounded-full bg-emerald-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                  {ar ? "50%" : "50% off"}
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+    </main>
+  );
+}
+
+function StatCard({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
+  return (
+    <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+      <div className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+        {icon} {label}
+      </div>
+      <div className="font-serif text-2xl font-medium">{value}</div>
+    </div>
+  );
+}
+
+function GoalBar({ label, current, max, color }: { label: string; current: number; max: number; color: string }) {
+  const pct = Math.min(100, Math.round((current / max) * 100));
+  return (
+    <div>
+      <div className="mb-1.5 flex justify-between text-xs">
+        <span className="text-muted-foreground">{label}</span>
+        <span className="font-medium">{current}/{max}</span>
+      </div>
+      <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${color}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+}
