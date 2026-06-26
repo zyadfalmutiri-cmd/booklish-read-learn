@@ -10,6 +10,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   const location = useLocation();
   const { data, completePlacement } = useUserLevel();
 
+  // لا نزال ننتظر تحميل الـ auth
   if (loading) {
     return (
       <div className="grid min-h-[60vh] place-items-center">
@@ -18,17 +19,30 @@ export function RequireAuth({ children }: { children: ReactNode }) {
     );
   }
 
+  // غير مسجل → صفحة الدخول
   if (!user) {
     return <Navigate to="/auth" search={{ redirect: location.pathname }} replace />;
   }
 
+  // صفحة /auth نفسها لا تحتاج اختبار
   if (location.pathname === "/auth") {
     return <>{children}</>;
   }
 
+  // ننتظر تحميل localStorage (data ستكون undefined أول لحظة)
+  if (!data) {
+    return (
+      <div className="grid min-h-[60vh] place-items-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  // أول مرة → اختبار التحديد
   if (!data.placementDone) {
     return <PlacementTest onComplete={completePlacement} />;
   }
 
   return <>{children}</>;
 }
+
