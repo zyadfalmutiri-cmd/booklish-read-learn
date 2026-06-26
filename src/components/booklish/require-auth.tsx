@@ -1,16 +1,14 @@
 import { Navigate, useLocation } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { useUserLevel } from "@/lib/reading-level";
+import { PlacementTest } from "@/components/booklish/placement-test";
 import { Loader2 } from "lucide-react";
 
-/**
- * Client-side auth gate. Supabase persists the session in localStorage,
- * so we render a loading state while the session boots and redirect to
- * /auth?redirect=<current> when unauthenticated.
- */
 export function RequireAuth({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
   const location = useLocation();
+  const { data, completePlacement } = useUserLevel();
 
   if (loading) {
     return (
@@ -19,8 +17,18 @@ export function RequireAuth({ children }: { children: ReactNode }) {
       </div>
     );
   }
+
   if (!user) {
     return <Navigate to="/auth" search={{ redirect: location.pathname }} replace />;
   }
+
+  if (location.pathname === "/auth") {
+    return <>{children}</>;
+  }
+
+  if (!data.placementDone) {
+    return <PlacementTest onComplete={completePlacement} />;
+  }
+
   return <>{children}</>;
 }
