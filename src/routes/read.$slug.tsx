@@ -10,7 +10,9 @@ import { useReadingTimer } from "@/lib/stats";
 import { useT } from "@/lib/i18n";
 import { useXp, XP_REWARDS } from "@/lib/xp";
 import { StoryCompletion } from "@/components/booklish/story-completion";
+import { useUserLevel } from "@/lib/reading-level";
 import type { SavedWord } from "@/lib/types";
+
 
 type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boolean; readingSeconds?: number }>;
 
@@ -34,7 +36,9 @@ function ReadPage() {
   const { markActivity } = useStreak();
   const [pct, setPct] = useState(0);
   const { t } = useT();
-  const { addXp, xp } = useXp();
+    const { addXp, xp } = useXp();
+  const { recordStoryFinished } = useUserLevel();
+
   const isFocusMode = settings.focusMode;
   const setFocusMode = (v: boolean) => setSettings({ ...settings, focusMode: v });
 
@@ -109,8 +113,10 @@ function ReadPage() {
 
     if (pct >= 95 && !alreadyFinished && !finishXpGranted.current) {
       finishXpGranted.current = true;
-      addXp(XP_REWARDS.finishStory, `finish:${story.slug}`);
+            addXp(XP_REWARDS.finishStory, `finish:${story.slug}`);
+      recordStoryFinished();
       setShowCompletion(true);
+
     }
 
     setProgress((prev) => {
