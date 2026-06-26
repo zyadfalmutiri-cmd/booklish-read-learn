@@ -38,5 +38,6 @@ export const storeKeys = {
   streak: "streak",
   stats: "stats",
   tapped: "tappedWords",
-  xp: "xp",
+    xp: "xp",
+  userLevel: "booklish.userLevel",
 } as const;
