@@ -5,12 +5,18 @@ import { useUserLevel } from "@/lib/reading-level";
 import { PlacementTest } from "@/components/booklish/placement-test";
 import { Loader2 } from "lucide-react";
 
+const PUBLIC_PATHS = ["/auth", "/reset-password", "/privacy", "/terms", "/cookies"];
+
 export function RequireAuth({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
   const location = useLocation();
   const { data, completePlacement } = useUserLevel();
 
-  // لا نزال ننتظر تحميل الـ auth
+  // صفحات عامة — لا تحتاج تسجيل دخول
+  if (PUBLIC_PATHS.includes(location.pathname)) {
+    return <>{children}</>;
+  }
+
   if (loading) {
     return (
       <div className="grid min-h-[60vh] place-items-center">
@@ -19,17 +25,10 @@ export function RequireAuth({ children }: { children: ReactNode }) {
     );
   }
 
-  // غير مسجل → صفحة الدخول
   if (!user) {
     return <Navigate to="/auth" search={{ redirect: location.pathname }} replace />;
   }
 
-  // صفحة /auth نفسها لا تحتاج اختبار
-  if (location.pathname === "/auth") {
-    return <>{children}</>;
-  }
-
-  // ننتظر تحميل localStorage (data ستكون undefined أول لحظة)
   if (!data) {
     return (
       <div className="grid min-h-[60vh] place-items-center">
@@ -38,11 +37,9 @@ export function RequireAuth({ children }: { children: ReactNode }) {
     );
   }
 
-  // أول مرة → اختبار التحديد
   if (!data.placementDone) {
     return <PlacementTest onComplete={completePlacement} />;
   }
 
   return <>{children}</>;
 }
-
