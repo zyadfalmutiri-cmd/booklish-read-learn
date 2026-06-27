@@ -57,8 +57,7 @@ export const lookupWordAI = createServerFn({ method: "POST" })
       }
 
       const json = await res.json();
-      const content: string =
-        json?.choices?.[0]?.message?.content ?? "{}";
+      const content: string = json?.choices?.[0]?.message?.content ?? "{}";
       const clean = content.replace(/```json|```/gi, "").trim();
       const parsed = JSON.parse(clean);
 
@@ -79,7 +78,9 @@ export const lookupWordAI = createServerFn({ method: "POST" })
       console.error("lookupWordAI error:", err);
       return { en: "No explanation available.", ar: "—", source: "none" };
     }
-  export const translateTextAI = createServerFn({ method: "POST" })
+  });
+
+export const translateTextAI = createServerFn({ method: "POST" })
   .inputValidator(z.object({ text: z.string().min(1).max(1200) }))
   .handler(async ({ data }): Promise<{ ar: string; source: "ai" | "none" }> => {
     const apiKey = process.env.OPENROUTER_API_KEY;
@@ -117,4 +118,3 @@ export const lookupWordAI = createServerFn({ method: "POST" })
       return { ar: "—", source: "none" };
     }
   });
-
