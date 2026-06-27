@@ -30,6 +30,7 @@ export function Header() {
     { to: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
     { to: "/vocab", label: t("nav.vocab"), icon: BookMarked },
     { to: "/review", label: t("nav.review"), icon: RotateCcw },
+    { to: "/vocab-games", label: lang === "ar" ? "ألعاب" : "Games", icon: Brain },
   ] as const;
 
   return (
