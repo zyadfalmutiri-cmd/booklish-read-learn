@@ -1,3 +1,4 @@
+import { Moon, Sun, BookOpen, Languages, LogOut, LogIn, Menu, X, Library, LayoutDashboard, BookMarked, RotateCcw, Brain } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Moon, Sun, BookOpen, Languages, LogOut, LogIn, Menu, X, Library, LayoutDashboard, BookMarked, RotateCcw } from "lucide-react";
 import { useSettings } from "./theme";
