@@ -157,8 +157,7 @@ function ReadPage() {
       <div className="sticky top-14 z-20 border-b border-border bg-background/85 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center gap-1.5 px-3 py-2 sm:gap-2 sm:px-4">
           <Link
-            to="/story/$slug"
-            params={{ slug: story.slug }}
+                        to="/library"
             className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border hover:bg-muted"
             aria-label="Back"
           >
