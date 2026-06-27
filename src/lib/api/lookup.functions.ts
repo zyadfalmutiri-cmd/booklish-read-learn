@@ -79,4 +79,42 @@ export const lookupWordAI = createServerFn({ method: "POST" })
       console.error("lookupWordAI error:", err);
       return { en: "No explanation available.", ar: "—", source: "none" };
     }
+  export const translateTextAI = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ text: z.string().min(1).max(1200) }))
+  .handler(async ({ data }): Promise<{ ar: string; source: "ai" | "none" }> => {
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey) return { ar: "—", source: "none" };
+
+    try {
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+          "HTTP-Referer": "https://booklish.app",
+          "X-Title": "Booklish",
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are a professional English-to-Arabic translator. Translate the given English text into natural Modern Standard Arabic. Return ONLY the Arabic translation, nothing else.",
+            },
+            { role: "user", content: data.text },
+          ],
+          temperature: 0.2,
+          max_tokens: 400,
+        }),
+      });
+
+      if (!res.ok) return { ar: "—", source: "none" };
+      const json = await res.json();
+      const ar = json?.choices?.[0]?.message?.content?.trim() ?? "";
+      return ar ? { ar, source: "ai" } : { ar: "—", source: "none" };
+    } catch {
+      return { ar: "—", source: "none" };
+    }
   });
+
