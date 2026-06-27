@@ -17,18 +17,17 @@ export const lookupWordAI = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<LookupResult> => {
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
-      return { en: "No explanation available yet.", ar: "—", source: "none" };
+      return { en: "No explanation available.", ar: "—", source: "none" };
     }
 
     const word = data.word.trim().toLowerCase();
     const sys =
-      "You are a concise English-to-Arabic dictionary for Arabic-speaking English learners. " +
+      "You are a concise English-to-Arabic dictionary for Arabic-speaking learners. " +
       "Given a single English word (and optionally a sentence for context), return ONLY a JSON object with exactly two fields: " +
       "'en' (a short English definition, max 12 words) and 'ar' (the most common Modern Standard Arabic translation, 1-4 words). " +
-      "No markdown, no extra text, no explanation — only the JSON object.";
-
+      "No markdown, no extra text — only valid JSON.";
     const user = data.context
-      ? `Word: "${word}"\nContext sentence: "${data.context}"`
+      ? `Word: "${word}"\nContext: "${data.context}"`
       : `Word: "${word}"`;
 
     try {
@@ -53,73 +52,31 @@ export const lookupWordAI = createServerFn({ method: "POST" })
       });
 
       if (!res.ok) {
-        console.error("OpenRouter error:", res.status, await res.text());
-        return { en: "No explanation available yet.", ar: "—", source: "none" };
+        console.error("OpenRouter error:", res.status);
+        return { en: "No explanation available.", ar: "—", source: "none" };
       }
 
       const json = await res.json();
-      const content: string = json?.choices?.[0]?.message?.content ?? "{}";
-
-      // Strip any accidental markdown fences
+      const content: string =
+        json?.choices?.[0]?.message?.content ?? "{}";
       const clean = content.replace(/```json|```/gi, "").trim();
       const parsed = JSON.parse(clean);
 
-      const en = typeof parsed.en === "string" && parsed.en.trim() ? parsed.en.trim() : "";
-      const ar = typeof parsed.ar === "string" && parsed.ar.trim() ? parsed.ar.trim() : "";
+      const en =
+        typeof parsed.en === "string" && parsed.en.trim()
+          ? parsed.en.trim()
+          : "";
+      const ar =
+        typeof parsed.ar === "string" && parsed.ar.trim()
+          ? parsed.ar.trim()
+          : "";
 
       if (!en && !ar) {
-        return { en: "No explanation available yet.", ar: "—", source: "none" };
+        return { en: "No explanation available.", ar: "—", source: "none" };
       }
-
       return { en: en || "—", ar: ar || "—", source: "ai" };
     } catch (err) {
       console.error("lookupWordAI error:", err);
-      return { en: "No explanation available yet.", ar: "—", source: "none" };
-    }
-  });
-
-// ─── Sentence / paragraph translation ────────────────────────────────────
-
-export const translateTextAI = createServerFn({ method: "POST" })
-  .inputValidator(
-    z.object({
-      text: z.string().min(1).max(1200),
-    })
-  )
-  .handler(async ({ data }): Promise<{ ar: string; source: "ai" | "none" }> => {
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) return { ar: "—", source: "none" };
-
-    try {
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-          "HTTP-Referer": "https://booklish.app",
-          "X-Title": "Booklish",
-        },
-        body: JSON.stringify({
-          model: "openai/gpt-4o-mini",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are a professional English-to-Arabic translator. Translate the given English text into natural, clear Modern Standard Arabic. Return ONLY the Arabic translation, no explanations.",
-            },
-            { role: "user", content: data.text },
-          ],
-          temperature: 0.2,
-          max_tokens: 400,
-        }),
-      });
-
-      if (!res.ok) return { ar: "—", source: "none" };
-
-      const json = await res.json();
-      const ar = json?.choices?.[0]?.message?.content?.trim() ?? "";
-      return ar ? { ar, source: "ai" } : { ar: "—", source: "none" };
-    } catch {
-      return { ar: "—", source: "none" };
+      return { en: "No explanation available.", ar: "—", source: "none" };
     }
   });
