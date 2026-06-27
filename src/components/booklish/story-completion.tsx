@@ -92,7 +92,7 @@ export function StoryCompletion({
           </Link>
           {next ? (
             <Link
-              to="/story/$slug"
+                            to="/read/$slug"
               params={{ slug: next.slug }}
               className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
             >
