@@ -4,10 +4,14 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useUserLevel } from "@/lib/reading-level";
 import { PlacementTest } from "@/components/booklish/placement-test";
+import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import type { CefrLevel } from "@/lib/reading-level";
 
 const PUBLIC_PATHS = ["/auth", "/reset-password", "/privacy", "/terms", "/cookies"];
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = supabase as any;
 
 export function RequireAuth({ children }: { children: ReactNode }) {
   const { user, loading: authLoading } = useAuth();
@@ -23,15 +27,23 @@ export function RequireAuth({ children }: { children: ReactNode }) {
 
     async function syncLevel() {
       try {
-        const res = await fetch(`/api/user-level?uid=${user!.id}`);
-        if (res.ok) {
-          const row = await res.json();
-          if (row?.cefr_level) {
-            completePlacement(row.cefr_level as CefrLevel);
-          }
+        const { data: row } = await db
+          .from("user_levels")
+          .select("cefr_level")
+          .eq("user_id", user!.id)
+          .single();
+
+        if (row?.cefr_level) {
+          completePlacement(row.cefr_level as CefrLevel);
+        } else if (data.placementDone) {
+          await db.from("user_levels").upsert({
+            user_id: user!.id,
+            cefr_level: data.cefrLevel,
+            updated_at: new Date().toISOString(),
+          });
         }
       } catch {
-        // silently continue
+        // table may not exist yet — continue normally
       } finally {
         setDbChecked(true);
       }
@@ -68,7 +80,22 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   }
 
   if (!data.placementDone) {
-    return <PlacementTest onComplete={completePlacement} />;
+    return (
+      <PlacementTest
+        onComplete={async (level) => {
+          completePlacement(level);
+          try {
+            await db.from("user_levels").upsert({
+              user_id: user.id,
+              cefr_level: level,
+              updated_at: new Date().toISOString(),
+            });
+          } catch {
+            // silently fail
+          }
+        }}
+      />
+    );
   }
 
   return <>{children}</>;
