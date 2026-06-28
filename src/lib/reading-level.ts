@@ -1,4 +1,4 @@
-/**
+/*
  * Reading level system: A1 → A2 → B1 → B2 → C1 → C2
  */
 
@@ -96,7 +96,7 @@ const DEFAULT_LEVEL_DATA: UserLevelData = {
 export const LEVEL_STORE_KEY = "booklish.userLevel";
 
 export function useUserLevel() {
-  const [data, setData] = useLocalStore<UserLevelData>(LEVEL_STORE_KEY, DEFAULT_LEVEL_DATA);
+  const [data, setData, hydrated] = useLocalStore<UserLevelData>(LEVEL_STORE_KEY, DEFAULT_LEVEL_DATA);
 
   function setLevel(level: CefrLevel) {
     setData((prev) => ({ ...prev, cefrLevel: level, storiesFinishedAtLevel: 0 }));
@@ -136,6 +136,7 @@ export function useUserLevel() {
 
   return {
     data,
+    hydrated,
     setLevel,
     completePlacement,
     recordStoryFinished,
