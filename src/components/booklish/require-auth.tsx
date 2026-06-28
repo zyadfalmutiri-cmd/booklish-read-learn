@@ -25,7 +25,7 @@ const PUBLIC_PATHS = ["/auth", "/reset-password", "/privacy", "/terms", "/cookie
 export function RequireAuth({ children }: { children: ReactNode }) {
   const { user, loading: authLoading } = useAuth();
   const location = useLocation();
-  const { data, completePlacement } = useUserLevel();
+  const { data, hydrated: levelHydrated, completePlacement } = useUserLevel();
 
   // Track whether we've finished the Supabase lookup
   const [dbChecked, setDbChecked] = useState(false);
@@ -91,8 +91,8 @@ export function RequireAuth({ children }: { children: ReactNode }) {
     );
   }
 
-  // Waiting for DB check
-  if (!dbChecked) {
+  // Waiting for local store to hydrate
+  if (!levelHydrated || !dbChecked) {
     return (
       <div className="grid min-h-[60vh] place-items-center">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
