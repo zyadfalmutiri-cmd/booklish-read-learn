@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef, Fragment, useCallback } from "rea
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   BookmarkPlus, Languages, Sparkles, Loader2, Check,
-  Volume2, VolumeX, Flag, Globe, User, Users,
+  Volume2, VolumeX, Globe, User, Users,
 } from "lucide-react";
 import { tokenize, splitSentences } from "@/lib/tokenize";
 import type { Story, VocabEntry, SavedWord } from "@/lib/types";
@@ -379,22 +379,25 @@ function Sentence({ sentence, vocab, translations, translateMode, showWordsAlway
   );
 }
 
-// Fetch sentence translation on demand if not in pre-baked translations
+// Fetch sentence translation — fetches once safely
 function TranslateSentenceOnDemand({ text }: { text: string }) {
   const [ar, setAr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const fetched = useRef(false);
 
   useEffect(() => {
+    if (fetched.current) return;
+    fetched.current = true;
     setLoading(true);
     translateTextAI({ data: { text } })
-      .then(res => setAr(res.ar))
+      .then(res => setAr(res.ar ?? null))
       .catch(() => setAr("تعذّر الترجمة"))
       .finally(() => setLoading(false));
   }, [text]);
 
   if (loading) return <span className="flex items-center gap-1 text-xs opacity-60"><Loader2 className="h-3 w-3 animate-spin" />جاري الترجمة...</span>;
   if (ar) return <>{ar}</>;
-  return <span className="italic opacity-60">لا توجد ترجمة</span>;
+  return <span className="italic opacity-60">—</span>;
 }
 
 // ─── WordToken ────────────────────────────────────────────────────────────
