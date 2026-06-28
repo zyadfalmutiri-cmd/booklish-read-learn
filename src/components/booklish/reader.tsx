@@ -197,7 +197,7 @@ export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct
       {selectionPos && (
         <div
           className="fixed z-50 flex flex-col gap-2 rounded-xl border border-border bg-card shadow-xl p-3 w-72 animate-scale-in"
-          style={{ top: selectionPos.y - 10, left: Math.min(selectionPos.x, window.innerWidth - 300) }}
+          style={{ top: selectionPos.y - 10, left: Math.min(selectionPos.x, (typeof window !== "undefined" ? window.innerWidth : 800) - 300) }}
         >
           {!selectionAr && !selectionLoading && (
             <button
