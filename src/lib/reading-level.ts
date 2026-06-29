@@ -1,8 +1,4 @@
-/*
- * Reading level system: A1 → A2 → B1 → B2 → C1 → C2
- */
-
-import { useLocalStore, storeKeys } from "./store";
+import { useLocalStore } from "./store";
 
 export type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 
@@ -93,7 +89,8 @@ const DEFAULT_LEVEL_DATA: UserLevelData = {
   promotedAt: [],
 };
 
-export const LEVEL_STORE_KEY = "booklish.userLevel";
+// ⚠️ مهم: لا تضع "booklish." في البداية لأن localAdapter يضيفها تلقائياً
+export const LEVEL_STORE_KEY = "userLevel";
 
 export function useUserLevel() {
   const [data, setData, hydrated] = useLocalStore<UserLevelData>(LEVEL_STORE_KEY, DEFAULT_LEVEL_DATA);
