@@ -18,6 +18,17 @@ const DEFAULT_STATS: Stats = {
   dailyMinutes: {},
 };
 
+/** Merge any stored (possibly old/incomplete) stats with safe defaults. */
+function normalizeStats(raw: Partial<Stats> | null | undefined): Stats {
+  return {
+    totalTaps: raw?.totalTaps ?? 0,
+    uniqueWords: Array.isArray(raw?.uniqueWords) ? raw!.uniqueWords : [],
+    readingSeconds: raw?.readingSeconds ?? 0,
+    lastSessionAt: raw?.lastSessionAt ?? null,
+    dailyMinutes: raw?.dailyMinutes && typeof raw.dailyMinutes === "object" ? raw.dailyMinutes : {},
+  };
+}
+
 export function useStats() {
   return useLocalStore<Stats>(storeKeys.stats, DEFAULT_STATS);
 }
@@ -25,7 +36,7 @@ export function useStats() {
 /** Imperative recorders — safe to call from event handlers anywhere. */
 export function recordWordTap(normalized: string) {
   if (!normalized) return;
-  const current = activeAdapter.get<Stats>(storeKeys.stats, DEFAULT_STATS);
+  const current = normalizeStats(activeAdapter.get<Stats>(storeKeys.stats, DEFAULT_STATS));
   const isNew = !current.uniqueWords.includes(normalized);
   activeAdapter.set<Stats>(storeKeys.stats, {
     ...current,
@@ -35,14 +46,15 @@ export function recordWordTap(normalized: string) {
   });
 
   const tapped = activeAdapter.get<string[]>(storeKeys.tapped, []);
-  if (!tapped.includes(normalized)) {
-    activeAdapter.set<string[]>(storeKeys.tapped, [...tapped, normalized]);
+  const tappedSafe = Array.isArray(tapped) ? tapped : [];
+  if (!tappedSafe.includes(normalized)) {
+    activeAdapter.set<string[]>(storeKeys.tapped, [...tappedSafe, normalized]);
   }
 }
 
 export function addReadingSeconds(seconds: number) {
   if (seconds <= 0) return;
-  const current = activeAdapter.get<Stats>(storeKeys.stats, DEFAULT_STATS);
+  const current = normalizeStats(activeAdapter.get<Stats>(storeKeys.stats, DEFAULT_STATS));
   const todayKey = new Date().toDateString();
   const existing = current.dailyMinutes ?? {};
   const addedMinutes = seconds / 60;
