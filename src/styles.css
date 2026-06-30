@@ -4,10 +4,11 @@
 @custom-variant dark (&:is(.dark *));
 
 @font-face {
-  font-family: 'KawkabMono';
-  src: url('/fonts/KawkabMono-Regular.ttf') format('truetype');
-  font-weight: normal;
+  font-family: 'Thmanyah';
+  src: url('/fonts/thmanyahserifdisplay-Medium.otf') format('opentype');
+  font-weight: 500;
   font-style: normal;
+  font-display: swap;
 }
 
 :root {
@@ -83,11 +84,17 @@
 }
 
 body {
+
   background-color: var(--background);
+
   color: var(--foreground);
+
   font-family: system-ui, -apple-system, sans-serif;
+
   -webkit-font-smoothing: antialiased;
+
   -moz-osx-font-smoothing: grayscale;
+
 }
 
 .font-serif {
@@ -95,9 +102,13 @@ body {
 }
 
 html[dir="rtl"] body,
+
 html[dir="rtl"] *,
+
 [dir="rtl"] {
-  font-family: 'KawkabMono', 'Segoe UI', Tahoma, system-ui, sans-serif;
+
+  font-family: 'Thmanyah', 'Segoe UI', Tahoma, system-ui, sans-serif;
+
 }
 
 .reading-column {
