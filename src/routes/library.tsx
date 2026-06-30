@@ -7,6 +7,7 @@ import { StoryCard } from "@/components/booklish/story-card";
 import type { Category, Genre } from "@/lib/types";
 import { useT } from "@/lib/i18n";
 import { useUserLevel, CEFR_TO_STORY_LEVEL, STORIES_TO_ADVANCE } from "@/lib/reading-level";
+import { PlacementTest } from "@/components/booklish/placement-test";
 
 export const Route = createFileRoute("/library")({
   component: Library,
@@ -17,7 +18,7 @@ const CATEGORIES: Category[] = ["short", "fiction", "non-fiction"];
 
 function Library() {
   const { t, dir } = useT();
-  const { data, storiesLeft, isMaxLevel, info } = useUserLevel();
+  const { data, hydrated, storiesLeft, isMaxLevel, info, completePlacement } = useUserLevel();
   const [genre, setGenre] = useState<Genre | "all">("all");
   const [category, setCategory] = useState<Category | "all">("all");
   const [q, setQ] = useState("");
@@ -35,6 +36,19 @@ function Library() {
       (term === "" || s.title.toLowerCase().includes(term) || s.blurb.toLowerCase().includes(term))
     );
   }, [genre, category, q, allowedStoryLevels]);
+
+  // Show placement test only here, in the library — never blocks reading
+  if (hydrated && !data.placementDone) {
+    return <PlacementTest onComplete={completePlacement} />;
+  }
+
+  if (!hydrated) {
+    return (
+      <main className="mx-auto max-w-5xl px-4 pb-24 pt-8">
+        <div className="h-40 animate-pulse rounded-xl bg-muted" />
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-5xl px-4 pb-24 pt-8">
