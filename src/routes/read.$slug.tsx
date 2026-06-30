@@ -10,9 +10,7 @@ import { useReadingTimer } from "@/lib/stats";
 import { useT } from "@/lib/i18n";
 import { useXp, XP_REWARDS } from "@/lib/xp";
 import { StoryCompletion } from "@/components/booklish/story-completion";
-import { useUserLevel } from "@/lib/reading-level";
 import type { SavedWord } from "@/lib/types";
-
 
 type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boolean; readingSeconds?: number }>;
 
@@ -36,20 +34,14 @@ function ReadPage() {
   const { markActivity } = useStreak();
   const [pct, setPct] = useState(0);
   const { t } = useT();
-    const { addXp, xp } = useXp();
-  const { recordStoryFinished } = useUserLevel();
+  const { addXp, xp } = useXp();
 
   const isFocusMode = settings.focusMode;
   const setFocusMode = (v: boolean) => setSettings({ ...settings, focusMode: v });
 
-  // ── Finish XP (once per session) ───────────────────────────────────────
   const finishXpGranted = useRef(false);
-
-  // ── Reading-time XP ────────────────────────────────────────────────────
   const readStartRef = useRef<number>(Date.now());
   const xpMinutesGranted = useRef(0);
-
-  // ── Session stats for completion screen ────────────────────────────────
   const sessionStartAt = useRef(Date.now());
   const vocabAtStart = useRef<number | null>(null);
   const xpAtStart = useRef<number | null>(null);
@@ -58,14 +50,12 @@ function ReadPage() {
 
   useReadingTimer();
 
-  // Capture session baseline once local data is hydrated
   useEffect(() => {
     if (!sessionInitialized.current && vocabHydrated) {
       sessionInitialized.current = true;
       vocabAtStart.current = vocabList.length;
       xpAtStart.current = xp;
     }
-    // We intentionally only run this when vocabHydrated first becomes true
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vocabHydrated]);
 
@@ -74,7 +64,6 @@ function ReadPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Reading-time XP grants (pauses on tab hide / window blur)
   useEffect(() => {
     const grantXpForTime = () => {
       const elapsed = (Date.now() - readStartRef.current) / 1000;
@@ -105,7 +94,6 @@ function ReadPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Save scroll progress + grant finish XP + show completion overlay
   useEffect(() => {
     if (!progressHydrated) return;
 
@@ -113,10 +101,8 @@ function ReadPage() {
 
     if (pct >= 95 && !alreadyFinished && !finishXpGranted.current) {
       finishXpGranted.current = true;
-            addXp(XP_REWARDS.finishStory, `finish:${story.slug}`);
-      recordStoryFinished();
+      addXp(XP_REWARDS.finishStory, `finish:${story.slug}`);
       setShowCompletion(true);
-
     }
 
     setProgress((prev) => {
@@ -146,8 +132,6 @@ function ReadPage() {
   };
 
   const remaining = Math.max(0, Math.round(story.minutes * (1 - pct / 100)));
-
-  // Completion screen stats
   const readingSeconds = Math.round((Date.now() - sessionStartAt.current) / 1000);
   const newWords = Math.max(0, vocabList.length - (vocabAtStart.current ?? vocabList.length));
   const xpEarned = Math.max(0, xp - (xpAtStart.current ?? xp));
@@ -157,7 +141,7 @@ function ReadPage() {
       <div className="sticky top-14 z-20 border-b border-border bg-background/85 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center gap-1.5 px-3 py-2 sm:gap-2 sm:px-4">
           <Link
-                        to="/library"
+            to="/library"
             className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border hover:bg-muted"
             aria-label="Back"
           >
