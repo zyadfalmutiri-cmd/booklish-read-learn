@@ -44,9 +44,16 @@ function writeCache(cache: CacheShape) {
 }
 
 function setCache(word: string, entry: { en: string; ar: string; example?: string }) {
+  // Only cache if both en and ar are non-empty
+  if (!entry.en?.trim() || !entry.ar?.trim()) return;
   const cache = readCache();
   cache[word] = { ...entry, timestamp: Date.now() };
   writeCache(cache);
+}
+
+/** Returns true only if the cache entry is valid (has both en and ar) */
+function isValidEntry(entry: { en?: string; ar?: string } | undefined): boolean {
+  return Boolean(entry?.en?.trim() && entry?.ar?.trim());
 }
 
 export function normalizeWord(w: string): string {
@@ -62,18 +69,22 @@ export function lookupLocal(
   if (!key) return null;
 
   const cache = readCache();
-  if (cache[key]) {
+
+  // Only use cache if entry is valid (non-empty ar and en)
+  if (cache[key] && isValidEntry(cache[key])) {
     return { word: key, ...cache[key], source: "cache" };
   }
 
   if (storyVocab && storyVocab[key]) {
     const v = storyVocab[key];
-    const entry = { en: v.def, ar: v.ar, example: v.example };
-    setCache(key, entry);
-    return { word: key, ...entry, timestamp: Date.now(), source: "story" };
+    if (v.ar?.trim() && v.def?.trim()) {
+      const entry = { en: v.def, ar: v.ar, example: v.example };
+      setCache(key, entry);
+      return { word: key, ...entry, timestamp: Date.now(), source: "story" };
+    }
   }
 
-  if (dict[key]) {
+  if (dict[key] && isValidEntry(dict[key])) {
     const entry = { en: dict[key].en, ar: dict[key].ar };
     setCache(key, entry);
     return { word: key, ...entry, timestamp: Date.now(), source: "dictionary" };
@@ -92,25 +103,30 @@ function enqueueAI<T>(fn: () => Promise<T>): Promise<T> {
   _aiQueue = next.then(() => new Promise((r) => setTimeout(r, 400)));
   return next;
 }
-// ────────────────────────────────────────────────────────────────────────────
 
-/** Async AI fallback. Caches result. */
+/** Async AI fallback. Caches result only if valid. */
 export async function lookupAI(word: string, context?: string): Promise<WordLookup> {
   const key = normalizeWord(word);
   return enqueueAI(async () => {
     try {
       const res = await lookupWordAI({ data: { word: key, context } });
-      if (res.source === "ai") {
+      if (res.source === "ai" && res.en?.trim() && res.ar?.trim()) {
         const entry = { en: res.en, ar: res.ar };
         setCache(key, entry);
         return { word: key, ...entry, timestamp: Date.now(), source: "ai" as const };
       }
-      return { word: key, en: res.en, ar: res.ar, timestamp: Date.now(), source: "none" as const };
+      return {
+        word: key,
+        en: res.en || "",
+        ar: res.ar || "",
+        timestamp: Date.now(),
+        source: "none" as const,
+      };
     } catch {
       return {
         word: key,
-        en: "No explanation available yet.",
-        ar: "—",
+        en: "",
+        ar: "",
         timestamp: Date.now(),
         source: "none" as const,
       };
@@ -125,12 +141,12 @@ export function preWarmCache(text: string, storyVocab?: Record<string, VocabEntr
   const words = new Set(text.toLowerCase().match(/[a-z']+/g) || []);
   let changed = false;
   words.forEach((w) => {
-    if (cache[w]) return;
-    if (storyVocab && storyVocab[w]) {
+    if (cache[w] && isValidEntry(cache[w])) return;
+    if (storyVocab && storyVocab[w] && storyVocab[w].ar?.trim()) {
       const v = storyVocab[w];
       cache[w] = { en: v.def, ar: v.ar, example: v.example, timestamp: Date.now() };
       changed = true;
-    } else if (dict[w]) {
+    } else if (dict[w] && isValidEntry(dict[w])) {
       cache[w] = { en: dict[w].en, ar: dict[w].ar, timestamp: Date.now() };
       changed = true;
     }
