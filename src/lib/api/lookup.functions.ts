@@ -7,6 +7,38 @@ interface LookupResult {
   source: "ai" | "none";
 }
 
+// ─── Google Translate (free, no API key) ─────────────────────────────────
+
+async function googleTranslate(text: string, from = "en", to = "ar"): Promise<string> {
+  const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`;
+  const res = await fetch(url, {
+    headers: { "User-Agent": "Mozilla/5.0" },
+  });
+  if (!res.ok) throw new Error(`Google Translate error: ${res.status}`);
+  const json = await res.json();
+  // Response shape: [[[translated, original, ...], ...], ...]
+  const translated = json?.[0]?.map((x: unknown[]) => x?.[0]).filter(Boolean).join("") ?? "";
+  return translated.trim();
+}
+
+// ─── Simple English definition from Free Dictionary API ──────────────────
+
+async function getDefinition(word: string): Promise<string> {
+  try {
+    const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+    if (!res.ok) return "";
+    const json = await res.json();
+    const def = json?.[0]?.meanings?.[0]?.definitions?.[0]?.definition ?? "";
+    // Trim to max 12 words
+    const words = def.split(" ");
+    return words.slice(0, 12).join(" ") + (words.length > 12 ? "." : "");
+  } catch {
+    return "";
+  }
+}
+
+// ─── Server Functions ─────────────────────────────────────────────────────
+
 export const lookupWordAI = createServerFn({ method: "POST" })
   .inputValidator(
     z.object({
@@ -15,104 +47,31 @@ export const lookupWordAI = createServerFn({ method: "POST" })
     })
   )
   .handler(async ({ data }): Promise<LookupResult> => {
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) {
-      return { en: "No explanation available.", ar: "—", source: "none" };
-    }
-
     const word = data.word.trim().toLowerCase();
-    const sys =
-      "You are a concise English-to-Arabic dictionary for Arabic-speaking learners. " +
-      "Given a single English word (and optionally a sentence for context), return ONLY a JSON object with exactly two fields: " +
-      "'en' (a short English definition, max 12 words) and 'ar' (the most common Modern Standard Arabic translation, 1-4 words). " +
-      "No markdown, no extra text — only valid JSON.";
-    const user = data.context
-      ? `Word: "${word}"\nContext: "${data.context}"`
-      : `Word: "${word}"`;
 
     try {
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-          "HTTP-Referer": "https://booklish.app",
-          "X-Title": "Booklish",
-        },
-        body: JSON.stringify({
-          model: "openai/gpt-4o-mini",
-          messages: [
-            { role: "system", content: sys },
-            { role: "user", content: user },
-          ],
-          response_format: { type: "json_object" },
-          temperature: 0.1,
-          max_tokens: 80,
-        }),
-      });
+      // Run translation and definition in parallel
+      const [ar, en] = await Promise.all([
+        googleTranslate(word, "en", "ar"),
+        getDefinition(word),
+      ]);
 
-      if (!res.ok) {
-        console.error("OpenRouter error:", res.status);
-        return { en: "No explanation available.", ar: "—", source: "none" };
+      if (!ar) {
+        return { en: en || "", ar: "—", source: "none" };
       }
 
-      const json = await res.json();
-      const content: string = json?.choices?.[0]?.message?.content ?? "{}";
-      const clean = content.replace(/```json|```/gi, "").trim();
-      const parsed = JSON.parse(clean);
-
-      const en =
-        typeof parsed.en === "string" && parsed.en.trim()
-          ? parsed.en.trim()
-          : "";
-      const ar =
-        typeof parsed.ar === "string" && parsed.ar.trim()
-          ? parsed.ar.trim()
-          : "";
-
-      if (!en && !ar) {
-        return { en: "No explanation available.", ar: "—", source: "none" };
-      }
-      return { en: en || "—", ar: ar || "—", source: "ai" };
+      return { en: en || "", ar, source: "ai" };
     } catch (err) {
       console.error("lookupWordAI error:", err);
-      return { en: "No explanation available.", ar: "—", source: "none" };
+      return { en: "", ar: "—", source: "none" };
     }
   });
 
 export const translateTextAI = createServerFn({ method: "POST" })
   .inputValidator(z.object({ text: z.string().min(1).max(1200) }))
   .handler(async ({ data }): Promise<{ ar: string; source: "ai" | "none" }> => {
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) return { ar: "—", source: "none" };
-
     try {
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-          "HTTP-Referer": "https://booklish.app",
-          "X-Title": "Booklish",
-        },
-        body: JSON.stringify({
-          model: "openai/gpt-4o-mini",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are a professional English-to-Arabic translator. Translate the given English text into natural Modern Standard Arabic. Return ONLY the Arabic translation, nothing else.",
-            },
-            { role: "user", content: data.text },
-          ],
-          temperature: 0.2,
-          max_tokens: 400,
-        }),
-      });
-
-      if (!res.ok) return { ar: "—", source: "none" };
-      const json = await res.json();
-      const ar = json?.choices?.[0]?.message?.content?.trim() ?? "";
+      const ar = await googleTranslate(data.text, "en", "ar");
       return ar ? { ar, source: "ai" } : { ar: "—", source: "none" };
     } catch {
       return { ar: "—", source: "none" };
