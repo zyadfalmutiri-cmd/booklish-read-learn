@@ -35,9 +35,10 @@ export const storeKeys = {
   bookmarks: "bookmarks",
   settings: "settings",
   quizScores: "quizScores",
+  shadowingScores: "shadowingScores",
   streak: "streak",
   stats: "stats",
   tapped: "tappedWords",
-    xp: "xp",
+  xp: "xp",
   userLevel: "booklish.userLevel",
 } as const;
