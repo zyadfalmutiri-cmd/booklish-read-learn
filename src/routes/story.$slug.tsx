@@ -77,6 +77,15 @@ function StoryDetail() {
             {t("story.takeQuiz")}
           </Link>
         )}
+        {pct >= 80 && (
+          <Link
+            to="/shadow/$slug"
+            params={{ slug: story.slug }}
+            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm transition-colors hover:bg-muted"
+          >
+            {dir === "rtl" ? "تدرّب بالنطق" : "Practice pronunciation"}
+          </Link>
+        )}
       </div>
 
       <section>
