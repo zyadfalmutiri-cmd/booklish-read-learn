@@ -20,7 +20,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useSettings } from "./theme";
 import { useT } from "@/lib/i18n";
 import { useAuth, signOut } from "@/hooks/use-auth";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState } from "react";
 
