@@ -83,7 +83,8 @@ export function StoryCompletion({
         {/* Actions */}
         <div className="flex flex-col gap-2 p-4 sm:flex-row">
           <Link
-            to="/library"
+            to="/quiz/$slug"
+            params={{ slug: storySlug }}
             className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             <BookOpen className="h-4 w-4" />
@@ -91,7 +92,7 @@ export function StoryCompletion({
           </Link>
           {next ? (
             <Link
-                            to="/read/$slug"
+              to="/read/$slug"
               params={{ slug: next.slug }}
               className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
             >
