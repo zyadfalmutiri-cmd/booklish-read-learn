@@ -33,6 +33,12 @@ export interface StoryScene {
   caption?: string;
 }
 
+export interface StoryAudio {
+  url: string;
+  duration: number; // بالثواني
+  source: "penguin" | "tts";
+}
+
 export interface Story {
   slug: string;
   title: string;
@@ -47,4 +53,5 @@ export interface Story {
   sentenceTranslations?: Record<string, string>;
   tags?: Category[];
   quiz: QuizQuestion[];
+  audio?: StoryAudio;
 }
