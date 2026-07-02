@@ -1,4 +1,5 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Headphones } from "lucide-react";
 import type { Story } from "@/lib/types";
 import { useT } from "@/lib/i18n";
 
@@ -596,9 +597,11 @@ const COVERS: Record<string, string> = {
 
 export function StoryCard({ story }: { story: Story }) {
   const { t } = useT();
+  const navigate = useNavigate();
   const svg = COVERS[story.slug];
 
   return (
+
     <Link to="/story/$slug" params={{ slug: story.slug }}>
       <div className="group relative block overflow-hidden rounded-xl border border-border bg-card transition-all hover:shadow-md hover:-translate-y-0.5">
         <div className={`relative flex h-40 items-center justify-center overflow-hidden bg-gradient-to-br ${story.coverHue}`}>
@@ -620,10 +623,24 @@ export function StoryCard({ story }: { story: Story }) {
             <span aria-hidden>·</span>
             <span>{story.minutes} {t("common.minutes")}</span>
           </div>
-          <h3 className="font-serif text-lg leading-snug text-foreground group-hover:text-primary transition-colors">
+                    <h3 className="font-serif text-lg leading-snug text-foreground group-hover:text-primary transition-colors">
             {story.title}
           </h3>
           <p className="line-clamp-2 text-sm text-muted-foreground">{story.blurb}</p>
+
+          {story.audio && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                navigate({ to: "/listen/$slug", params: { slug: story.slug } });
+              }}
+              className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Headphones className="h-3.5 w-3.5" />
+              {t("common.listen") ?? "استمع"}
+            </button>
+          )}
         </div>
       </div>
     </Link>
