@@ -283,6 +283,16 @@ export function Header() {
           ))}
         </div>
       </nav>
+
+      {/* Reliably pushes page content up above the fixed bottom bar on mobile,
+          regardless of where <Header /> sits relative to <Outlet /> in the DOM. */}
+      <style>{`
+        @media (max-width: 639px) {
+          body {
+            padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+          }
+        }
+      `}</style>
     </>
   );
 }
