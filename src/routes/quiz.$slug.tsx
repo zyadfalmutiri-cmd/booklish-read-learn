@@ -5,6 +5,8 @@ import { getStory } from "@/data/stories";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useT } from "@/lib/i18n";
 import { useXp, XP_REWARDS } from "@/lib/xp";
+import { syncNow } from "@/lib/sync";
+import { useAuth } from "@/hooks/use-auth";
 
 import type { SavedWord } from "@/lib/types";
 
@@ -26,6 +28,7 @@ function QuizPage() {
   const { story } = Route.useLoaderData() as { story: import("@/lib/types").Story };
   const { t } = useT();
   const { addXp } = useXp();
+  const { user } = useAuth();
   const [scores, setScores] = useLocalStore<ScoreMap>(storeKeys.quizScores, {});
   const [, setVocab] = useLocalStore<SavedWord[]>(storeKeys.vocab, []);
 
@@ -46,6 +49,7 @@ function QuizPage() {
       setXpEarned(earned);
     }
     setSubmitted(true);
+    if (user) syncNow(user.id);
   };
 
   const allAnswered = answers.every((a) => a !== null);
