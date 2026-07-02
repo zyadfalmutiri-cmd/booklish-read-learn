@@ -165,7 +165,7 @@ async function pushToCloud(userId: string): Promise<void> {
       );
     }
 
-    // ── Streak ─────────────────────────────────────────────────────────────
+        // ── Streak ─────────────────────────────────────────────────────────────
     const streak = activeAdapter.get<StreakData>(storeKeys.streak, {
       current: 0,
       lastActive: null,
@@ -183,10 +183,27 @@ async function pushToCloud(userId: string): Promise<void> {
         { onConflict: "user_id" },
       );
     }
+
+    // ── Quiz scores ────────────────────────────────────────────────────────
+    const quizScores = activeAdapter.get<ScoreMap>(storeKeys.quizScores, {});
+    const quizEntries = Object.entries(quizScores);
+    if (quizEntries.length > 0) {
+      await supabase.from("quiz_results").upsert(
+        quizEntries.map(([slug, q]) => ({
+          user_id: userId,
+          story_slug: slug,
+          score: q.score,
+          total: q.total,
+          created_at: new Date(q.at).toISOString(),
+        })),
+        { onConflict: "user_id,story_slug" },
+      );
+    }
   } catch (err) {
     console.warn("[Booklish sync] push failed:", err);
   }
 }
+
 
 /**
  * Mount this once at the app root. Automatically pulls on sign-in and
