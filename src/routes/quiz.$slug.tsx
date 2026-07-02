@@ -26,10 +26,14 @@ function QuizPage() {
   const { story } = Route.useLoaderData() as { story: import("@/lib/types").Story };
   const { t } = useT();
   const { addXp } = useXp();
+  const [scores, setScores] = useLocalStore<ScoreMap>(storeKeys.quizScores, {});
+  const [, setVocab] = useLocalStore<SavedWord[]>(storeKeys.vocab, []);
+
+  const priorResult = scores[story.slug];
+  const [retaking, setRetaking] = useState(false);
+
   const [answers, setAnswers] = useState<(number | null)[]>(() => story.quiz.map(() => null));
   const [submitted, setSubmitted] = useState(false);
-  const [, setScores] = useLocalStore<ScoreMap>(storeKeys.quizScores, {});
-  const [, setVocab] = useLocalStore<SavedWord[]>(storeKeys.vocab, []);
   const [xpEarned, setXpEarned] = useState(0);
 
   const score = answers.reduce<number>((acc, a, i) => acc + (a === story.quiz[i].answer ? 1 : 0), 0);
@@ -62,6 +66,50 @@ function QuizPage() {
       return next;
     });
   };
+
+  // لديه نتيجة سابقة ولا يحاول إعادة الاختبار الآن → اعرض النتيجة القديمة مباشرة
+  if (priorResult && !retaking) {
+    return (
+      <main className="mx-auto max-w-2xl px-4 pb-24 pt-8">
+        <p className="mb-2 text-xs uppercase tracking-wider text-muted-foreground">{t("quiz.kicker")}</p>
+        <h1 className="mb-6 font-serif text-3xl">{story.title}</h1>
+
+        <div className="rounded-xl border border-border bg-card p-6 text-center">
+          <p className="text-sm text-muted-foreground">لقد أكملت هذا الاختبار من قبل</p>
+          <p className="mt-2 font-serif text-2xl">
+            {t("quiz.youScored")} {priorResult.score} / {priorResult.total}
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {priorResult.score === priorResult.total
+              ? t("quiz.perfect")
+              : priorResult.score >= priorResult.total / 2
+              ? t("quiz.nice")
+              : t("quiz.reread")}
+          </p>
+
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
+            <button
+              onClick={() => {
+                setAnswers(story.quiz.map(() => null));
+                setSubmitted(false);
+                setXpEarned(0);
+                setRetaking(true);
+              }}
+              className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
+            >
+              <RotateCcw className="h-4 w-4" /> {t("quiz.tryAgain")}
+            </button>
+            <Link
+              to="/library"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"
+            >
+              {t("quiz.backLibrary")}
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-2xl px-4 pb-24 pt-8">
