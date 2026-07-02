@@ -638,7 +638,7 @@ export function StoryCard({ story }: { story: Story }) {
               className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
             >
               <Headphones className="h-3.5 w-3.5" />
-              {t("common.listen") ?? "استمع"}
+الاستماع للقصة
             </button>
           )}
         </div>
