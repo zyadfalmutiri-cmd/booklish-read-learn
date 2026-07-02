@@ -1,3 +1,4 @@
+import { storyAudio } from "@/data/story-audio";
 import type { Story, Category } from "@/lib/types";
 import { theMissingKey } from "@/data/stories/the-missing-key";
 import { lightersFromTheLighthouse } from "@/data/stories/letters-from-the-lighthouse";
@@ -35,8 +36,10 @@ function withDefaults(story: Story): Story {
   const merged = new Set<Category>(tags);
   if (story.genre !== "non-fiction") merged.add("fiction");
   if (story.minutes <= 5) merged.add("short");
-  return { ...story, tags: Array.from(merged) };
+  const audio = storyAudio[story.slug];
+  return { ...story, tags: Array.from(merged), ...(audio ? { audio } : {}) };
 }
+
 
 export const stories: Story[] = [
   // Original 9
