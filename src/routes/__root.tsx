@@ -134,6 +134,19 @@ function RootShell({ children }: { children: ReactNode }) {
          src="https://cloud.umami.is/script.js"
          data-website-id="590797f8-fc37-4617-8f56-9289886216f7"
        />
+
+       {/* Google tag (gtag.js) */}
+       <script async src="https://www.googletagmanager.com/gtag/js?id=G-XQ88T80JG8" />
+       <script
+         dangerouslySetInnerHTML={{
+           __html: `
+             window.dataLayer = window.dataLayer || [];
+             function gtag(){dataLayer.push(arguments);}
+             gtag('js', new Date());
+             gtag('config', 'G-XQ88T80JG8');
+           `,
+         }}
+       />
      </head>
 
      <body>
