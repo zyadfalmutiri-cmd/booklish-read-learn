@@ -99,8 +99,7 @@ LEVEL: <A1|A2|B1|B2|C1>`;
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-model: "google/gemini-2.5-flash",
-
+          model: "deepseek/deepseek-chat-v3.1:free",
           messages,
         }),
       });
