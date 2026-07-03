@@ -99,7 +99,7 @@ LEVEL: <A1|A2|B1|B2|C1>`;
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: "deepseek/deepseek-chat-v3.1:free",
+          model: "meta-llama/llama-3.3-70b-instruct:free",
           messages,
         }),
       });
