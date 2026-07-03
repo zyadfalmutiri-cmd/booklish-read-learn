@@ -99,7 +99,7 @@ LEVEL: <A1|A2|B1|B2|C1>`;
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: "meta-llama/llama-3.3-70b-instruct:free",
+          model: "poolside/laguna-xs-2.1:free",
           messages,
         }),
       });
