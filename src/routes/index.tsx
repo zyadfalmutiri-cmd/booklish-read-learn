@@ -8,7 +8,7 @@ import { useStreak } from "@/lib/streak";
 import { useXp, LEVELS } from "@/lib/xp";
 import { useStats } from "@/lib/stats";
 import type { SavedWord } from "@/lib/types";
-import { Flame, BookOpen, ArrowRight, Target, Zap, Mic, MicOff, Volume2, Loader2 } from "lucide-react";
+import { Flame, BookOpen, ArrowRight, Target, Zap, Mic, MicOff, MessageCircle, Loader2 } from "lucide-react";
 import { useT } from "@/lib/i18n";
 import { useState, useRef } from "react";
 
@@ -26,19 +26,36 @@ function todayString() {
   return d.toDateString();
 }
 
-function VoiceAssistant({ ar }: { ar: boolean }) {
+type ChatTurn = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+type LevelCode = "A1" | "A2" | "B1" | "B2" | "C1";
+
+const LEVEL_LABELS_AR: Record<LevelCode, string> = {
+  A1: "مبتدئ",
+  A2: "مبتدئ متوسط",
+  B1: "متوسط",
+  B2: "متوسط متقدم",
+  C1: "متقدم",
+};
+
+function SpeakingPartner({ ar }: { ar: boolean }) {
   const [listening, setListening] = useState(false);
   const [thinking, setThinking] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [reply, setReply] = useState("");
-  const [suggestedStories, setSuggestedStories] = useState<typeof stories>([]);
+  const [feedback, setFeedback] = useState("");
+  const [level, setLevel] = useState<LevelCode | null>(null);
+  const historyRef = useRef<ChatTurn[]>([]);
   const recognitionRef = useRef<any>(null);
   const silenceTimerRef = useRef<any>(null);
 
   const speak = (text: string) => {
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = "ar-SA";
+    utter.lang = "en-US";
     window.speechSynthesis.speak(utter);
   };
 
@@ -47,69 +64,76 @@ function VoiceAssistant({ ar }: { ar: boolean }) {
     setListening(false);
     setThinking(true);
     setReply("");
-    setSuggestedStories([]);
+    setFeedback("");
 
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
 
       if (!apiKey) {
-        setReply("خطأ: مفتاح API غير موجود - VITE_GEMINI_API_KEY");
+        setReply(ar ? "خطأ: مفتاح API غير موجود - VITE_OPENROUTER_API_KEY" : "Error: missing VITE_OPENROUTER_API_KEY");
+        setThinking(false);
         return;
       }
 
-      const storyList = stories
-        .map((s) => `- ${s.title} (${s.level}, ${s.genre})`)
-        .join("\n");
+      const systemPrompt = `You are a friendly, patient English speaking partner for an Arabic-speaking English learner using the Booklish app.
+Your job every turn:
+1. Continue a natural, simple spoken conversation in English. Keep your reply short (1-3 sentences), warm, and ask a small follow-up question to keep the user talking.
+2. Silently evaluate the user's LAST message for grammar mistakes, wrong word choices, or awkward sentence structure.
+3. Estimate the user's overall spoken English level using CEFR: A1, A2, B1, B2, or C1.
 
-      const systemPrompt = `You are a helpful English learning assistant for Arabic speakers in Booklish app.
-Available stories:
-${storyList}
+Respond in EXACTLY this format, nothing else:
+REPLY: <your English conversational reply>
+FEEDBACK: <feedback in Arabic about mistakes in the user's last sentence, be specific and give the corrected sentence. If there were no mistakes, write "ممتاز! ما فيه أخطاء بهذي الجملة.">
+LEVEL: <A1|A2|B1|B2|C1>`;
 
-Suggest 1-3 stories based on user interest or level.
-Reply in Arabic in 2-3 friendly sentences.
-If suggesting stories, end with: [SUGGEST: Title1, Title2]
-Use exact English titles from the list.`;
+      const messages = [
+        { role: "system", content: systemPrompt },
+        ...historyRef.current,
+        { role: "user", content: text },
+      ];
 
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  { text: systemPrompt + "\n\nUser: " + text }
-                ]
-              }
-            ]
-          }),
-        }
-      );
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash:free",
+          messages,
+        }),
+      });
 
       if (!response.ok) {
         const errText = await response.text();
-        setReply(`خطأ HTTP ${response.status}: ${errText.slice(0, 200)}`);
+        setReply(`${ar ? "خطأ" : "Error"} HTTP ${response.status}: ${errText.slice(0, 200)}`);
         return;
       }
 
       const data = await response.json();
-      const message = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      const message: string = data.choices?.[0]?.message?.content || "";
 
-      const match = message.match(/\[SUGGEST:\s*([^\]]+)\]/);
-      if (match) {
-        const titles = match[1].split(",").map((t: string) => t.trim());
-        const found = stories.filter((s) =>
-          titles.some((t) => s.title.toLowerCase().includes(t.toLowerCase()))
-        );
-        setSuggestedStories(found);
-      }
+      const replyMatch = message.match(/REPLY:\s*([\s\S]*?)(?=FEEDBACK:|$)/i);
+      const feedbackMatch = message.match(/FEEDBACK:\s*([\s\S]*?)(?=LEVEL:|$)/i);
+      const levelMatch = message.match(/LEVEL:\s*(A1|A2|B1|B2|C1)/i);
 
-      const cleanReply = message.replace(/\[SUGGEST:[^\]]+\]/, "").trim();
-      setReply(cleanReply);
-      speak(cleanReply);
+      const replyText = replyMatch ? replyMatch[1].trim() : message.trim();
+      const feedbackText = feedbackMatch ? feedbackMatch[1].trim() : "";
+      const levelCode = levelMatch ? (levelMatch[1].toUpperCase() as LevelCode) : null;
+
+      setReply(replyText);
+      setFeedback(feedbackText);
+      if (levelCode) setLevel(levelCode);
+
+      historyRef.current = [
+        ...historyRef.current,
+        { role: "user", content: text },
+        { role: "assistant", content: replyText },
+      ].slice(-12);
+
+      speak(replyText);
     } catch (err: any) {
-      setReply(`خطأ: ${err?.message || String(err)}`);
+      setReply(`${ar ? "خطأ" : "Error"}: ${err?.message || String(err)}`);
     } finally {
       setThinking(false);
     }
@@ -124,7 +148,7 @@ Use exact English titles from the list.`;
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = "ar-SA";
+    recognition.lang = "en-US";
     recognition.interimResults = true;
     recognition.continuous = true;
     recognitionRef.current = recognition;
@@ -167,7 +191,7 @@ Use exact English titles from the list.`;
     recognition.start();
     setListening(true);
     setReply("");
-    setSuggestedStories([]);
+    setFeedback("");
     setTranscript("");
     finalTranscript = "";
   };
@@ -181,23 +205,29 @@ Use exact English titles from the list.`;
   const clearAll = () => {
     setTranscript("");
     setReply("");
-    setSuggestedStories([]);
+    setFeedback("");
+    historyRef.current = [];
   };
 
   return (
     <section className="mb-8 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
       <div className="px-5 py-4 border-b border-border flex items-center gap-3">
         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 shrink-0">
-          <Volume2 className="h-4 w-4 text-primary" />
+          <MessageCircle className="h-4 w-4 text-primary" />
         </div>
         <div className="flex-1 min-w-0">
           <h2 className="font-serif text-base font-medium">
-            {ar ? "مساعد القراءة" : "Reading Assistant"}
+            {ar ? "شريك المحادثة" : "Speaking Partner"}
           </h2>
           <p className="text-xs text-muted-foreground truncate">
-            {ar ? "تحدث واقترح لك قصة مناسبة" : "Speak to get story suggestions"}
+            {ar ? "تحدث بالإنجليزي وسأصحح أخطاءك وأقيّم مستواك" : "Speak English, get corrected, get rated"}
           </p>
         </div>
+        {level && (
+          <div className="shrink-0 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            {level} · {ar ? LEVEL_LABELS_AR[level] : level}
+          </div>
+        )}
       </div>
 
       <div className="p-5 space-y-4">
@@ -224,7 +254,7 @@ Use exact English titles from the list.`;
                 ? (ar ? "جاري التفكير..." : "Thinking...")
                 : listening
                 ? (ar ? "يستمع... (3 ث صمت)" : "Listening... (3s silence)")
-                : (ar ? "اضغط وتحدث" : "Tap & speak")}
+                : (ar ? "اضغط وتحدث بالإنجليزي" : "Tap & speak English")}
             </span>
           </button>
 
@@ -233,7 +263,7 @@ Use exact English titles from the list.`;
               onClick={clearAll}
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              {ar ? "مسح" : "Clear"}
+              {ar ? "محادثة جديدة" : "New chat"}
             </button>
           )}
         </div>
@@ -243,7 +273,7 @@ Use exact English titles from the list.`;
             <span className="mt-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wide shrink-0 w-10 text-center">
               {ar ? "أنت" : "You"}
             </span>
-            <p className="text-sm bg-muted/50 rounded-xl px-3 py-2 flex-1 leading-relaxed">
+            <p className="text-sm bg-muted/50 rounded-xl px-3 py-2 flex-1 leading-relaxed" dir="ltr">
               {transcript}
             </p>
           </div>
@@ -261,22 +291,20 @@ Use exact English titles from the list.`;
             <span className="mt-1 text-[10px] font-bold text-primary uppercase tracking-wide shrink-0 w-10 text-center">
               AI
             </span>
-            <p className="text-sm bg-primary/5 border border-primary/15 rounded-xl px-3 py-2.5 flex-1 leading-relaxed">
+            <p className="text-sm bg-primary/5 border border-primary/15 rounded-xl px-3 py-2.5 flex-1 leading-relaxed" dir="ltr">
               {reply}
             </p>
           </div>
         )}
 
-        {suggestedStories.length > 0 && (
-          <div>
-            <p className="mb-2 text-xs font-medium text-muted-foreground">
-              {ar ? "مقترح لك" : "Suggested for you"}
+        {feedback && !thinking && (
+          <div className="flex gap-2 items-start">
+            <span className="mt-1 text-[10px] font-bold text-emerald-600 uppercase tracking-wide shrink-0 w-10 text-center">
+              {ar ? "تصحيح" : "Fix"}
+            </span>
+            <p className="text-sm bg-emerald-500/5 border border-emerald-500/15 rounded-xl px-3 py-2.5 flex-1 leading-relaxed">
+              {feedback}
             </p>
-            <div className="grid gap-2">
-              {suggestedStories.map((s) => (
-                <StoryCard key={s.slug} story={s} />
-              ))}
-            </div>
           </div>
         )}
       </div>
@@ -369,8 +397,8 @@ function Home() {
         />
       </section>
 
-      {/* Voice Assistant */}
-      <VoiceAssistant ar={ar} />
+      {/* Speaking Partner */}
+      <SpeakingPartner ar={ar} />
 
       {/* Continue Reading */}
       {continueStory && (
