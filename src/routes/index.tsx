@@ -99,7 +99,8 @@ LEVEL: <A1|A2|B1|B2|C1>`;
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash:free",
+model: "google/gemini-2.5-flash",
+
           messages,
         }),
       });
