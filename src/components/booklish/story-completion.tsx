@@ -1,6 +1,21 @@
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { CheckCircle2, BookOpen, Zap, Clock, BookMarked, ArrowRight } from "lucide-react";
+import {
+  CheckCircle2,
+  BookOpen,
+  Zap,
+  Clock,
+  BookMarked,
+  ArrowRight,
+  Mic,
+  Square,
+  Play,
+  Volume2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { stories } from "@/data/stories";
+import { splitSentences } from "@/lib/tokenize";
 import { useT } from "@/lib/i18n";
 
 interface StoryCompletionProps {
@@ -25,6 +40,205 @@ function formatTime(seconds: number): string {
   return `${m}m ${s}s`;
 }
 
+function pickShadowingSentences(storySlug: string, max = 5): string[] {
+  const story = stories.find((s) => s.slug === storySlug);
+  if (!story) return [];
+
+  const allSentences = story.paragraphs.flatMap((p) => splitSentences(p));
+  const candidates = allSentences
+    .map((s) => s.trim())
+    .filter((s) => {
+      const words = s.split(/\s+/).filter(Boolean).length;
+      return words >= 4 && words <= 16;
+    });
+
+  if (candidates.length === 0) return allSentences.slice(0, max);
+  if (candidates.length <= max) return candidates;
+
+  // Spread the picks evenly across the story instead of bunching at the start
+  const picked: string[] = [];
+  const step = candidates.length / max;
+  for (let i = 0; i < max; i++) {
+    picked.push(candidates[Math.floor(i * step)]);
+  }
+  return picked;
+}
+
+function speak(text: string) {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = "en-US";
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+}
+
+function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }) {
+  const sentences = useMemo(() => pickShadowingSentences(storySlug, 5), [storySlug]);
+  const [index, setIndex] = useState(0);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
+  const [micError, setMicError] = useState<string | null>(null);
+
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  const current = sentences[index];
+
+  useEffect(() => {
+    // Reset recording state whenever the sentence changes
+    setRecordedUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+    setMicError(null);
+  }, [index]);
+
+  useEffect(() => {
+    return () => {
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+      if (recordedUrl) URL.revokeObjectURL(recordedUrl);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (sentences.length === 0) return null;
+
+  const startRecording = async () => {
+    setMicError(null);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      const mr = new MediaRecorder(stream);
+      chunksRef.current = [];
+
+      mr.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+      mr.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+        const url = URL.createObjectURL(blob);
+        setRecordedUrl(url);
+        stream.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+      };
+
+      mediaRecorderRef.current = mr;
+      mr.start();
+      setIsRecording(true);
+    } catch {
+      setMicError(
+        ar
+          ? "ما قدرنا نوصل للمايكروفون، تأكد من إعطاء الإذن للمتصفح"
+          : "Couldn't access the microphone, check browser permissions",
+      );
+    }
+  };
+
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+    setIsRecording(false);
+  };
+
+  const playRecording = () => {
+    if (!recordedUrl) return;
+    const audio = new Audio(recordedUrl);
+    audio.play();
+  };
+
+  const goNext = () => setIndex((i) => Math.min(sentences.length - 1, i + 1));
+  const goPrev = () => setIndex((i) => Math.max(0, i - 1));
+
+  return (
+    <div className="border-t border-border p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-medium">
+          {ar ? "تدرب على النطق" : "Pronunciation practice"}
+        </h3>
+        <div className="flex gap-1">
+          {sentences.map((_, i) => (
+            <span
+              key={i}
+              className={`h-1.5 w-1.5 rounded-full ${i === index ? "bg-primary" : "bg-muted"}`}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-xl bg-muted/40 p-4">
+        <p dir="ltr" className="mb-4 text-center font-serif text-base leading-relaxed">
+          {current}
+        </p>
+
+        <div className="flex items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={goPrev}
+            disabled={index === 0}
+            className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30"
+            aria-label={ar ? "الجملة السابقة" : "Previous sentence"}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => speak(current)}
+            className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
+          >
+            <Volume2 className="h-4 w-4" />
+            {ar ? "استمع" : "Listen"}
+          </button>
+
+          <button
+            type="button"
+            onClick={isRecording ? stopRecording : startRecording}
+            className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+              isRecording
+                ? "bg-red-500 text-white shadow-lg shadow-red-500/20"
+                : "bg-primary text-primary-foreground hover:bg-primary/90"
+            }`}
+          >
+            {isRecording ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            {isRecording ? (ar ? "إيقاف" : "Stop") : ar ? "سجل" : "Record"}
+          </button>
+
+          <button
+            type="button"
+            onClick={goNext}
+            disabled={index === sentences.length - 1}
+            className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30"
+            aria-label={ar ? "الجملة التالية" : "Next sentence"}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+
+        {micError && (
+          <p className="mt-3 text-center text-xs text-red-500">{micError}</p>
+        )}
+
+        {recordedUrl && !isRecording && (
+          <div className="mt-4 flex items-center justify-center">
+            <button
+              type="button"
+              onClick={playRecording}
+              className="flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
+            >
+              <Play className="h-3.5 w-3.5" />
+              {ar ? "تشغيل تسجيلك" : "Play your recording"}
+            </button>
+          </div>
+        )}
+      </div>
+
+      <p className="mt-2 text-center text-xs text-muted-foreground">
+        {index + 1} / {sentences.length}
+      </p>
+    </div>
+  );
+}
+
 export function StoryCompletion({
   storySlug,
   storyTitle,
@@ -42,7 +256,7 @@ export function StoryCompletion({
       className="fixed inset-x-0 bottom-0 z-50 px-4 pb-6 pt-2 animate-slide-up"
       dir={ar ? "rtl" : "ltr"}
     >
-      <div className="mx-auto max-w-lg overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
+      <div className="mx-auto max-w-lg overflow-hidden rounded-2xl border border-border bg-card shadow-2xl max-h-[85vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center gap-3 border-b border-border bg-primary/5 px-5 py-4">
           <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" />
@@ -79,6 +293,9 @@ export function StoryCompletion({
             label="XP"
           />
         </div>
+
+        {/* Shadowing pronunciation practice */}
+        <ShadowingPractice storySlug={storySlug} ar={ar} />
 
         {/* Actions */}
         <div className="flex flex-col gap-2 p-4 sm:flex-row">
