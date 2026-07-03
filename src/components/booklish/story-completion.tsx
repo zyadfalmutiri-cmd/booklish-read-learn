@@ -13,6 +13,7 @@ import {
   Volume2,
   ChevronLeft,
   ChevronRight,
+  Loader2,
 } from "lucide-react";
 import { stories } from "@/data/stories";
 import { splitSentences } from "@/lib/tokenize";
@@ -55,7 +56,6 @@ function pickShadowingSentences(storySlug: string, max = 5): string[] {
   if (candidates.length === 0) return allSentences.slice(0, max);
   if (candidates.length <= max) return candidates;
 
-  // Spread the picks evenly across the story instead of bunching at the start
   const picked: string[] = [];
   const step = candidates.length / max;
   for (let i = 0; i < max; i++) {
@@ -72,26 +72,91 @@ function speak(text: string) {
   window.speechSynthesis.speak(utt);
 }
 
+function normalizeWords(text: string): string[] {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s']/g, "")
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+function scoreAttempt(target: string, spoken: string) {
+  const targetWords = normalizeWords(target);
+  const spokenSet = new Set(normalizeWords(spoken));
+  let matched = 0;
+  const results = targetWords.map((w) => {
+    const ok = spokenSet.has(w);
+    if (ok) matched++;
+    return { word: w, ok };
+  });
+  const score = targetWords.length ? Math.round((matched / targetWords.length) * 100) : 0;
+  return { score, results };
+}
+
+async function getPronunciationTip(
+  target: string,
+  spoken: string,
+  ar: boolean,
+): Promise<string | null> {
+  const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+  if (!apiKey) return null;
+
+  try {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "poolside/laguna-xs-2.1:free",
+        messages: [
+          {
+            role: "system",
+            content: `You are a pronunciation coach for Arabic-speaking English learners.
+Compare the target sentence with what the speech recognizer heard the user say, and give ONE short, encouraging tip in Arabic (max 1-2 sentences) about a specific word or sound to improve. If the attempt was very close or perfect, just congratulate them briefly in Arabic. Do not repeat the full sentences back.`,
+          },
+          {
+            role: "user",
+            content: `Target sentence: "${target}"\nWhat the recognizer heard: "${spoken || "(nothing detected)"}"`,
+          },
+        ],
+      }),
+    });
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content?.trim() || null;
+  } catch {
+    return null;
+  }
+}
+
 function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }) {
   const sentences = useMemo(() => pickShadowingSentences(storySlug, 5), [storySlug]);
   const [index, setIndex] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
   const [micError, setMicError] = useState<string | null>(null);
+  const [result, setResult] = useState<{ score: number; results: { word: string; ok: boolean }[] } | null>(null);
+  const [tip, setTip] = useState<string | null>(null);
+  const [tipLoading, setTipLoading] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
+  const recognitionRef = useRef<any>(null);
+  const spokenTextRef = useRef<string>("");
 
   const current = sentences[index];
 
   useEffect(() => {
-    // Reset recording state whenever the sentence changes
     setRecordedUrl((prev) => {
       if (prev) URL.revokeObjectURL(prev);
       return null;
     });
     setMicError(null);
+    setResult(null);
+    setTip(null);
   }, [index]);
 
   useEffect(() => {
@@ -104,8 +169,26 @@ function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }
 
   if (sentences.length === 0) return null;
 
+  const runEvaluation = async (spokenText: string) => {
+    const scored = scoreAttempt(current, spokenText);
+    setResult(scored);
+
+    if (scored.score < 100) {
+      setTipLoading(true);
+      const t = await getPronunciationTip(current, spokenText, ar);
+      setTip(t);
+      setTipLoading(false);
+    } else {
+      setTip(ar ? "نطق ممتاز! 👏" : "Perfect pronunciation! 👏");
+    }
+  };
+
   const startRecording = async () => {
     setMicError(null);
+    setResult(null);
+    setTip(null);
+    spokenTextRef.current = "";
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
@@ -125,6 +208,25 @@ function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }
 
       mediaRecorderRef.current = mr;
       mr.start();
+
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.lang = "en-US";
+        recognition.interimResults = false;
+        recognition.continuous = true;
+        recognition.onresult = (e: any) => {
+          let text = "";
+          for (let i = 0; i < e.results.length; i++) {
+            text += e.results[i][0].transcript + " ";
+          }
+          spokenTextRef.current = text.trim();
+        };
+        recognition.start();
+        recognitionRef.current = recognition;
+      }
+
       setIsRecording(true);
     } catch {
       setMicError(
@@ -137,7 +239,11 @@ function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }
 
   const stopRecording = () => {
     mediaRecorderRef.current?.stop();
+    recognitionRef.current?.stop();
     setIsRecording(false);
+    setTimeout(() => {
+      runEvaluation(spokenTextRef.current);
+    }, 400);
   };
 
   const playRecording = () => {
@@ -148,6 +254,15 @@ function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }
 
   const goNext = () => setIndex((i) => Math.min(sentences.length - 1, i + 1));
   const goPrev = () => setIndex((i) => Math.max(0, i - 1));
+
+  const scoreColor =
+    result == null
+      ? ""
+      : result.score >= 80
+        ? "text-emerald-600 bg-emerald-500/10"
+        : result.score >= 50
+          ? "text-yellow-600 bg-yellow-500/10"
+          : "text-red-500 bg-red-500/10";
 
   return (
     <div className="border-t border-border p-4">
@@ -167,7 +282,16 @@ function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }
 
       <div className="rounded-xl bg-muted/40 p-4">
         <p dir="ltr" className="mb-4 text-center font-serif text-base leading-relaxed">
-          {current}
+          {result
+            ? result.results.map((r, i) => (
+                <span
+                  key={i}
+                  className={r.ok ? "text-emerald-600" : "text-red-500 underline decoration-dotted"}
+                >
+                  {r.word}{" "}
+                </span>
+              ))
+            : current}
         </p>
 
         <div className="flex items-center justify-center gap-3">
@@ -214,12 +338,33 @@ function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }
           </button>
         </div>
 
-        {micError && (
-          <p className="mt-3 text-center text-xs text-red-500">{micError}</p>
+        {micError && <p className="mt-3 text-center text-xs text-red-500">{micError}</p>}
+
+        {result && (
+          <div className="mt-4 space-y-2">
+            <div className="flex items-center justify-center">
+              <span className={`rounded-full px-3 py-1 text-sm font-semibold ${scoreColor}`}>
+                {ar ? "نسبة الدقة" : "Accuracy"}: {result.score}%
+              </span>
+            </div>
+
+            {tipLoading && (
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                {ar ? "جاري تحليل نطقك..." : "Analyzing your pronunciation..."}
+              </div>
+            )}
+
+            {tip && !tipLoading && (
+              <p className="rounded-lg bg-primary/5 border border-primary/15 px-3 py-2 text-center text-sm leading-relaxed">
+                {tip}
+              </p>
+            )}
+          </div>
         )}
 
         {recordedUrl && !isRecording && (
-          <div className="mt-4 flex items-center justify-center">
+          <div className="mt-3 flex items-center justify-center">
             <button
               type="button"
               onClick={playRecording}
