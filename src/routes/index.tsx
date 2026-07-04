@@ -41,6 +41,64 @@ const LEVEL_LABELS_AR: Record<LevelCode, string> = {
   C1: "متقدم",
 };
 
+function PublicLanding({ ar }: { ar: boolean }) {
+  return (
+    <main className="mx-auto max-w-5xl px-4 pb-24 pt-8 sm:pt-14" dir={ar ? "rtl" : "ltr"}>
+      <section className="mb-10 sm:mb-14 text-center">
+        <p className="mb-3 text-xs uppercase tracking-[0.2em] text-primary">
+          {ar ? "تعلم الإنجليزية بطريقة طبيعية" : "Learn English Naturally"}
+        </p>
+        <h1 className="mb-5 mx-auto max-w-2xl font-serif text-3xl leading-[1.1] tracking-tight sm:text-5xl">
+          Booklish
+        </h1>
+        <p className="mb-7 mx-auto max-w-xl text-base text-muted-foreground">
+          {ar
+            ? "اقرأ قصصًا قصيرة، اضغط على أي كلمة لمعناها، ومارس النطق والمحادثة بالذكاء الاصطناعي."
+            : "Read short stories, tap any word for its meaning, and practice speaking with AI."}
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link
+            to="/auth"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            {ar ? "ابدأ الآن مجانًا" : "Get started free"}
+          </Link>
+          <Link
+            to="/pricing"
+            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          >
+            {ar ? "الأسعار" : "Pricing"}
+          </Link>
+        </div>
+      </section>
+
+      <section className="grid gap-4 sm:grid-cols-3 mb-10">
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm text-center">
+          <div className="text-2xl mb-2">📚</div>
+          <h3 className="font-serif text-base mb-1">{ar ? "قصص تفاعلية" : "Interactive Stories"}</h3>
+          <p className="text-sm text-muted-foreground">
+            {ar ? "اضغط على أي كلمة لمعناها فورًا" : "Tap any word for instant meaning"}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm text-center">
+          <div className="text-2xl mb-2">🎙️</div>
+          <h3 className="font-serif text-base mb-1">{ar ? "شريك محادثة ذكي" : "AI Conversation Partner"}</h3>
+          <p className="text-sm text-muted-foreground">
+            {ar ? "تحدث بالإنجليزي واحصل على تصحيح فوري" : "Speak English and get instant feedback"}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm text-center">
+          <div className="text-2xl mb-2">🔥</div>
+          <h3 className="font-serif text-base mb-1">{ar ? "تتبع تقدمك" : "Track Your Progress"}</h3>
+          <p className="text-sm text-muted-foreground">
+            {ar ? "نقاط خبرة، مستويات، وسلسلة أيام" : "XP, levels, and daily streaks"}
+          </p>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 function SpeakingPartner({ ar }: { ar: boolean }) {
   const [listening, setListening] = useState(false);
   const [thinking, setThinking] = useState(false);
@@ -322,6 +380,11 @@ function Home() {
   const { isPro, loading: subLoading } = useSubscription();
   const { user } = useAuth();
   const ar = lang === "ar";
+
+  // Public landing page for visitors who aren't logged in
+  if (!user) {
+    return <PublicLanding ar={ar} />;
+  }
 
   const continueEntry = Object.entries(progress)
     .filter(([, v]) => !v.finished && v.pct > 0)
