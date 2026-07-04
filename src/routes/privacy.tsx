@@ -8,7 +8,7 @@ function PrivacyPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-12 prose prose-neutral" dir="rtl">
       <h1 className="text-3xl font-bold mb-6">سياسة الخصوصية</h1>
-      <p className="text-sm text-gray-500 mb-8">آخر تحديث: [التاريخ]</p>
+      <p className="text-sm text-gray-500 mb-8">آخر تحديث: [2026/7/4]</p>
 
       <p>تحترم Booklish خصوصيتك، وهذه السياسة توضح كيف نجمع بياناتك ونستخدمها.</p>
 
@@ -39,7 +39,7 @@ function PrivacyPage() {
       <p>نتخذ إجراءات معقولة لحماية بياناتك، لكن لا يمكن ضمان أمان مطلق لأي نقل بيانات عبر الإنترنت.</p>
 
       <h2>6. التواصل</h2>
-      <p>لأي استفسار حول الخصوصية: [بريدك الإلكتروني]</p>
+      <p>لأي استفسار حول الخصوصية: [booklish.app@gmail.com ]</p>
     </div>
   )
 }
