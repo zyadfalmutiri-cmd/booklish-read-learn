@@ -8,7 +8,7 @@ function RefundPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-12 prose prose-neutral" dir="rtl">
       <h1 className="text-3xl font-bold mb-6">سياسة الاسترداد والإلغاء</h1>
-      <p className="text-sm text-gray-500 mb-8">آخر تحديث: [التاريخ]</p>
+      <p className="text-sm text-gray-500 mb-8">آخر تحديث: [2026/7/4]</p>
 
       <h2>1. فترة التجربة المجانية</h2>
       <p>تقدّم Booklish فترة تجربة مجانية مدتها 4 أيام. يمكنك الإلغاء خلال هذه الفترة دون أي خصم مالي.</p>
@@ -27,7 +27,7 @@ function RefundPage() {
       <p>جميع المدفوعات تُعالَج عبر Paddle.com بصفته Merchant of Record، وبالتالي فإن أي استرداد يتم معالجته عبر نظام Paddle مباشرة بعد موافقتنا على الطلب.</p>
 
       <h2>5. كيفية تقديم طلب استرداد</h2>
-      <p>راسلنا على [بريدك الإلكتروني] مع ذكر بريد حسابك وسبب الطلب، وسنرد خلال [2-3] أيام عمل.</p>
+      <p>راسلنا على [booklish.app@gmail.com] مع ذكر بريد حسابك وسبب الطلب، وسنرد خلال [2-3] أيام عمل.</p>
     </div>
   )
 }
