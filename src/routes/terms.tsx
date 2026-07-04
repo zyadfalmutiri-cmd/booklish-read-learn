@@ -8,7 +8,7 @@ function TermsPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-12 prose prose-neutral" dir="rtl">
       <h1 className="text-3xl font-bold mb-6">الشروط والأحكام</h1>
-      <p className="text-sm text-gray-500 mb-8">آخر تحديث: [التاريخ]</p>
+      <p className="text-sm text-gray-500 mb-8">آخر تحديث: [2026/7/4]</p>
 
       <p>مرحبًا بك في Booklish ("المنصة"، "نحن"، "الخدمة"). باستخدامك للموقع أو التطبيق فإنك توافق على هذه الشروط.</p>
 
