@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import type { CefrLevel } from "@/lib/reading-level";
 
-const PUBLIC_PATHS = ["/auth", "/reset-password", "/privacy", "/terms", "/cookies", "/refund", "/pricing"];
+const PUBLIC_PATHS = ["/auth", "/reset-password", "/privacy", "/terms", "/cookies", "/refund", "/pricing", "/"];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
