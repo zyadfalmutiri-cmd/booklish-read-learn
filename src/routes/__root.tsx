@@ -1,3 +1,4 @@
+import { Footer } from "../components/booklish/footer";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
  Outlet,
@@ -176,13 +177,14 @@ function RootComponent() {
  useCloudSync();
 
  return (
-   <QueryClientProvider client={queryClient}>
-     <ThemeSync />
-     <Header />
-     <RequireAuth>
-       <Outlet />
-     </RequireAuth>
-     <Toaster />
-   </QueryClientProvider>
- );
+  <QueryClientProvider client={queryClient}>
+    <ThemeSync />
+    <Header />
+    <RequireAuth>
+      <Outlet />
+    </RequireAuth>
+    <Footer />
+    <Toaster />
+  </QueryClientProvider>
+);
 }
