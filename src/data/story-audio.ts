@@ -152,5 +152,250 @@ export const storyAudio: Record<string, StoryAudio> = {
     "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-clock-tower.mp3",
     "duration": 97,
     "source": "tts"
+  },
+  "the-red-umbrella": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-red-umbrella.mp3",
+    "duration": 38,
+    "source": "tts"
+  },
+  "my-morning-coffee": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/my-morning-coffee.mp3",
+    "duration": 36,
+    "source": "tts"
+  },
+  "a-walk-in-the-park": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/a-walk-in-the-park.mp3",
+    "duration": 35,
+    "source": "tts"
+  },
+  "the-new-neighbor": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-new-neighbor.mp3",
+    "duration": 36,
+    "source": "tts"
+  },
+  "my-favorite-food": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/my-favorite-food.mp3",
+    "duration": 31,
+    "source": "tts"
+  },
+  "the-old-radio": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-old-radio.mp3",
+    "duration": 34,
+    "source": "tts"
+  },
+  "a-day-at-the-market": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/a-day-at-the-market.mp3",
+    "duration": 35,
+    "source": "tts"
+  },
+  "the-little-cat": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-little-cat.mp3",
+    "duration": 32,
+    "source": "tts"
+  },
+  "my-school-bag": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/my-school-bag.mp3",
+    "duration": 34,
+    "source": "tts"
+  },
+  "the-quiet-morning": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-quiet-morning.mp3",
+    "duration": 34,
+    "source": "tts"
+  },
+  "the-summer-job": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-summer-job.mp3",
+    "duration": 43,
+    "source": "tts"
+  },
+  "a-letter-to-mom": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/a-letter-to-mom.mp3",
+    "duration": 43,
+    "source": "tts"
+  },
+  "the-broken-phone": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-broken-phone.mp3",
+    "duration": 40,
+    "source": "tts"
+  },
+  "moving-to-a-new-city": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/moving-to-a-new-city.mp3",
+    "duration": 41,
+    "source": "tts"
+  },
+  "the-cooking-class": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-cooking-class.mp3",
+    "duration": 41,
+    "source": "tts"
+  },
+  "a-weekend-trip": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/a-weekend-trip.mp3",
+    "duration": 42,
+    "source": "tts"
+  },
+  "the-lost-wallet": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-lost-wallet.mp3",
+    "duration": 39,
+    "source": "tts"
+  },
+  "learning-to-swim": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/learning-to-swim.mp3",
+    "duration": 42,
+    "source": "tts"
+  },
+  "the-new-teacher": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-new-teacher.mp3",
+    "duration": 38,
+    "source": "tts"
+  },
+  "a-surprise-visit": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/a-surprise-visit.mp3",
+    "duration": 39,
+    "source": "tts"
+  },
+  "the-job-interview": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-job-interview.mp3",
+    "duration": 47,
+    "source": "tts"
+  },
+  "a-difficult-decision": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/a-difficult-decision.mp3",
+    "duration": 46,
+    "source": "tts"
+  },
+  "the-family-reunion": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-family-reunion.mp3",
+    "duration": 50,
+    "source": "tts"
+  },
+  "starting-a-business": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/starting-a-business.mp3",
+    "duration": 48,
+    "source": "tts"
+  },
+  "the-hiking-accident": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-hiking-accident.mp3",
+    "duration": 47,
+    "source": "tts"
+  },
+  "a-misunderstanding": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/a-misunderstanding.mp3",
+    "duration": 49,
+    "source": "tts"
+  },
+  "changing-careers": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/changing-careers.mp3",
+    "duration": 48,
+    "source": "tts"
+  },
+  "the-neighborhood-garden": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-neighborhood-garden.mp3",
+    "duration": 47,
+    "source": "tts"
+  },
+  "a-second-chance": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/a-second-chance.mp3",
+    "duration": 46,
+    "source": "tts"
+  },
+  "the-whistleblower": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-whistleblower.mp3",
+    "duration": 56,
+    "source": "tts"
+  },
+  "a-question-of-trust": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/a-question-of-trust.mp3",
+    "duration": 55,
+    "source": "tts"
+  },
+  "the-art-forger": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-art-forger.mp3",
+    "duration": 58,
+    "source": "tts"
+  },
+  "negotiating-peace": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/negotiating-peace.mp3",
+    "duration": 61,
+    "source": "tts"
+  },
+  "the-refugee-story": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-refugee-story.mp3",
+    "duration": 59,
+    "source": "tts"
+  },
+  "an-unexpected-inheritance": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/an-unexpected-inheritance.mp3",
+    "duration": 59,
+    "source": "tts"
+  },
+  "the-climate-scientist": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-climate-scientist.mp3",
+    "duration": 59,
+    "source": "tts"
+  },
+  "a-city-divided": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/a-city-divided.mp3",
+    "duration": 65,
+    "source": "tts"
+  },
+  "the-memory-thief": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-memory-thief.mp3",
+    "duration": 61,
+    "source": "tts"
+  },
+  "breaking-the-silence": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/breaking-the-silence.mp3",
+    "duration": 59,
+    "source": "tts"
+  },
+  "the-philosopher-king": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-philosopher-king.mp3",
+    "duration": 69,
+    "source": "tts"
+  },
+  "a-matter-of-perspective": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/a-matter-of-perspective.mp3",
+    "duration": 72,
+    "source": "tts"
+  },
+  "the-linguist": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-linguist.mp3",
+    "duration": 77,
+    "source": "tts"
+  },
+  "echoes-of-the-past": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/echoes-of-the-past.mp3",
+    "duration": 75,
+    "source": "tts"
+  },
+  "the-diplomat": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-diplomat.mp3",
+    "duration": 78,
+    "source": "tts"
+  },
+  "an-ethical-dilemma": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/an-ethical-dilemma.mp3",
+    "duration": 78,
+    "source": "tts"
+  },
+  "the-archivist": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-archivist.mp3",
+    "duration": 75,
+    "source": "tts"
+  },
+  "shadows-of-empire": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/shadows-of-empire.mp3",
+    "duration": 83,
+    "source": "tts"
+  },
+  "the-consciousness-question": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-consciousness-question.mp3",
+    "duration": 88,
+    "source": "tts"
+  },
+  "a-fragile-peace": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/a-fragile-peace.mp3",
+    "duration": 82,
+    "source": "tts"
   }
 };
