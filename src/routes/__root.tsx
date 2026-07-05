@@ -129,6 +129,13 @@ function RootShell({ children }: { children: ReactNode }) {
        <ScriptOnce>{THEME_INIT_SCRIPT}</ScriptOnce>
        <HeadContent />
 
+       {/* Google AdSense */}
+       <script
+         async
+         src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5277341714713924"
+         crossOrigin="anonymous"
+       />
+
        {/* Umami Analytics */}
        <script
          defer
