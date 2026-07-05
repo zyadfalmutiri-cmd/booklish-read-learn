@@ -19,10 +19,12 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: bun run scripts/generate-audio.ts
-      - name: Commit updated audio data
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src/data/story-audio.ts
-          git diff --staged --quiet || git commit -m "chore: generate story audio"
-          git push
+      - name: Commit and push
+  run: |
+    git config user.name "github-actions[bot]"
+    git config user.email "github-actions[bot]@users.noreply.github.com"
+    git add src/data/story-audio.ts
+    git diff --staged --quiet || git commit -m "chore: generate story audio"
+    git pull --rebase origin old-version
+    git push
+
