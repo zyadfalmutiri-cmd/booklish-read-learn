@@ -1,6 +1,7 @@
 export type Level = "beginner" | "intermediate" | "advanced";
 export type Genre = "mystery" | "romance" | "sci-fi" | "adventure" | "drama" | "non-fiction";
 export type Category = "short" | "fiction" | "non-fiction";
+export type CEFRLevel = "A1" | "A2" | "B1" | "B2" | "C1";
 
 export interface VocabEntry {
   ar: string;
@@ -44,6 +45,7 @@ export interface Story {
   title: string;
   genre: Genre;
   level: Level;
+  cefr?: CEFRLevel;
   blurb: string;
   cover: string;
   coverHue: string;
