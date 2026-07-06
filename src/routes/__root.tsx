@@ -135,6 +135,17 @@ function RootShell({ children }: { children: ReactNode }) {
          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5277341714713924"
          crossOrigin="anonymous"
        />
+       {/* Auto Ads: يخلي Google يحدد أماكن الإعلانات تلقائيًا في كل صفحة */}
+       <script
+         dangerouslySetInnerHTML={{
+           __html: `
+             (adsbygoogle = window.adsbygoogle || []).push({
+               google_ad_client: "ca-pub-5277341714713924",
+               enable_page_level_ads: true
+             });
+           `,
+         }}
+       />
 
        {/* Umami Analytics */}
        <script
