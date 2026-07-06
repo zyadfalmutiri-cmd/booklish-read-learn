@@ -256,5 +256,23 @@ export function useCloudSync() {
 
 /** Immediately push local data to cloud (call after saving a word, finishing a story, etc.) */
 export function syncNow(userId: string) {
-  void pushToCloud(userId);
+  void pushToCloud(userId).then(() => {
+    void checkAchievementsAfterSync(userId);
+  });
+}
+
+async function checkAchievementsAfterSync(userId: string) {
+  try {
+    await supabase.rpc("update_user_streak", { p_user_id: userId });
+    const { data: unlocked, error } = await supabase.rpc("check_and_award_achievements", { p_user_id: userId });
+    if (error) {
+      console.warn("[Booklish achievements] check failed:", error);
+      return;
+    }
+    if (unlocked && unlocked.length > 0) {
+      window.dispatchEvent(new CustomEvent("booklish:achievement-unlocked", { detail: unlocked }));
+    }
+  } catch (err) {
+    console.warn("[Booklish achievements] error:", err);
+  }
 }
