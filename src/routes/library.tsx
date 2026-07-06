@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { Search, TrendingUp } from "lucide-react";
+import { Search, TrendingUp, GraduationCap, X } from "lucide-react";
 import { stories } from "@/data/stories";
 import { StoryCard } from "@/components/booklish/story-card";
 import type { Category, Genre } from "@/lib/types";
@@ -22,61 +22,90 @@ function Library() {
   const [genre, setGenre] = useState<Genre | "all">("all");
   const [category, setCategory] = useState<Category | "all">("all");
   const [q, setQ] = useState("");
+  const [showPlacementTest, setShowPlacementTest] = useState(false);
 
-  const allowedStoryLevels = CEFR_TO_STORY_LEVEL[data.cefrLevel];
-  const progressPct = Math.round((data.storiesFinishedAtLevel / STORIES_TO_ADVANCE) * 100);
+  // قبل اكتمال الـ hydration، أو قبل تحديد المستوى، نعرض كل القصص
+  // بدل ما نحجب الصفحة بمربع تحميل فاضي أو اختبار إجباري.
+  const allowedStoryLevels = hydrated && data.placementDone ? CEFR_TO_STORY_LEVEL[data.cefrLevel] : null;
+  const progressPct = hydrated ? Math.round((data.storiesFinishedAtLevel / STORIES_TO_ADVANCE) * 100) : 0;
   const isRtl = dir === "rtl";
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
     return stories.filter((s) =>
-      allowedStoryLevels.includes(s.level) &&
+      (allowedStoryLevels === null || allowedStoryLevels.includes(s.level)) &&
       (genre === "all" || s.genre === genre) &&
       (category === "all" || (s.tags ?? []).includes(category)) &&
       (term === "" || s.title.toLowerCase().includes(term) || s.blurb.toLowerCase().includes(term))
     );
   }, [genre, category, q, allowedStoryLevels]);
 
-  // Show placement test only here, in the library — never blocks reading
-  if (hydrated && !data.placementDone) {
-    return <PlacementTest onComplete={completePlacement} />;
-  }
-
-  if (!hydrated) {
+  // اختبار تحديد المستوى الحين اختياري: يظهر كنافذة منفصلة لو المستخدم طلبه،
+  // وما يمنع عرض قائمة القصص أبداً.
+  if (showPlacementTest) {
     return (
-      <main className="mx-auto max-w-5xl px-4 pb-24 pt-8">
-        <div className="h-40 animate-pulse rounded-xl bg-muted" />
-      </main>
+      <div className="relative">
+        <button
+          onClick={() => setShowPlacementTest(false)}
+          className="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full border border-border bg-card hover:bg-muted"
+          aria-label="Close"
+        >
+          <X className="h-4 w-4" />
+        </button>
+        <PlacementTest
+          onComplete={(result) => {
+            completePlacement(result);
+            setShowPlacementTest(false);
+          }}
+        />
+      </div>
     );
   }
 
   return (
     <main className="mx-auto max-w-5xl px-4 pb-24 pt-8">
-      <div className={`mb-6 rounded-xl bg-gradient-to-br ${info.color} p-4`}>
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <div className="mb-0.5 flex items-center gap-2">
-              <span className="text-2xl font-bold">{data.cefrLevel}</span>
-              <span className="text-sm font-medium">{info.nameAr}</span>
+      {hydrated && data.placementDone && (
+        <div className={`mb-6 rounded-xl bg-gradient-to-br ${info.color} p-4`}>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <div className="mb-0.5 flex items-center gap-2">
+                <span className="text-2xl font-bold">{data.cefrLevel}</span>
+                <span className="text-sm font-medium">{info.nameAr}</span>
+              </div>
+              <p className="text-xs opacity-80">{info.descAr}</p>
             </div>
-            <p className="text-xs opacity-80">{info.descAr}</p>
+            {!isMaxLevel && (
+              <div className="text-right text-xs opacity-80">
+                <TrendingUp className="mb-1 h-4 w-4 inline" /><br />
+                {storiesLeft} قصة للمستوى التالي
+              </div>
+            )}
           </div>
           {!isMaxLevel && (
-            <div className="text-right text-xs opacity-80">
-              <TrendingUp className="mb-1 h-4 w-4 inline" /><br />
-              {storiesLeft} قصة للمستوى التالي
+            <div className="mt-3">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-black/10">
+                <div className="h-full rounded-full bg-black/20 transition-all duration-500" style={{ width: `${progressPct}%` }} />
+              </div>
             </div>
           )}
+          {isMaxLevel && <p className="mt-2 text-xs font-medium opacity-80">🎓 وصلت للمستوى الأعلى!</p>}
         </div>
-        {!isMaxLevel && (
-          <div className="mt-3">
-            <div className="h-2 w-full overflow-hidden rounded-full bg-black/10">
-              <div className="h-full rounded-full bg-black/20 transition-all duration-500" style={{ width: `${progressPct}%` }} />
-            </div>
+      )}
+
+      {hydrated && !data.placementDone && (
+        <button
+          onClick={() => setShowPlacementTest(true)}
+          className="mb-6 flex w-full items-center gap-3 rounded-xl border border-dashed border-border bg-card p-4 text-left transition-colors hover:bg-muted"
+        >
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10">
+            <GraduationCap className="h-5 w-5 text-primary" />
           </div>
-        )}
-        {isMaxLevel && <p className="mt-2 text-xs font-medium opacity-80">🎓 وصلت للمستوى الأعلى!</p>}
-      </div>
+          <div>
+            <div className="text-sm font-medium">حدد مستواك في اللغة</div>
+            <div className="text-xs text-muted-foreground">اختبار قصير يساعدنا نرشح لك القصص المناسبة</div>
+          </div>
+        </button>
+      )}
 
       <div className="mb-8 flex flex-col gap-4">
         <h1 className="font-serif text-3xl">{t("library.title")}</h1>
