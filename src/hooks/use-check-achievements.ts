@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 
 export async function checkAchievements(userId: string) {
   await supabase.rpc('update_user_streak', { p_user_id: userId });
