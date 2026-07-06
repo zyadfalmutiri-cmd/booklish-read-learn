@@ -19,6 +19,7 @@ import { THEME_INIT_SCRIPT } from "../lib/theme-init";
 import { Toaster } from "../components/ui/sonner";
 import { useCloudSync } from "../lib/sync";
 import { RequireAuth } from "../components/booklish/require-auth";
+import { AchievementToastListener } from "../components/booklish/achievement-toast-listener";
 
 function NotFoundComponent() {
  return (
@@ -203,6 +204,7 @@ function RootComponent() {
     </RequireAuth>
     <Footer />
     <Toaster />
+    <AchievementToastListener />
   </QueryClientProvider>
 );
 }
