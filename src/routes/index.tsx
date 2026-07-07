@@ -554,43 +554,7 @@ function Home() {
         </div>
       </section>
 
-      {/* Pricing Banner */}
-      {!subLoading && !isPro && (
-        <section className="mb-8 overflow-hidden rounded-2xl border border-primary/30 shadow-sm">
-          <div className="bg-gradient-to-br from-primary/15 via-primary/8 to-transparent p-5">
-            <div className="mb-1 text-xs uppercase tracking-widest text-primary font-medium">
-              {ar ? "ترقية" : "Upgrade"}
-            </div>
-            <h2 className="mb-2 font-serif text-xl font-medium">
-              {ar ? "افتح كل القصص" : "Unlock all stories"}
-            </h2>
-            <ul className="mb-4 space-y-1 text-sm text-muted-foreground list-none">
-              <li>{ar ? "- جميع القصص والمستويات" : "- All stories and levels"}</li>
-              <li>{ar ? "- حفظ كلمات بلا حدود" : "- Unlimited word saving"}</li>
-              <li>{ar ? "- بدون إعلانات" : "- Ad-free experience"}</li>
-            </ul>
-            <div className="flex flex-wrap gap-3">
-              <button
-                onClick={() => openCheckout(import.meta.env.VITE_PADDLE_MONTHLY_PRICE_ID)}
-                className="rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors shadow-md shadow-primary/20"
-              >
-                {ar ? "شهري - $5" : "Monthly - $5"}
-              </button>
-              <div className="relative">
-                <button
-                  onClick={() => openCheckout(import.meta.env.VITE_PADDLE_YEARLY_PRICE_ID)}
-                  className="rounded-full border-2 border-primary px-5 py-2.5 text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
-                >
-                  {ar ? "سنوي - $30" : "Yearly - $30"}
-                </button>
-                <span className="absolute -top-2 -right-2 rounded-full bg-emerald-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                  {ar ? "50%" : "50% off"}
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+
 
     </main>
   );
