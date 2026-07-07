@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useSearch } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Minus, Plus, Languages, Clock, Maximize2, Minimize2 } from "lucide-react";
 import { getStory } from "@/data/stories";
@@ -10,11 +10,14 @@ import { useReadingTimer } from "@/lib/stats";
 import { useT } from "@/lib/i18n";
 import { useXp, XP_REWARDS } from "@/lib/xp";
 import { StoryCompletion } from "@/components/booklish/story-completion";
-import type { SavedWord } from "@/lib/types";
+import type { SavedWord, Story } from "@/lib/types";
 
 type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boolean; readingSeconds?: number }>;
 
 export const Route = createFileRoute("/read/$slug")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    chapter: typeof search.chapter === "number" ? search.chapter : undefined,
+  }),
   loader: ({ params }) => {
     const story = getStory(params.slug);
     if (!story) throw notFound();
@@ -27,7 +30,18 @@ export const Route = createFileRoute("/read/$slug")({
 });
 
 function ReadPage() {
-  const { story } = Route.useLoaderData() as { story: import("@/lib/types").Story };
+  const { story } = Route.useLoaderData() as { story: Story };
+  const { chapter } = useSearch({ from: "/read/$slug" });
+
+  const hasChapters = story.chapters && story.chapters.length > 0;
+  const chapterIndex = hasChapters ? (chapter ?? 0) : null;
+  const activeChapter = hasChapters ? story.chapters![chapterIndex!] : null;
+
+  // مفتاح التخزين: لو فيه فصل نحفظ تقدمه لحاله، وإلا نحفظ تقدم القصة كامل زي القديم
+  const progressKey = activeChapter ? `${story.slug}::ch${chapterIndex}` : story.slug;
+  const displayParagraphs = activeChapter ? activeChapter.paragraphs : story.paragraphs;
+  const displayTitle = activeChapter ? `${story.title} — ${activeChapter.title}` : story.title;
+
   const [progress, setProgress, progressHydrated] = useLocalStore<ProgressMap>(storeKeys.progress, {});
   const [vocabList, , vocabHydrated] = useLocalStore<SavedWord[]>(storeKeys.vocab, []);
   const [settings, setSettings] = useSettings();
@@ -97,19 +111,19 @@ function ReadPage() {
   useEffect(() => {
     if (!progressHydrated) return;
 
-    const alreadyFinished = progress[story.slug]?.finished ?? false;
+    const alreadyFinished = progress[progressKey]?.finished ?? false;
 
     if (pct >= 95 && !alreadyFinished && !finishXpGranted.current) {
       finishXpGranted.current = true;
-      addXp(XP_REWARDS.finishStory, `finish:${story.slug}`);
+      addXp(XP_REWARDS.finishStory, `finish:${progressKey}`);
       setShowCompletion(true);
     }
 
     setProgress((prev) => {
-      const previous = prev[story.slug];
+      const previous = prev[progressKey];
       return {
         ...prev,
-        [story.slug]: {
+        [progressKey]: {
           pct: Math.max(pct, previous?.pct ?? 0),
           lastAt: Date.now(),
           finished: (previous?.finished ?? false) || pct >= 95,
@@ -118,7 +132,7 @@ function ReadPage() {
       };
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pct, progressHydrated]);
+  }, [pct, progressHydrated, progressKey]);
 
   const adjustFont = (delta: number) => {
     const next = Math.min(1.3, Math.max(0.85, +(settings.fontScale + delta).toFixed(2)));
@@ -136,18 +150,24 @@ function ReadPage() {
   const newWords = Math.max(0, vocabList.length - (vocabAtStart.current ?? vocabList.length));
   const xpEarned = Math.max(0, xp - (xpAtStart.current ?? xp));
 
+  const nextChapterIndex =
+    hasChapters && chapterIndex !== null && chapterIndex < story.chapters!.length - 1
+      ? chapterIndex + 1
+      : null;
+
   return (
     <div className="min-h-screen">
       <div className="sticky top-14 z-20 border-b border-border bg-background/85 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center gap-1.5 px-3 py-2 sm:gap-2 sm:px-4">
           <Link
-            to="/library"
+            to="/story/$slug"
+            params={{ slug: story.slug }}
             className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border hover:bg-muted"
             aria-label="Back"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
-          <div className="min-w-0 flex-1 truncate text-sm text-muted-foreground">{story.title}</div>
+          <div className="min-w-0 flex-1 truncate text-sm text-muted-foreground">{displayTitle}</div>
           <span className="hidden items-center gap-1 text-xs text-muted-foreground sm:inline-flex">
             <Clock className="h-3 w-3" /> {remaining} {t("common.minLeft")}
           </span>
@@ -188,20 +208,61 @@ function ReadPage() {
       </div>
 
       <div className={isFocusMode ? "focus-mode-active" : ""}>
-        <Reader story={story} onScrollPct={setPct} />
+        <Reader story={{ ...story, paragraphs: displayParagraphs }} onScrollPct={setPct} />
 
         {!isFocusMode && (
           <div className="reading-column px-4 pb-16">
-            <div className="mt-8 rounded-xl border border-border bg-card p-5 text-center font-sans">
-              <p className="text-sm text-muted-foreground">{t("read.finishedQ")}</p>
-              <Link
-                to="/quiz/$slug"
-                params={{ slug: story.slug }}
-                className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-              >
-                {t("read.takeQuiz")}
-              </Link>
-            </div>
+            {hasChapters ? (
+              <div className="mt-8 rounded-xl border border-border bg-card p-5 text-center font-sans">
+                {nextChapterIndex !== null ? (
+                  <>
+                    <p className="text-sm text-muted-foreground">
+                      {pct >= 95 ? "أحسنت! جاهز للفصل التالي؟" : "أكمل القراءة لفتح الفصل التالي"}
+                    </p>
+                    {pct >= 95 ? (
+                      <Link
+                        to="/read/$slug"
+                        params={{ slug: story.slug }}
+                        search={{ chapter: nextChapterIndex }}
+                        className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                      >
+                        الفصل التالي
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/story/$slug"
+                        params={{ slug: story.slug }}
+                        className="mt-3 inline-flex items-center gap-2 rounded-full border border-border px-5 py-2 text-sm font-medium hover:bg-muted"
+                      >
+                        رجوع لصفحة القصة
+                      </Link>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-muted-foreground">خلصت آخر فصل! جاهز للاختبار؟</p>
+                    <Link
+                      to="/quiz/$slug"
+                      params={{ slug: story.slug }}
+                      className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                    >
+                      {t("read.takeQuiz")}
+                    </Link>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="mt-8 rounded-xl border border-border bg-card p-5 text-center font-sans">
+                <p className="text-sm text-muted-foreground">{t("read.finishedQ")}</p>
+                <Link
+                  to="/quiz/$slug"
+                  params={{ slug: story.slug }}
+                  className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                >
+                  {t("read.takeQuiz")}
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -209,7 +270,7 @@ function ReadPage() {
       {showCompletion && (
         <StoryCompletion
           storySlug={story.slug}
-          storyTitle={story.title}
+          storyTitle={displayTitle}
           readingSeconds={readingSeconds}
           newWords={newWords}
           xpEarned={xpEarned}
@@ -219,3 +280,4 @@ function ReadPage() {
     </div>
   );
 }
+
