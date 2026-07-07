@@ -1,6 +1,6 @@
 export type Level = "beginner" | "intermediate" | "advanced";
 export type Genre = "mystery" | "romance" | "sci-fi" | "adventure" | "drama" | "non-fiction";
-export type Category = "short" | "fiction" | "non-fiction";
+export type Category = "short" | "fiction" | "non-fiction" | "sports";
 export type CEFRLevel = "A1" | "A2" | "B1" | "B2" | "C1";
 
 export interface VocabEntry {
