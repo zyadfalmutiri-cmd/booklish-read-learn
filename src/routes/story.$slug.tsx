@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Bookmark, BookmarkCheck, Clock, ArrowRight } from "lucide-react";
+import { Bookmark, BookmarkCheck, Clock, ArrowRight, Lock, CheckCircle2 } from "lucide-react";
 import { getStory } from "@/data/stories";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useT } from "@/lib/i18n";
@@ -23,6 +23,10 @@ export const Route = createFileRoute("/story/$slug")({
   component: StoryDetail,
 });
 
+function chapterKey(slug: string, index: number) {
+  return `${slug}::ch${index}`;
+}
+
 function StoryDetail() {
   const { story } = Route.useLoaderData() as { story: import("@/lib/types").Story };
   const [bookmarks, setBookmarks] = useLocalStore<string[]>(storeKeys.bookmarks, []);
@@ -36,6 +40,7 @@ function StoryDetail() {
     setBookmarks((prev) => (prev.includes(story.slug) ? prev.filter((s) => s !== story.slug) : [...prev, story.slug]));
 
   const vocabSample = Object.entries(story.vocab).slice(0, 6);
+  const hasChapters = story.chapters && story.chapters.length > 0;
 
   return (
     <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
@@ -54,38 +59,93 @@ function StoryDetail() {
       <h1 className="mb-4 font-serif text-3xl leading-tight sm:text-4xl" dir="ltr">{story.title}</h1>
       <p className="mb-8 text-base text-muted-foreground" dir="ltr">{story.blurb}</p>
 
+      {!hasChapters && (
+        <div className="mb-10 flex flex-wrap items-center gap-3">
+          <Link
+            to="/read/$slug"
+            params={{ slug: story.slug }}
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            {pct > 0 ? `${t("story.continue")} (${pct}%)` : t("story.start")} <ArrowRight className={arrowClass} />
+          </Link>
+          {pct >= 80 && (
+            <Link
+              to="/quiz/$slug"
+              params={{ slug: story.slug }}
+              className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm transition-colors hover:bg-muted"
+            >
+              {t("story.takeQuiz")}
+            </Link>
+          )}
+        </div>
+      )}
+
+      {hasChapters && (
+        <section className="mb-10">
+          <h2 className="mb-3 font-serif text-lg">{dir === "rtl" ? "الفصول" : "Chapters"}</h2>
+          <div className="space-y-3">
+            {story.chapters!.map((chapter, index) => {
+              const isFirst = index === 0;
+              const prevDone = isFirst || (progress[chapterKey(story.slug, index - 1)]?.finished ?? false);
+              const thisProgress = progress[chapterKey(story.slug, index)];
+              const isDone = thisProgress?.finished ?? false;
+              const locked = !prevDone;
+
+              const content = (
+                <div
+                  className={`flex items-center gap-3 rounded-xl border p-4 transition-colors ${
+                    locked
+                      ? "border-border bg-muted/40 opacity-60"
+                      : "border-border bg-card hover:shadow-md hover:-translate-y-0.5"
+                  }`}
+                >
+                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/10 text-sm font-medium text-primary">
+                    {index + 1}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-serif text-base">{chapter.title}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {locked
+                        ? (dir === "rtl" ? "أكمل الفصل السابق أولاً" : "Finish the previous chapter first")
+                        : isDone
+                        ? (dir === "rtl" ? "مكتمل" : "Completed")
+                        : (dir === "rtl" ? "متاح للقراءة" : "Ready to read")}
+                    </div>
+                  </div>
+                  {locked ? (
+                    <Lock className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  ) : isDone ? (
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
+                  ) : (
+                    <ArrowRight className={`${arrowClass} shrink-0 text-muted-foreground`} />
+                  )}
+                </div>
+              );
+
+              return locked ? (
+                <div key={index}>{content}</div>
+              ) : (
+                <Link
+                  key={index}
+                  to="/read/$slug"
+                  params={{ slug: story.slug }}
+                  search={{ chapter: index }}
+                >
+                  {content}
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       <div className="mb-10 flex flex-wrap items-center gap-3">
-        <Link
-          to="/read/$slug"
-          params={{ slug: story.slug }}
-          className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-        >
-          {pct > 0 ? `${t("story.continue")} (${pct}%)` : t("story.start")} <ArrowRight className={arrowClass} />
-        </Link>
         <button
           onClick={toggle}
           className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm transition-colors hover:bg-muted"
         >
           {saved ? <><BookmarkCheck className="h-4 w-4 text-primary" /> {t("story.bookmarked")}</> : <><Bookmark className="h-4 w-4" /> {t("story.bookmark")}</>}
         </button>
-        {pct >= 80 && (
-          <Link
-            to="/quiz/$slug"
-            params={{ slug: story.slug }}
-            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm transition-colors hover:bg-muted"
-          >
-            {t("story.takeQuiz")}
-          </Link>
-        )}
-        {pct >= 80 && (
-          <Link
-            to="/shadow/$slug"
-            params={{ slug: story.slug }}
-            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm transition-colors hover:bg-muted"
-          >
-            {dir === "rtl" ? "تدرّب بالنطق" : "Practice pronunciation"}
-          </Link>
-        )}
       </div>
 
       <section>
