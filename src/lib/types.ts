@@ -40,6 +40,11 @@ export interface StoryAudio {
   source: "penguin" | "tts";
 }
 
+export interface StoryChapter {
+  title: string;
+  paragraphs: string[];
+}
+
 export interface Story {
   slug: string;
   title: string;
@@ -51,9 +56,11 @@ export interface Story {
   coverHue: string;
   minutes: number;
   paragraphs: string[];
+  chapters?: StoryChapter[];   // ← جديد
   vocab: Record<string, VocabEntry>;
   sentenceTranslations?: Record<string, string>;
   tags?: Category[];
   quiz: QuizQuestion[];
   audio?: StoryAudio;
 }
+
