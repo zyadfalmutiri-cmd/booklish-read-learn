@@ -397,5 +397,25 @@ export const storyAudio: Record<string, StoryAudio> = {
     "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/a-fragile-peace.mp3",
     "duration": 82,
     "source": "tts"
+  },
+  "the-online-friend": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/the-online-friend.mp3",
+    "duration": 48,
+    "source": "tts"
+  },
+  "ronaldo-from-poverty-to-glory": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/ronaldo-from-poverty-to-glory.mp3",
+    "duration": 85,
+    "source": "tts"
+  },
+  "messi-overcoming-growth-hormone-deficiency": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/messi-overcoming-growth-hormone-deficiency.mp3",
+    "duration": 66,
+    "source": "tts"
+  },
+  "roberto-baggio-died-standing": {
+    "url": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-audio/roberto-baggio-died-standing.mp3",
+    "duration": 62,
+    "source": "tts"
   }
 };
