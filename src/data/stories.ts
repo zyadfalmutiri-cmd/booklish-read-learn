@@ -80,6 +80,9 @@ import { theArchivist } from "@/data/stories/the-archivist";
 import { shadowsOfEmpire } from "@/data/stories/shadows-of-empire";
 import { theConsciousnessQuestion } from "@/data/stories/the-consciousness-question";
 import { aFragilePeace } from "@/data/stories/a-fragile-peace";
+import { GloryOfRonldo } from "@/data/stories/sports-stories";
+import { messiGrowthHormone } from "@/data/stories/sports-stories";
+import { DiedStanding } from "@/data/stories/sports-stories";
 
 function withDefaults(story: Story): Story {
   const tags: Category[] = story.tags ?? [];
