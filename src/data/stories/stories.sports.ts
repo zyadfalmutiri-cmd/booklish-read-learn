@@ -1,8 +1,8 @@
 import type { Story } from "@/lib/types";
 
 export const GloryOfRonldo: Story = {
-  slug: "Glory-of-Ronaldo",
-  title: "Ronaldo: From Poverty to Glory",
+  slug: "ronaldo-from-poverty-to-glory",
+  title: "Glory of Ronaldo",
   genre: "non-fiction",
   level: "beginner",
   blurb: "A poor boy from a small island had almost nothing. He became one of the greatest football players ever.",
@@ -67,8 +67,8 @@ export const GloryOfRonldo: Story = {
 };
 
 export const messiGrowthHormone: Story = {
-  slug: "Messi’s Struggles",
-  title: "Messi: Overcoming Growth Hormone Deficiency",
+  slug: "messi-overcoming-growth-hormone-deficiency",
+  title: "Messi’s Struggles",
   genre: "non-fiction",
   level: "intermediate",
   blurb: "A small boy with a big talent had a medical condition that threatened his dream. This is how he overcame it.",
@@ -131,7 +131,7 @@ export const messiGrowthHormone: Story = {
 
 export const DiedStanding: Story = {
   slug: "roberto-baggio-died-standing",
-  title: "Roberto Baggio: The Man Who \"Died Standing\"",
+  title: "Died Standing",
   genre: "non-fiction",
   level: "advanced",
   blurb: "A gifted Italian footballer faced the most painful moment of his career in front of the entire world — and responded with dignity.",
