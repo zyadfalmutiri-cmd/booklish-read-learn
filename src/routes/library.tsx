@@ -27,7 +27,7 @@ function Library() {
 
   // قبل اكتمال الـ hydration، أو قبل تحديد المستوى، نعرض كل القصص
   // بدل ما نحجب الصفحة بمربع تحميل فاضي أو اختبار إجباري.
-  const allowedStoryLevels = hydrated && data.placementDone ? CEFR_TO_STORY_LEVEL[data.cefrLevel] : null;
+const allowedStoryLevels = null;
   const progressPct = hydrated ? Math.round((data.storiesFinishedAtLevel / STORIES_TO_ADVANCE) * 100) : 0;
   const isRtl = dir === "rtl";
 
