@@ -181,8 +181,11 @@ export const stories: Story[] = [
   shadowsOfEmpire,
   theConsciousnessQuestion,
   aFragilePeace,
+  // Sports category (3)
+  ronaldoFromPovertyToGlory,
+  messiGrowthHormone,
+  baggioDiedStanding,
 ].map(withDefaults);
-
 
 export function getStory(slug: string): Story | undefined {
   return stories.find((s) => s.slug === slug);
