@@ -80,9 +80,7 @@ import { theArchivist } from "@/data/stories/the-archivist";
 import { shadowsOfEmpire } from "@/data/stories/shadows-of-empire";
 import { theConsciousnessQuestion } from "@/data/stories/the-consciousness-question";
 import { aFragilePeace } from "@/data/stories/a-fragile-peace";
-import { GloryOfRonldo } from "@/data/stories/stories.sports";
-import { messiGrowthHormone } from "@/data/stories/stories.sports";
-import { DiedStanding } from "@/data/stories/stories.sports";
+import { GloryOfRonldo, messiGrowthHormone, DiedStanding } from "@/data/stories/stories.sports";
 
 function withDefaults(story: Story): Story {
   const tags: Category[] = story.tags ?? [];
@@ -181,11 +179,12 @@ export const stories: Story[] = [
   shadowsOfEmpire,
   theConsciousnessQuestion,
   aFragilePeace,
-  // Sports category (3)
-  ronaldoFromPovertyToGlory,
+    // Sports category (3)
+  GloryOfRonldo,
   messiGrowthHormone,
-  baggioDiedStanding,
+  DiedStanding,
 ].map(withDefaults);
+
 
 export function getStory(slug: string): Story | undefined {
   return stories.find((s) => s.slug === slug);
