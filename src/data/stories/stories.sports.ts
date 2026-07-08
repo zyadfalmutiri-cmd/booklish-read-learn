@@ -191,9 +191,3 @@ export const baggioDiedStanding: Story = {
     { kind: "vocab", q: "\"Shootout\" means…", choices: ["a training session", "a series of penalty kicks to decide a match", "a type of injury", "a pre-match interview"], answer: 1 },
   ],
 };
-
-export const sportsStories: Story[] = [
-  ronaldoFromPovertyToGlory,
-  messiGrowthHormone,
-  baggioDiedStanding,
-];
