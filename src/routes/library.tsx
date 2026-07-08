@@ -16,7 +16,6 @@ export const Route = createFileRoute("/library")({
 const GENRES: Genre[] = ["mystery", "romance", "sci-fi", "adventure", "drama", "non-fiction"];
 const CATEGORIES: Category[] = ["short", "fiction", "non-fiction", "sports"];
 
-
 function Library() {
   const { t, dir } = useT();
   const { data, hydrated, storiesLeft, isMaxLevel, info, completePlacement } = useUserLevel();
@@ -25,11 +24,11 @@ function Library() {
   const [q, setQ] = useState("");
   const [showPlacementTest, setShowPlacementTest] = useState(false);
 
-  // قبل اكتمال الـ hydration، أو قبل تحديد المستوى، نعرض كل القصص
-  // بدل ما نحجب الصفحة بمربع تحميل فاضي أو اختبار إجباري.
-const allowedStoryLevels = null;
+  const allowedStoryLevels = null;
   const progressPct = hydrated ? Math.round((data.storiesFinishedAtLevel / STORIES_TO_ADVANCE) * 100) : 0;
   const isRtl = dir === "rtl";
+
+  const isBrowsing = genre === "all" && category === "all" && q.trim() === "";
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -41,8 +40,19 @@ const allowedStoryLevels = null;
     );
   }, [genre, category, q, allowedStoryLevels]);
 
-  // اختبار تحديد المستوى الحين اختياري: يظهر كنافذة منفصلة لو المستخدم طلبه،
-  // وما يمنع عرض قائمة القصص أبداً.
+  // تجميع القصص حسب النوع لعرض الصفوف الأفقية عند التصفح الحر
+  const storiesByGenre = useMemo(() => {
+    const map = new Map<Genre, typeof stories>();
+    for (const g of GENRES) {
+      const list = stories.filter((s) => s.genre === g);
+      if (list.length > 0) map.set(g, list);
+    }
+    return map;
+  }, []);
+
+  const sportsStories = useMemo(() => stories.filter((s) => (s.tags ?? []).includes("sports")), []);
+  const shortStories = useMemo(() => stories.filter((s) => (s.tags ?? []).includes("short")), []);
+
   if (showPlacementTest) {
     return (
       <div className="relative">
@@ -125,11 +135,35 @@ const allowedStoryLevels = null;
         </div>
       </div>
 
-      {filtered.length === 0
-        ? <p className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">{t("common.noMatch")}</p>
-        : <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{filtered.map((s) => <StoryCard key={s.slug} story={s} />)}</div>
-      }
+      {isBrowsing ? (
+        <div className="space-y-8">
+          {shortStories.length > 0 && <GenreRow title="قصص قصيرة" stories={shortStories} />}
+          {Array.from(storiesByGenre.entries()).map(([g, list]) => (
+            <GenreRow key={g} title={t(`genre.${g}`)} stories={list} />
+          ))}
+          {sportsStories.length > 0 && <GenreRow title="رياضة" stories={sportsStories} />}
+        </div>
+      ) : filtered.length === 0 ? (
+        <p className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">{t("common.noMatch")}</p>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{filtered.map((s) => <StoryCard key={s.slug} story={s} />)}</div>
+      )}
     </main>
+  );
+}
+
+function GenreRow({ title, stories: rowStories }: { title: string; stories: typeof stories }) {
+  return (
+    <section>
+      <h2 className="mb-3 font-serif text-xl">{title}</h2>
+      <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {rowStories.map((s) => (
+          <div key={s.slug} className="w-40 shrink-0">
+            <StoryCard story={s} />
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
