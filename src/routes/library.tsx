@@ -16,6 +16,7 @@ export const Route = createFileRoute("/library")({
 const GENRES: Genre[] = ["mystery", "romance", "sci-fi", "adventure", "drama", "non-fiction"];
 const CATEGORIES: Category[] = ["short", "fiction", "non-fiction", "sports"];
 
+
 function Library() {
   const { t, dir } = useT();
   const { data, hydrated, storiesLeft, isMaxLevel, info, completePlacement } = useUserLevel();
