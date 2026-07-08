@@ -1,7 +1,7 @@
 import type { Story } from "@/lib/types";
 
 export const GloryOfRonldo: Story = {
-  slug: "ronaldo-from-poverty-to-glory",
+  slug: "Glory-of-Ronaldo",
   title: "Ronaldo: From Poverty to Glory",
   genre: "non-fiction",
   level: "beginner",
@@ -67,7 +67,7 @@ export const GloryOfRonldo: Story = {
 };
 
 export const messiGrowthHormone: Story = {
-  slug: "messi-overcoming-growth-hormone-deficiency",
+  slug: "Messi’s Struggles",
   title: "Messi: Overcoming Growth Hormone Deficiency",
   genre: "non-fiction",
   level: "intermediate",
