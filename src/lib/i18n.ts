@@ -74,7 +74,8 @@ const DICT: Dict = {
   "category.short": { ar: "قصيرة", en: "Short" },
   "category.fiction": { ar: "خيال", en: "Fiction" },
   "category.non-fiction": { ar: "واقعية", en: "Non-Fiction" },
-"category.sports": "رياضة",
+"category.sports": { ar: "رياضة", en: "Sports" },
+
 
 
   // Story page
