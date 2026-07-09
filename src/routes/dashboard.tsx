@@ -113,7 +113,9 @@ function Dashboard() {
                     params={{ slug }}
                     className="flex items-center gap-4 rounded-lg border border-border bg-card p-3 transition-colors hover:bg-muted"
                   >
-                    <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-md bg-gradient-to-br ${s.coverHue} text-xl`}>{s.cover}</div>
+<div className={`grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-md bg-gradient-to-br ${s.coverHue} text-xl`}>
+  {s.coverImage ? <img src={s.coverImage} alt={s.title} className="h-full w-full object-cover" /> : s.cover}
+</div>
                     <div className="min-w-0 flex-1">
                       <div className="truncate font-serif">{s.title}</div>
                       <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-muted">
