@@ -53,15 +53,14 @@ export interface Story {
   cefr?: CEFRLevel;
   blurb: string;
   cover: string;
-coverImage?: string;
-coverHue: string;
+  coverImage?: string; // ← Auto-generated cover image (base64 or URL)
+  coverHue: string;
   minutes: number;
   paragraphs: string[];
-  chapters?: StoryChapter[];   // ← جديد
+  chapters?: StoryChapter[];
   vocab: Record<string, VocabEntry>;
   sentenceTranslations?: Record<string, string>;
   tags?: Category[];
   quiz: QuizQuestion[];
   audio?: StoryAudio;
 }
-
