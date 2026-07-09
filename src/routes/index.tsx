@@ -64,7 +64,7 @@ function PublicLanding({ ar }: { ar: boolean }) {
             {ar ? "ابدأ الآن مجانًا" : "Get started free"}
           </Link>
           <Link
-            to="/pricing"
+
             className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
           >
             {ar ? "الأسعار" : "Pricing"}
