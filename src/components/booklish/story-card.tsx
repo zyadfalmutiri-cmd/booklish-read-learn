@@ -4,8 +4,9 @@ import type { Story } from "@/lib/types";
 import { useT } from "@/lib/i18n";
 
 const COVER_IMAGES: Record<string, string> = {
-  "cristiano-ronaldo-story": "/covers/glory-of-ronaldo.PNG",
+  "ronaldo-from-poverty-to-glory": "/covers/glory-of-ronaldo.PNG",
 };
+
 
 const COVERS: Record<string, string> = {
   "a-birthday-surprise": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
