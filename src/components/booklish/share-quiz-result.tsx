@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { toPng } from "html-to-image";
 import { Share2 } from "lucide-react";
 import { ResultShareCard } from "./result-share-card";
-import { playSound, vibrate } from "@/hooks/use-feedback";
+
 
 export function ShareQuizResult({
   storyTitle, score, total,
@@ -10,8 +10,6 @@ export function ShareQuizResult({
   const cardRef = useRef<HTMLDivElement>(null);
 
   const handleShare = async () => {
-    vibrate(15);
-    playSound("/sounds/success.mp3");
     if (!cardRef.current) return;
 
     const dataUrl = await toPng(cardRef.current, { pixelRatio: 2 });
