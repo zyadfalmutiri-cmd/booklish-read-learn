@@ -7,6 +7,7 @@ import { useT } from "@/lib/i18n";
 import { useXp, XP_REWARDS } from "@/lib/xp";
 import { syncNow } from "@/lib/sync";
 import { useAuth } from "@/hooks/use-auth";
+import { ShareQuizResult } from "@/components/booklish/share-quiz-result";
 
 import type { SavedWord } from "@/lib/types";
 
@@ -90,6 +91,10 @@ function QuizPage() {
               ? t("quiz.nice")
               : t("quiz.reread")}
           </p>
+
+          <div className="mt-4 flex justify-center">
+            <ShareQuizResult storyTitle={story.title} score={priorResult.score} total={priorResult.total} />
+          </div>
 
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             <button
@@ -184,6 +189,9 @@ function QuizPage() {
               +{xpEarned} XP {t("quiz.xpEarned")}
             </div>
           )}
+          <div className="mt-4 flex justify-center">
+            <ShareQuizResult storyTitle={story.title} score={score} total={story.quiz.length} />
+          </div>
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             <button
               onClick={saveMissedVocab}
