@@ -7,9 +7,6 @@ const COVER_IMAGES: Record<string, string> = {
   "ronaldo-from-poverty-to-glory": "/covers/glory-of-ronaldo.PNG",
 };
 
-const COVERS: Record<string, string> = {
-  // ... جميع تعريفات SVG الموجودة بملفك الأصلي تبقى كما هي بدون أي تغيير ...
-};
 
 const COVERS: Record<string, string> = {
   "a-birthday-surprise": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
