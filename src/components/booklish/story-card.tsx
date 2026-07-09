@@ -7,6 +7,9 @@ const COVER_IMAGES: Record<string, string> = {
   "ronaldo-from-poverty-to-glory": "/covers/glory-of-ronaldo.PNG",
 };
 
+const COVERS: Record<string, string> = {
+  // ... جميع تعريفات SVG الموجودة بملفك الأصلي تبقى كما هي بدون أي تغيير ...
+};
 
 const COVERS: Record<string, string> = {
   "a-birthday-surprise": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
@@ -1626,12 +1629,22 @@ export function StoryCard({ story }: { story: Story }) {
   const svg = COVERS[story.slug];
   const image = COVER_IMAGES[story.slug];
 
+const levelStyles: Record<string, string> = {
+    beginner: "bg-emerald-500 text-white",
+    intermediate: "bg-yellow-500 text-white",
+    advanced: "bg-red-500 text-white",
+  };
 
   return (
 
     <Link to="/story/$slug" params={{ slug: story.slug }}>
       <div className="group relative block overflow-hidden rounded-xl border border-border bg-card transition-all hover:shadow-md hover:-translate-y-0.5">
         <div className={`relative flex h-40 items-center justify-center overflow-hidden bg-gradient-to-br ${story.coverHue}`}>
+          <span
+            className={`absolute right-2 top-2 z-10 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider shadow-sm ${levelStyles[story.level] ?? "bg-muted text-muted-foreground"}`}
+          >
+            {t(`level.${story.level}`)}
+          </span>
           {image ? (
   <img
     src={image}
