@@ -42,6 +42,12 @@ function StoryDetail() {
   const vocabSample = Object.entries(story.vocab).slice(0, 6);
   const hasChapters = story.chapters && story.chapters.length > 0;
 
+  const levelStyles: Record<string, string> = {
+    beginner: "bg-emerald-500 text-white",
+    intermediate: "bg-yellow-500 text-white",
+    advanced: "bg-red-500 text-white",
+  };
+
   return (
     <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
       <div className={`mb-8 flex h-56 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br ${story.coverHue} text-7xl`}>
