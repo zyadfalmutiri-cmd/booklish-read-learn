@@ -7,7 +7,8 @@ export const GloryOfRonldo: Story = {
   level: "beginner",
   blurb: "A poor boy from a small island had almost nothing. He became one of the greatest football players ever.",
   cover: "⚽",
-  coverHue: "from-green-200 to-emerald-300",
+coverImage: "/covers/glory-of-ronaldo.PNG",
+coverHue: "from-green-200 to-emerald-300",
   minutes: 6,
   tags: ["sports"],
   paragraphs: [
