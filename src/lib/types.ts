@@ -53,7 +53,8 @@ export interface Story {
   cefr?: CEFRLevel;
   blurb: string;
   cover: string;
-  coverHue: string;
+coverImage?: string;
+coverHue: string;
   minutes: number;
   paragraphs: string[];
   chapters?: StoryChapter[];   // ← جديد
