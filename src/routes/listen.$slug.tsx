@@ -43,8 +43,15 @@ function ListenPage() {
           </div>
         ) : (
           <>
-            <div className="mb-6 text-center">
-              <div className="mb-2 text-5xl">{story.cover}</div>
+<div className="mb-6 text-center">
+  <div className="mb-2 flex justify-center">
+    {story.coverImage ? (
+      <img src={story.coverImage} alt={story.title} className="h-24 w-24 rounded-xl object-cover" />
+    ) : (
+      <span className="text-5xl">{story.cover}</span>
+    )}
+  </div>
+
               <h1 className="text-xl font-bold">{story.title}</h1>
               <p className="mt-1 text-sm text-muted-foreground">{story.blurb}</p>
             </div>
