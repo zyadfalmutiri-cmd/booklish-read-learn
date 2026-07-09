@@ -3,6 +3,10 @@ import { Headphones } from "lucide-react";
 import type { Story } from "@/lib/types";
 import { useT } from "@/lib/i18n";
 
+const COVER_IMAGES: Record<string, string> = {
+  "glory-of-ronaldo": "/covers/glory-of-ronaldo.PNG",
+};
+
 const COVERS: Record<string, string> = {
   "a-birthday-surprise": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
 <defs><linearGradient id="gaabirthdaysurprise" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#dfa091"/><stop offset="100%" stop-color="#b17264"/></linearGradient><linearGradient id="gbabirthdaysurprise" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#b16a5f"/><stop offset="100%" stop-color="#843c32"/></linearGradient><linearGradient id="gcabirthdaysurprise" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fbf1ea"/><stop offset="100%" stop-color="#cdc3bc"/></linearGradient><linearGradient id="gdabirthdaysurprise" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6a4b44"/><stop offset="100%" stop-color="#3c1d16"/></linearGradient><linearGradient id="bgabirthdaysurprise" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f9ebe9"/><stop offset="100%" stop-color="#e8d3d0"/></linearGradient><filter id="shabirthdaysurprise" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#4A241C" flood-opacity="0.28"/></filter><linearGradient id="snabirthdaysurprise" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/><stop offset="45%" stop-color="#ffffff" stop-opacity="0"/></linearGradient></defs>
@@ -1619,13 +1623,22 @@ export function StoryCard({ story }: { story: Story }) {
   const { t } = useT();
   const navigate = useNavigate();
   const svg = COVERS[story.slug];
+  const image = COVER_IMAGES[story.slug];
+
 
   return (
 
     <Link to="/story/$slug" params={{ slug: story.slug }}>
       <div className="group relative block overflow-hidden rounded-xl border border-border bg-card transition-all hover:shadow-md hover:-translate-y-0.5">
         <div className={`relative flex h-40 items-center justify-center overflow-hidden bg-gradient-to-br ${story.coverHue}`}>
-          {svg ? (
+          {image ? (
+  <img
+    src={image}
+    alt={story.title}
+    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+  />
+) : svg ? (
+
             <div
               className="absolute inset-0 h-full w-full transition-transform duration-500 group-hover:scale-105"
               dangerouslySetInnerHTML={{ __html: svg }}
