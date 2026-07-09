@@ -44,9 +44,14 @@ function StoryDetail() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
-      <div className={`mb-8 flex h-56 items-center justify-center rounded-2xl bg-gradient-to-br ${story.coverHue} text-7xl`}>
-        {story.cover}
-      </div>
+      <div className={`mb-8 flex h-56 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br ${story.coverHue} text-7xl`}>
+  {story.coverImage ? (
+    <img src={story.coverImage} alt={story.title} className="h-full w-full object-cover" />
+  ) : (
+    story.cover
+  )}
+</div>
+
 
       <div className="mb-2 flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
         <span>{t(`genre.${story.genre}`)}</span>
