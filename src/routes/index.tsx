@@ -472,9 +472,14 @@ function Home() {
             params={{ slug: continueStory.slug }}
             className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4 transition-all hover:shadow-md hover:-translate-y-0.5"
           >
-            <div className={`grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-gradient-to-br ${continueStory.coverHue} text-2xl shadow-sm`}>
-              {continueStory.cover}
-            </div>
+<div className={`grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-gradient-to-br ${continueStory.coverHue} text-2xl shadow-sm`}>
+  {continueStory.coverImage ? (
+    <img src={continueStory.coverImage} alt={continueStory.title} className="h-full w-full object-cover" />
+  ) : (
+    continueStory.cover
+  )}
+</div>
+
             <div className="min-w-0 flex-1">
               <div className="mb-1 truncate font-serif text-base">{continueStory.title}</div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
