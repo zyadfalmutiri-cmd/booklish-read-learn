@@ -377,7 +377,8 @@ function Home() {
   const { streak } = useStreak();
   const { xp, level, progress: lvlProgress, xpToNext } = useXp();
   const { t, lang, dir } = useT();
-  const { isPro, loading: subLoading } = useSubscription();
+const isPro = true;
+const subLoading = false;
   const { user } = useAuth();
   const ar = lang === "ar";
 
