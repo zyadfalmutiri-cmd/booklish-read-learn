@@ -1,8 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/pricing")({
-  component: PricingPage,
-});
+import { redirect } from '@tanstack/react-router'
+
+export const Route = createFileRoute('/pricing')({
+  loader: () => {
+    throw redirect({ to: '/' })
+  },
+})
+
 
 function PricingPage() {
   return (
