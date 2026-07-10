@@ -1,3 +1,4 @@
+import { storyCoverUrls } from "@/data/story-covers-map";
 import { storyAudio } from "@/data/story-audio";
 import type { Story, Category } from "@/lib/types";
 import { theMissingKey } from "@/data/stories/the-missing-key";
@@ -88,8 +89,15 @@ function withDefaults(story: Story): Story {
   if (story.genre !== "non-fiction") merged.add("fiction");
   if (story.minutes <= 5) merged.add("short");
   const audio = storyAudio[story.slug];
-  return { ...story, tags: Array.from(merged), ...(audio ? { audio } : {}) };
+  const generatedCover = storyCoverUrls[story.slug];
+  return {
+    ...story,
+    tags: Array.from(merged),
+    ...(audio ? { audio } : {}),
+    ...(generatedCover ? { coverImage: generatedCover } : {}),
+  };
 }
+
 
 
 export const stories: Story[] = [
