@@ -5,7 +5,7 @@ import { tokenize, splitSentences } from "@/lib/tokenize";
 import type { Story, VocabEntry, SavedWord } from "@/lib/types";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useSettings } from "./theme";
-import { lookupLocal, lookupAI, preWarmCache, normalizeWord, type WordLookup } from "@/lib/lookup";
+import { lookupLocal, lookupAI, preWarmCache, normalizeWord, saveWordChoice, type WordLookup } from "@/lib/lookup";
 import { recordWordTap } from "@/lib/stats";
 import { useXp, XP_REWARDS } from "@/lib/xp";
 import { storyScenes } from "@/data/illustrations";
@@ -77,7 +77,9 @@ export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct
             tappedSet={tappedSet}
             savedSet={savedSet}
             onSave={saveWord}
+            storyId={story.slug}
           />
+
           {sceneMap.has(pi) && <StoryImage {...sceneMap.get(pi)!} />}
         </Fragment>
       ))}
@@ -116,7 +118,9 @@ interface ParagraphProps {
   tappedSet: Set<string>;
   savedSet: Set<string>;
   onSave: (word: string, entry: { ar: string; def: string; example: string }) => void;
+  storyId: string;
 }
+
 
 function Paragraph(props: ParagraphProps) {
   const sentences = useMemo(() => splitSentences(props.paragraph), [props.paragraph]);
@@ -165,7 +169,9 @@ function Sentence({
             tapped={tappedSet.has(key)}
             saved={savedSet.has(key)}
             onSave={onSave}
+            storyId={props.storyId}
           />
+
         );
       })}
       <button
@@ -202,6 +208,7 @@ function WordToken({
   tapped,
   saved,
   onSave,
+            storyId={storyId}
 }: {
   word: string;
   normalized: string;
@@ -211,7 +218,9 @@ function WordToken({
   tapped: boolean;
   saved: boolean;
   onSave: (word: string, entry: { ar: string; def: string; example: string }) => void;
+  storyId: string;
 }) {
+
   const [open, setOpen] = useState(false);
   const [result, setResult] = useState<WordLookup | null>(null);
   const [loading, setLoading] = useState(false);
@@ -247,6 +256,19 @@ function WordToken({
   };
 
   const isAI = result?.source === "ai";
+
+  const [choice, setChoice] = useState<"known" | "learning" | null>(null);
+
+  const handleChoice = async (knewIt: boolean) => {
+    if (!result) return;
+    setChoice(knewIt ? "known" : "learning");
+    try {
+      await saveWordChoice(result.word, result.ar || result.en, storyId, knewIt);
+    } catch {
+      // تجاهل الخطأ بصمت، الحالة المحلية بالفعل تحدثت بالواجهة
+    }
+  };
+
 
   const tokenClass = [
     "word-token",
@@ -326,12 +348,38 @@ function WordToken({
         </div>
 
         {/* Footer actions */}
-        <div className="flex border-t border-border">
+        <div className="flex flex-col border-t border-border">
+          <div className="flex">
+            <button
+              type="button"
+              disabled={!result || loading}
+              onClick={() => handleChoice(true)}
+              className={`flex flex-1 items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors ${
+                choice === "known"
+                  ? "text-green-600 bg-green-50"
+                  : "text-muted-foreground hover:bg-muted disabled:opacity-40"
+              }`}
+            >
+              ✅ أعرفها
+            </button>
+            <button
+              type="button"
+              disabled={!result || loading}
+              onClick={() => handleChoice(false)}
+              className={`flex flex-1 items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium border-l border-border transition-colors ${
+                choice === "learning"
+                  ? "text-amber-600 bg-amber-50"
+                  : "text-muted-foreground hover:bg-muted disabled:opacity-40"
+              }`}
+            >
+              📘 ما أعرفها
+            </button>
+          </div>
           <button
             type="button"
             disabled={!result || loading || saved}
             onClick={handleSave}
-            className={`flex flex-1 items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium transition-colors ${
+            className={`flex flex-1 items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium border-t border-border transition-colors ${
               saved
                 ? "text-primary/60 cursor-default"
                 : "text-primary hover:bg-muted disabled:opacity-40"
@@ -344,6 +392,7 @@ function WordToken({
             )}
           </button>
         </div>
+
       </PopoverContent>
     </Popover>
   );
