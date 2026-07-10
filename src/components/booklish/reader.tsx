@@ -5,7 +5,8 @@ import { tokenize, splitSentences } from "@/lib/tokenize";
 import type { Story, VocabEntry, SavedWord } from "@/lib/types";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useSettings } from "./theme";
-import { lookupLocal, lookupAI, preWarmCache, normalizeWord, saveWordChoice, type WordLookup } from "@/lib/lookup";
+import { lookupLocal, lookupAI, preWarmCache, normalizeWord, type WordLookup } from "@/lib/lookup";
+import { SRS_INTERVALS_MS } from "@/lib/srs";
 import { recordWordTap } from "@/lib/stats";
 import { useXp, XP_REWARDS } from "@/lib/xp";
 import { storyScenes } from "@/data/illustrations";
@@ -43,15 +44,23 @@ export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct
   const fontSize = `${settings.fontScale}rem`;
   const showWordsAlways = settings.translateMode === "words";
 
-  const saveWord = (word: string, entry: { ar: string; def: string; example: string }) => {
+    const saveWord = (
+    word: string,
+    entry: { ar: string; def: string; example: string },
+    opts?: { alreadyKnown?: boolean },
+  ) => {
     setVocabList((prev) => {
       if (prev.some((w) => normalizeWord(w.word) === normalizeWord(word) && w.slug === story.slug)) {
         return prev;
       }
       addXp(XP_REWARDS.saveWord, `saved:${word}`);
-      return [...prev, { word, ...entry, slug: story.slug, at: Date.now(), level: 0, nextReview: Date.now() }];
+      const known = opts?.alreadyKnown;
+      const level = known ? SRS_INTERVALS_MS.length - 1 : 0;
+      const nextReview = known ? Date.now() + SRS_INTERVALS_MS[SRS_INTERVALS_MS.length - 1] : Date.now();
+      return [...prev, { word, ...entry, slug: story.slug, at: Date.now(), level, nextReview }];
     });
   };
+
 
   const scenes = storyScenes[story.slug] ?? [];
   const sceneMap = useMemo(
@@ -68,7 +77,7 @@ export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct
 
       {story.paragraphs.map((para, pi) => (
         <Fragment key={pi}>
-          <Paragraph
+                    <Paragraph
             paragraph={para}
             vocab={story.vocab}
             translations={story.sentenceTranslations}
@@ -77,8 +86,8 @@ export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct
             tappedSet={tappedSet}
             savedSet={savedSet}
             onSave={saveWord}
-            storyId={story.slug}
           />
+
 
           {sceneMap.has(pi) && <StoryImage {...sceneMap.get(pi)!} />}
         </Fragment>
@@ -117,9 +126,13 @@ interface ParagraphProps {
   showWordsAlways: boolean;
   tappedSet: Set<string>;
   savedSet: Set<string>;
-  onSave: (word: string, entry: { ar: string; def: string; example: string }) => void;
-  storyId: string;
+  onSave: (
+    word: string,
+    entry: { ar: string; def: string; example: string },
+    opts?: { alreadyKnown?: boolean },
+  ) => void;
 }
+
 
 
 function Paragraph(props: ParagraphProps) {
@@ -159,7 +172,7 @@ function Sentence({
         const key = t.key ?? "";
         const hasStoryEntry = Boolean(key && vocab[key]);
         return (
-          <WordToken
+                    <WordToken
             key={i}
             word={t.text}
             normalized={key}
@@ -169,8 +182,8 @@ function Sentence({
             tapped={tappedSet.has(key)}
             saved={savedSet.has(key)}
             onSave={onSave}
-            storyId={props.storyId}
           />
+
 
         );
       })}
@@ -208,7 +221,6 @@ function WordToken({
   tapped,
   saved,
   onSave,
-            storyId={storyId}
 }: {
   word: string;
   normalized: string;
@@ -217,9 +229,13 @@ function WordToken({
   highlight: boolean;
   tapped: boolean;
   saved: boolean;
-  onSave: (word: string, entry: { ar: string; def: string; example: string }) => void;
-  storyId: string;
+  onSave: (
+    word: string,
+    entry: { ar: string; def: string; example: string },
+    opts?: { alreadyKnown?: boolean },
+  ) => void;
 }) {
+
 
   const [open, setOpen] = useState(false);
   const [result, setResult] = useState<WordLookup | null>(null);
@@ -255,19 +271,18 @@ function WordToken({
     setOpen(false);
   };
 
-  const isAI = result?.source === "ai";
+    const isAI = result?.source === "ai";
 
-  const [choice, setChoice] = useState<"known" | "learning" | null>(null);
-
-  const handleChoice = async (knewIt: boolean) => {
+  const handleAlreadyKnow = () => {
     if (!result) return;
-    setChoice(knewIt ? "known" : "learning");
-    try {
-      await saveWordChoice(result.word, result.ar || result.en, storyId, knewIt);
-    } catch {
-      // تجاهل الخطأ بصمت، الحالة المحلية بالفعل تحدثت بالواجهة
-    }
+    onSave(
+      result.word,
+      { ar: result.ar, def: result.en, example: result.example ?? sentence },
+      { alreadyKnown: true },
+    );
+    setOpen(false);
   };
+
 
 
   const tokenClass = [
@@ -349,32 +364,18 @@ function WordToken({
 
         {/* Footer actions */}
         <div className="flex flex-col border-t border-border">
-          <div className="flex">
-            <button
-              type="button"
-              disabled={!result || loading}
-              onClick={() => handleChoice(true)}
-              className={`flex flex-1 items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors ${
-                choice === "known"
-                  ? "text-green-600 bg-green-50"
-                  : "text-muted-foreground hover:bg-muted disabled:opacity-40"
-              }`}
-            >
-              ✅ أعرفها
-            </button>
-            <button
-              type="button"
-              disabled={!result || loading}
-              onClick={() => handleChoice(false)}
-              className={`flex flex-1 items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium border-l border-border transition-colors ${
-                choice === "learning"
-                  ? "text-amber-600 bg-amber-50"
-                  : "text-muted-foreground hover:bg-muted disabled:opacity-40"
-              }`}
-            >
-              📘 ما أعرفها
-            </button>
-          </div>
+          <button
+            type="button"
+            disabled={!result || loading || saved}
+            onClick={handleAlreadyKnow}
+            className={`flex flex-1 items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors ${
+              saved
+                ? "text-muted-foreground/50 cursor-default"
+                : "text-green-600 hover:bg-green-50 disabled:opacity-40"
+            }`}
+          >
+            ✅ أعرفها مسبقًا
+          </button>
           <button
             type="button"
             disabled={!result || loading || saved}
@@ -392,6 +393,7 @@ function WordToken({
             )}
           </button>
         </div>
+
 
       </PopoverContent>
     </Popover>
