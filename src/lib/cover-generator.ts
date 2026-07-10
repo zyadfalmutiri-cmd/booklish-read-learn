@@ -79,24 +79,25 @@ export async function generateAIStoryCover(
 }
 
 /**
- * الأسلوب الفني الثابت لكل الأغلفة — رسم توضيحي درامي بأسلوب أغلفة الكتب
- * (illustration)، مو صورة فوتوغرافية واقعية. هذا الأسلوب ثابت لكل القصص
- * بغض النظر عن نوعها، عشان يعطي هوية بصرية موحدة للمكتبة كاملة.
+ * الأسلوب الفني الثابت لكل الأغلفة — رسم فلات (Flat Vector Illustration)
+ * بألوان جريئة وأشكال هندسية بسيطة، بنفس أسلوب باقي أغلفة المكتبة
+ * (زي أغلفة هاري بوتر وأجاثا كريستي وقصص السفر بالتطبيق). هذا الأسلوب
+ * ثابت لكل القصص بغض النظر عن نوعها، عشان هوية بصرية موحدة بالمكتبة كاملة.
  */
 const BASE_ILLUSTRATION_STYLE =
-  "dramatic painted book cover illustration, semi-realistic digital painting art style, bold graphic composition, rich saturated colors, strong dynamic lighting, in the style of modern biography and non-fiction book covers, painterly brushwork, no photorealism";
+  "flat vector illustration book cover art, minimalist flat design, bold saturated flat colors, simple clean geometric shapes, 2D graphic illustration style, modern flat book cover design, no gradients shading or realistic textures, no photorealism, no painterly brushwork, crisp clean vector shapes, limited color palette, simple silhouettes and iconic shapes";
 
 /**
- * تلميحات مزاج/إضاءة حسب نوع القصة (Genre) — تعديل بسيط على المزاج
- * مع الحفاظ على نفس الأسلوب الفني الأساسي أعلاه
+ * تلميحات لوحة ألوان/مزاج حسب نوع القصة (Genre) — تعديل بسيط على لوحة
+ * الألوان فقط، مع الحفاظ على نفس الأسلوب الفلات الثابت أعلاه
  */
 const GENRE_MOOD_MAP: Record<string, string> = {
-  "non-fiction": "inspiring and emotional mood, warm heroic lighting",
-  mystery: "dark moody atmosphere, deep shadows, suspenseful tone",
-  romance: "soft warm tones, golden hour glow, tender atmosphere",
-  "sci-fi": "futuristic color palette, glowing highlights, epic scale",
-  adventure: "energetic dynamic mood, vivid outdoor colors, sense of motion",
-  drama: "emotional intense mood, contrast lighting, cinematic tension",
+  "non-fiction": "warm inspiring color palette, greens and golds",
+  mystery: "dark moody color palette, deep purples and navy blues",
+  romance: "soft warm color palette, pinks and warm oranges",
+  "sci-fi": "cool futuristic color palette, blues and purples with bright accents",
+  adventure: "vibrant energetic color palette, bright blues and oranges",
+  drama: "bold contrast color palette, deep reds and dark tones",
 };
 
 /**
