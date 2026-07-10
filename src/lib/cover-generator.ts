@@ -1,5 +1,3 @@
-import { toPng } from "html-to-image";
-
 export interface CoverGeneratorOptions {
   emoji: string;
   title: string;
@@ -10,7 +8,39 @@ export interface CoverGeneratorOptions {
 }
 
 /**
+ * تلف نص طويل على عدة أسطر داخل عرض معين (Canvas)
+ */
+function wrapText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number
+): string[] {
+  const words = text.split(" ");
+  const lines: string[] = [];
+  let currentLine = "";
+
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const testWidth = ctx.measureText(testLine).width;
+
+    if (testWidth > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  }
+
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+
+  return lines;
+}
+
+/**
  * Generate a story cover image with emoji, title, and gradient background
+ * باستخدام Canvas API مباشرة (بدون html-to-image) — أكثر ثباتًا على متصفحات الموبايل
  */
 export async function generateStoryCover(
   options: CoverGeneratorOptions
@@ -24,103 +54,96 @@ export async function generateStoryCover(
     height = 600,
   } = options;
 
-  // Create container element
-  const container = document.createElement("div");
+  const pixelRatio = 2;
 
-  // مهم: نخلي العنصر داخل نطاق الشاشة (fixed/top:0/left:0) لكن مخفي بصريًا
-  // بدل ما نبعده -9999px، لأن بعض متصفحات الموبايل (Safari) ما ترسم
-  // عناصر بعيدة جدًا عن الشاشة المرئية، فتطلع الصورة فاضية.
-  container.setAttribute(
-    "style",
-    `
-    width: ${width}px;
-    height: ${height}px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, ${gradientFrom}, ${gradientTo});
-    position: fixed;
-    top: 0;
-    left: 0;
-    opacity: 0;
-    pointer-events: none;
-    z-index: -9999;
-    font-family: system-ui, -apple-system, sans-serif;
-    border-radius: 12px;
-  `
-  );
+  const canvas = document.createElement("canvas");
+  canvas.width = width * pixelRatio;
+  canvas.height = height * pixelRatio;
 
-  // Add emoji
-  const emojiElement = document.createElement("div");
-  emojiElement.style.fontSize = "200px";
-  emojiElement.style.marginBottom = "30px";
-  emojiElement.style.filter = "drop-shadow(0 4px 8px rgba(0,0,0,0.2))";
-  emojiElement.textContent = emoji;
-  container.appendChild(emojiElement);
-
-  // Add title
-  const titleElement = document.createElement("div");
-  titleElement.style.fontSize = "48px";
-  titleElement.style.fontWeight = "bold";
-  titleElement.style.color = "white";
-  titleElement.style.textAlign = "center";
-  titleElement.style.maxWidth = `${width - 80}px`;
-  titleElement.style.textShadow = "0 4px 12px rgba(0,0,0,0.3)";
-  titleElement.style.lineHeight = "1.3";
-  titleElement.style.padding = "0 40px";
-  titleElement.textContent = title;
-  container.appendChild(titleElement);
-
-  // Add decorative elements
-  const decorative = document.createElement("div");
-  decorative.style.position = "absolute";
-  decorative.style.bottom = "20px";
-  decorative.style.right = "20px";
-  decorative.style.width = "100px";
-  decorative.style.height = "100px";
-  decorative.style.borderRadius = "50%";
-  decorative.style.background = "rgba(255,255,255,0.1)";
-  decorative.style.boxShadow = "0 0 40px rgba(255,255,255,0.2)";
-  container.appendChild(decorative);
-
-  // Append to body temporarily
-  document.body.appendChild(container);
-
-  // ننتظر فريمين رسم كاملين (double rAF) + تأخير بسيط
-  // عشان نضمن إن المتصفح خلص يرسم الخط والإيموجي والتدرج فعليًا
-  // قبل ما نلتقط الصورة. هذا يصلح مشكلة الصور الفاضية على الموبايل.
-  await new Promise<void>((resolve) => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setTimeout(resolve, 100);
-      });
-    });
-  });
-
-  try {
-    // Convert to PNG
-    const dataUrl = await toPng(container, {
-      width,
-      height,
-      pixelRatio: 2,
-      cacheBust: true,
-      skipFonts: false,
-    });
-
-    // تحقق بسيط: لو الصورة الناتجة صغيرة جدًا (أقل من حجم منطقي)
-    // فهذا مؤشر إنها فاضية، نرمي خطأ واضح بدل ما نرفع صورة تالفة
-    if (!dataUrl || dataUrl.length < 1000) {
-      throw new Error(
-        `Generated image data looks empty or invalid (length: ${dataUrl?.length ?? 0})`
-      );
-    }
-
-    return dataUrl;
-  } finally {
-    // Clean up
-    document.body.removeChild(container);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    throw new Error("Failed to get 2D canvas context");
   }
+
+  // نكبّر كل الرسم بمقدار pixelRatio عشان نطلع بجودة عالية (Retina)
+  ctx.scale(pixelRatio, pixelRatio);
+
+  // خلفية متدرجة (Gradient)
+  const gradient = ctx.createLinearGradient(0, 0, width, height);
+  gradient.addColorStop(0, gradientFrom);
+  gradient.addColorStop(1, gradientTo);
+  ctx.fillStyle = gradient;
+
+  // رسم الخلفية بزوايا دائرية بسيطة
+  const radius = 12;
+  ctx.beginPath();
+  ctx.moveTo(radius, 0);
+  ctx.lineTo(width - radius, 0);
+  ctx.quadraticCurveTo(width, 0, width, radius);
+  ctx.lineTo(width, height - radius);
+  ctx.quadraticCurveTo(width, height, width - radius, height);
+  ctx.lineTo(radius, height);
+  ctx.quadraticCurveTo(0, height, 0, height - radius);
+  ctx.lineTo(0, radius);
+  ctx.quadraticCurveTo(0, 0, radius, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  // الدائرة الزخرفية بأسفل يمين الصورة
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(width - 70, height - 70, 100, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(255,255,255,0.1)";
+  ctx.shadowColor = "rgba(255,255,255,0.2)";
+  ctx.shadowBlur = 40;
+  ctx.fill();
+  ctx.restore();
+
+  // الإيموجي الكبير بالمنتصف
+  const emojiSize = 200;
+  const emojiY = height / 2 - 60;
+
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,0.2)";
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetY = 4;
+  ctx.font = `${emojiSize}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(emoji, width / 2, emojiY);
+  ctx.restore();
+
+  // العنوان أسفل الإيموجي (مع التفاف تلقائي للنص الطويل)
+  ctx.save();
+  ctx.fillStyle = "white";
+  ctx.font = `bold 48px system-ui, -apple-system, sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.shadowColor = "rgba(0,0,0,0.3)";
+  ctx.shadowBlur = 12;
+  ctx.shadowOffsetY = 4;
+
+  const maxTextWidth = width - 80;
+  const lines = wrapText(ctx, title, maxTextWidth);
+  const lineHeight = 48 * 1.3;
+  const titleStartY = height / 2 + 100;
+
+  lines.forEach((line, index) => {
+    ctx.fillText(line, width / 2, titleStartY + index * lineHeight);
+  });
+  ctx.restore();
+
+  // تحويل الرسمة إلى صورة PNG (Data URL)
+  const dataUrl = canvas.toDataURL("image/png");
+
+  // تحقق بسيط: لو الصورة الناتجة صغيرة جدًا فهذا مؤشر لخلل
+  if (!dataUrl || dataUrl.length < 1000) {
+    throw new Error(
+      `Generated image data looks empty or invalid (length: ${dataUrl?.length ?? 0})`
+    );
+  }
+
+  return dataUrl;
 }
 
 /**
