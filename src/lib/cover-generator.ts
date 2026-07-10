@@ -44,22 +44,26 @@ export async function generateStoryCover(
 
   // Create inline style with actual gradient values
   container.setAttribute(
-    "style",
-    `
-    width: ${width}px;
-    height: ${height}px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, ${gradientFrom}, ${gradientTo});
-    position: absolute;
-    left: -9999px;
-    top: -9999px;
-    font-family: system-ui, -apple-system, sans-serif;
-    border-radius: 12px;
+  "style",
   `
-  );
+  width: ${width}px;
+  height: ${height}px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, ${gradientFrom}, ${gradientTo});
+  position: fixed;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -9999;
+  font-family: system-ui, -apple-system, sans-serif;
+  border-radius: 12px;
+`
+);
+
 
   // Add emoji
   const emojiElement = document.createElement("div");
