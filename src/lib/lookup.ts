@@ -1,4 +1,3 @@
-import { supabase } from "@/integration/supabase/client";
 import dictionary from "@/data/dictionary.json";
 import { lookupWordAI } from "@/lib/api/lookup.functions";
 import type { VocabEntry } from "@/lib/types";
@@ -153,38 +152,4 @@ export function preWarmCache(text: string, storyVocab?: Record<string, VocabEntr
     }
   });
   if (changed) writeCache(cache);
-}
-
-// ===== نظام مراجعة المفردات =====
-export async function saveWordChoice(
-  word: string,
-  translation: string,
-  storyId: string,
-  knewIt: boolean
-) {
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    console.warn("No logged-in user, skipping word save");
-    return;
-  }
-
-  const { error } = await supabase
-    .from("user_words")
-    .upsert(
-      {
-        user_id: user.id,
-        word: normalizeWord(word),
-        translation,
-        source_story_id: storyId,
-        status: knewIt ? "known" : "learning",
-        last_reviewed_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id,word" }
-    );
-
-  if (error) {
-    console.error("Error saving word choice:", error);
-    throw error;
-  }
 }
