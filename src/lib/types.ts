@@ -53,7 +53,8 @@ export interface Story {
   cefr?: CEFRLevel;
   blurb: string;
   cover: string;
-  coverImage?: string; // ← Auto-generated cover image (base64 or URL)
+  coverImage?: string;
+  coverPrompt?: string; // ← وصف مخصص لتوليد صورة AI فوتوغرافية (اختياري)
   coverHue: string;
   minutes: number;
   paragraphs: string[];
