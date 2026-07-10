@@ -26,44 +26,30 @@ export async function generateStoryCover(
 
   // Create container element
   const container = document.createElement("div");
-  container.style.width = `${width}px`;
-  container.style.height = `${height}px`;
-  container.style.display = "flex";
-  container.style.flexDirection = "column";
-  container.style.alignItems = "center";
-  container.style.justifyContent = "center";
-  container.style.backgroundImage = `linear-gradient(135deg, var(--from), var(--to))`;
-  container.style.position = "absolute";
-  container.style.left = "-9999px";
-  container.style.top = "-9999px";
-  container.style.fontFamily = "system-ui, -apple-system, sans-serif";
 
-  // Set CSS variables for gradient colors
-  container.style.setProperty("--from", `var(--gradient-from, ${gradientFrom})`);
-  container.style.setProperty("--to", `var(--gradient-to, ${gradientTo})`);
-
-  // Create inline style with actual gradient values
+  // مهم: نخلي العنصر داخل نطاق الشاشة (fixed/top:0/left:0) لكن مخفي بصريًا
+  // بدل ما نبعده -9999px، لأن بعض متصفحات الموبايل (Safari) ما ترسم
+  // عناصر بعيدة جدًا عن الشاشة المرئية، فتطلع الصورة فاضية.
   container.setAttribute(
-  "style",
+    "style",
+    `
+    width: ${width}px;
+    height: ${height}px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, ${gradientFrom}, ${gradientTo});
+    position: fixed;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -9999;
+    font-family: system-ui, -apple-system, sans-serif;
+    border-radius: 12px;
   `
-  width: ${width}px;
-  height: ${height}px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, ${gradientFrom}, ${gradientTo});
-  position: fixed;
-  top: 0;
-  left: 0;
-  opacity: 0;
-  pointer-events: none;
-  z-index: -9999;
-  font-family: system-ui, -apple-system, sans-serif;
-  border-radius: 12px;
-`
-);
-
+  );
 
   // Add emoji
   const emojiElement = document.createElement("div");
@@ -99,26 +85,42 @@ export async function generateStoryCover(
   container.appendChild(decorative);
 
   // Append to body temporarily
-document.body.appendChild(container);
+  document.body.appendChild(container);
 
-// انتظر فريمين عشان نضمن اكتمال الرسم قبل الالتقاط
-await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-
-try {
-  // Convert to PNG
-  const dataUrl = await toPng(container, {
-    width,
-    height,
-    pixelRatio: 2,
-    cacheBust: true,
+  // ننتظر فريمين رسم كاملين (double rAF) + تأخير بسيط
+  // عشان نضمن إن المتصفح خلص يرسم الخط والإيموجي والتدرج فعليًا
+  // قبل ما نلتقط الصورة. هذا يصلح مشكلة الصور الفاضية على الموبايل.
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTimeout(resolve, 100);
+      });
+    });
   });
 
-  return dataUrl;
-} finally {
-  // Clean up
-  document.body.removeChild(container);
-}
+  try {
+    // Convert to PNG
+    const dataUrl = await toPng(container, {
+      width,
+      height,
+      pixelRatio: 2,
+      cacheBust: true,
+      skipFonts: false,
+    });
 
+    // تحقق بسيط: لو الصورة الناتجة صغيرة جدًا (أقل من حجم منطقي)
+    // فهذا مؤشر إنها فاضية، نرمي خطأ واضح بدل ما نرفع صورة تالفة
+    if (!dataUrl || dataUrl.length < 1000) {
+      throw new Error(
+        `Generated image data looks empty or invalid (length: ${dataUrl?.length ?? 0})`
+      );
+    }
+
+    return dataUrl;
+  } finally {
+    // Clean up
+    document.body.removeChild(container);
+  }
 }
 
 /**
