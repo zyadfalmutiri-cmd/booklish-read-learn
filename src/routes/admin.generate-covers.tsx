@@ -22,13 +22,39 @@ interface ResultRow {
 function GenerateCoversPage() {
   const [results, setResults] = useState<ResultRow[]>([]);
   const [running, setRunning] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const successCount = results.filter((r) => r.status === "success").length;
+
+  async function handleCopyCode() {
+    const successResults = results.filter(
+      (r) => r.status === "success" && r.url
+    );
+
+    const entries = successResults
+      .map((r) => `  "${r.slug}": "${r.url}",`)
+      .join("\n");
+
+    const code = `export const storyCoverUrls: Record<string, string> = {\n${entries}\n};\n`;
+
+    await navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 3000);
+  }
 
   async function handleGenerate() {
     setRunning(true);
     setResults(stories.map((s) => ({ slug: s.slug, status: "pending" })));
 
-    for (const story of stories) {
+    for (let i = 0; i < stories.length; i++) {
+      const story = stories[i];
       const prompt = buildCoverPrompt(story);
+
+      // تأخير بسيط بين كل قصة وقصة (عدا أول واحدة) عشان نتجنب
+      // Rate Limiting من Pollinations.ai
+      if (i > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      }
 
       try {
         // 1) توليد الصورة الفوتوغرافية عبر Pollinations.ai
@@ -103,6 +129,26 @@ function GenerateCoversPage() {
       >
         {running ? "جاري التوليد..." : "ولّد كل الأغلفة"}
       </button>
+
+      {successCount > 0 && (
+        <button
+          onClick={handleCopyCode}
+          style={{
+            padding: "12px 20px",
+            fontSize: 16,
+            background: copied ? "#16a34a" : "#2563eb",
+            color: "white",
+            border: "none",
+            borderRadius: 8,
+            marginTop: 10,
+            marginRight: 10,
+          }}
+        >
+          {copied
+            ? "✅ انتسخ! الصقه بملف story-covers-map.ts"
+            : `📋 نسخ الكود الجاهز (${successCount} قصة)`}
+        </button>
+      )}
 
       <div style={{ marginTop: 20 }}>
         {results.map((r) => (
