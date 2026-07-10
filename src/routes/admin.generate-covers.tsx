@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { generateStoryCover, extractGradientColors, dataUrlToBlob } from "@/lib/cover-generator";
 import { stories } from "@/data/stories";
-import { supabase } from "@/lib/supabase"; // ⚠️ عدّل هذا المسار حسب مكان ملف supabase client عندك
+import { supabase } from "@/integrations/supabase/client";
+
 
 export const Route = createFileRoute("/admin/generate-covers")({
   component: GenerateCoversPage,
