@@ -14,35 +14,68 @@ export interface GenerateAICoverOptions {
   height?: number;
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function generateAIStoryCover(
   options: GenerateAICoverOptions
 ): Promise<Blob> {
   const { prompt, width = 1200, height = 800 } = options;
 
   const encodedPrompt = encodeURIComponent(prompt);
-  // seed عشوائي عشان كل توليد يطلع مختلف شوي حتى لو نفس البرومبت
-  const seed = Math.floor(Math.random() * 1_000_000);
+  const maxRetries = 4;
 
-  const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&nologo=true&seed=${seed}`;
+  let lastError: unknown;
 
-  const response = await fetch(url);
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      // seed عشوائي عشان كل توليد يطلع مختلف شوي حتى لو نفس البرومبت
+      const seed = Math.floor(Math.random() * 1_000_000);
+      const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&nologo=true&seed=${seed}`;
 
-  if (!response.ok) {
-    throw new Error(
-      `Failed to generate AI cover image: HTTP ${response.status}`
-    );
+      const response = await fetch(url);
+
+      if (response.status === 429) {
+        // Rate limited — ننتظر مدة متزايدة (Exponential backoff) ونعيد المحاولة
+        const waitTime = 4000 * (attempt + 1); // 4s, 8s, 12s, 16s...
+        lastError = new Error(
+          `Rate limited (HTTP 429) on attempt ${attempt + 1}`
+        );
+        if (attempt < maxRetries) {
+          await sleep(waitTime);
+          continue;
+        }
+        throw lastError;
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to generate AI cover image: HTTP ${response.status}`
+        );
+      }
+
+      const blob = await response.blob();
+
+      // تحقق بسيط: لو حجم الصورة صغير جدًا فهذا مؤشر خلل (صورة فاضية/خطأ)
+      if (!blob || blob.size < 2000) {
+        throw new Error(
+          `Generated AI cover looks empty or invalid (size: ${blob?.size ?? 0} bytes)`
+        );
+      }
+
+      return blob;
+    } catch (err) {
+      lastError = err;
+      // لو الخطأ مو 429 (مثلًا مشكلة شبكة)، نعيد المحاولة بتأخير بسيط
+      if (attempt < maxRetries) {
+        await sleep(2000 * (attempt + 1));
+        continue;
+      }
+    }
   }
 
-  const blob = await response.blob();
-
-  // تحقق بسيط: لو حجم الصورة صغير جدًا فهذا مؤشر خلل (صورة فاضية/خطأ)
-  if (!blob || blob.size < 2000) {
-    throw new Error(
-      `Generated AI cover looks empty or invalid (size: ${blob?.size ?? 0} bytes)`
-    );
-  }
-
-  return blob;
+  throw lastError;
 }
 
 /**
