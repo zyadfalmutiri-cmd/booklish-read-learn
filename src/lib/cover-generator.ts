@@ -46,35 +46,46 @@ export async function generateAIStoryCover(
 }
 
 /**
- * خرائط أسلوب التصوير حسب نوع القصة (Genre)
+ * الأسلوب الفني الثابت لكل الأغلفة — رسم توضيحي درامي بأسلوب أغلفة الكتب
+ * (illustration)، مو صورة فوتوغرافية واقعية. هذا الأسلوب ثابت لكل القصص
+ * بغض النظر عن نوعها، عشان يعطي هوية بصرية موحدة للمكتبة كاملة.
  */
-const GENRE_STYLE_MAP: Record<string, string> = {
-  "non-fiction": "photorealistic documentary-style photograph, natural lighting",
-  mystery: "cinematic moody photograph, dramatic shadows, film noir style",
-  romance: "warm cinematic photograph, soft golden hour light",
-  "sci-fi": "photorealistic futuristic scene, dramatic cinematic lighting",
-  adventure: "photorealistic action photograph, dynamic composition, outdoor setting",
-  drama: "cinematic emotional photograph, natural soft lighting",
+const BASE_ILLUSTRATION_STYLE =
+  "dramatic painted book cover illustration, semi-realistic digital painting art style, bold graphic composition, rich saturated colors, strong dynamic lighting, in the style of modern biography and non-fiction book covers, painterly brushwork, no photorealism";
+
+/**
+ * تلميحات مزاج/إضاءة حسب نوع القصة (Genre) — تعديل بسيط على المزاج
+ * مع الحفاظ على نفس الأسلوب الفني الأساسي أعلاه
+ */
+const GENRE_MOOD_MAP: Record<string, string> = {
+  "non-fiction": "inspiring and emotional mood, warm heroic lighting",
+  mystery: "dark moody atmosphere, deep shadows, suspenseful tone",
+  romance: "soft warm tones, golden hour glow, tender atmosphere",
+  "sci-fi": "futuristic color palette, glowing highlights, epic scale",
+  adventure: "energetic dynamic mood, vivid outdoor colors, sense of motion",
+  drama: "emotional intense mood, contrast lighting, cinematic tension",
 };
 
 /**
  * تلميحات إضافية حسب التصنيف (Tags) لو موجودة
  */
 const TAG_HINT_MAP: Record<string, string> = {
-  sports: "athlete in action, sports stadium or field, dynamic motion",
+  sports: "athlete figure, sports stadium setting, dynamic action pose",
 };
 
 /**
  * يبني برومبت تلقائي معبّر عن القصة إذا ما كان فيه coverPrompt مخصص
+ * الأسلوب الفني ثابت دائمًا (illustration)، والمزاج فقط يختلف حسب النوع
  */
 export function buildCoverPrompt(story: Story): string {
   if (story.coverPrompt && story.coverPrompt.trim().length > 0) {
-    return story.coverPrompt.trim();
+    // حتى لو فيه coverPrompt مخصص، نضيف الأسلوب الفني الثابت له
+    // عشان يبقى متسق مع باقي المكتبة
+    return `${BASE_ILLUSTRATION_STYLE}, ${story.coverPrompt.trim()}, no text, no watermark`;
   }
 
-  const style =
-    GENRE_STYLE_MAP[story.genre] ||
-    "photorealistic cinematic photograph, high quality";
+  const mood =
+    GENRE_MOOD_MAP[story.genre] || "emotional cinematic mood";
 
   const tagHint = story.tags
     ?.map((tag) => TAG_HINT_MAP[tag])
@@ -82,11 +93,12 @@ export function buildCoverPrompt(story: Story): string {
     .join(", ");
 
   const parts = [
-    style,
+    BASE_ILLUSTRATION_STYLE,
+    mood,
     tagHint,
     `depicting the theme of "${story.title}"`,
     story.blurb,
-    "no text, no watermark, high detail, professional photography",
+    "no text, no watermark, no logo, high detail",
   ].filter(Boolean);
 
   return parts.join(", ");
