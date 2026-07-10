@@ -99,22 +99,26 @@ export async function generateStoryCover(
   container.appendChild(decorative);
 
   // Append to body temporarily
-  document.body.appendChild(container);
+document.body.appendChild(container);
 
-  try {
-    // Convert to PNG
-    const dataUrl = await toPng(container, {
-      width,
-      height,
-      pixelRatio: 2,
-      cacheBust: true,
-    });
+// انتظر فريمين عشان نضمن اكتمال الرسم قبل الالتقاط
+await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-    return dataUrl;
-  } finally {
-    // Clean up
-    document.body.removeChild(container);
-  }
+try {
+  // Convert to PNG
+  const dataUrl = await toPng(container, {
+    width,
+    height,
+    pixelRatio: 2,
+    cacheBust: true,
+  });
+
+  return dataUrl;
+} finally {
+  // Clean up
+  document.body.removeChild(container);
+}
+
 }
 
 /**
