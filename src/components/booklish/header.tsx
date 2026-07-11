@@ -9,7 +9,6 @@ import {
   X,
   Library,
   LayoutDashboard,
-  BookMarked,
   RotateCcw,
   Brain,
   Home,
@@ -26,7 +25,7 @@ import { useState } from "react";
 
 // The 4 items in the bottom tab bar (mobile)
 const bottomTabs = [
-  { to: "/vocab", labelAr: "كلماتي", labelEn: "My Words", icon: BookMarked },
+  { to: "/review", labelAr: "المراجعة", labelEn: "Review", icon: RotateCcw },
   { to: "/", labelAr: "الرئيسية", labelEn: "Home", icon: Home },
   { to: "/library", labelAr: "المكتبة", labelEn: "Library", icon: Library },
   { to: "/vocab-games", labelAr: "مفردات", labelEn: "Vocabulary", icon: Brain },
@@ -35,7 +34,6 @@ const bottomTabs = [
 // Everything else lives in the ☰ menu
 const menuLinks = [
   { to: "/dashboard", labelAr: "الإحصائيات", labelEn: "Stats", icon: LayoutDashboard },
-  { to: "/review", labelAr: "المراجعة", labelEn: "Review", icon: RotateCcw },
 ] as const;
 
 export function Header() {
