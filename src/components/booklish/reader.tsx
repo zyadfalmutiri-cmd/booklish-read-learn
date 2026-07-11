@@ -375,16 +375,16 @@ function WordToken({
             type="button"
             disabled={!result || loading || saved}
             onClick={handleAlreadyKnow}
-            className={`flex flex-1 items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors ${
+            className={`flex flex-1 items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium transition-colors ${
               saved
                 ? "text-muted-foreground/50 cursor-default"
-                : "text-green-600 hover:bg-green-50 disabled:opacity-40"
+                : "text-foreground hover:bg-muted disabled:opacity-40"
             }`}
           >
             {saved ? (
-              <>✅ {isArabicUi ? "معروفة" : "Known"}</>
+              <><Check className="h-4 w-4" /> {isArabicUi ? "معروفة" : "Known"}</>
             ) : (
-              <>✅ {isArabicUi ? "أعرفها مسبقًا" : "Already know it"}</>
+              <><Check className="h-4 w-4" /> {isArabicUi ? "أعرفها مسبقًا" : "Already know it"}</>
             )}
           </button>
           <button
