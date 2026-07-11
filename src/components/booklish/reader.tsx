@@ -13,6 +13,7 @@ import { storyScenes } from "@/data/illustrations";
 
 export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct: number) => void }) {
   const [settings] = useSettings();
+  const isArabicUi = settings.uiLanguage === "ar";
   const [vocabList, setVocabList] = useLocalStore<SavedWord[]>(storeKeys.vocab, []);
   const [tappedWords] = useLocalStore<string[]>(storeKeys.tapped, []);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -86,6 +87,7 @@ export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct
             tappedSet={tappedSet}
             savedSet={savedSet}
             onSave={saveWord}
+            isArabicUi={isArabicUi}
           />
 
 
@@ -131,6 +133,7 @@ interface ParagraphProps {
     entry: { ar: string; def: string; example: string },
     opts?: { alreadyKnown?: boolean },
   ) => void;
+  isArabicUi: boolean;
 }
 
 
@@ -155,6 +158,7 @@ function Sentence({
   tappedSet,
   savedSet,
   onSave,
+  isArabicUi,
 }: ParagraphProps & { sentence: string }) {
   const tokens = useMemo(() => tokenize(sentence), [sentence]);
   const [revealed, setRevealed] = useState(translateMode === "sentences");
@@ -182,6 +186,7 @@ function Sentence({
             tapped={tappedSet.has(key)}
             saved={savedSet.has(key)}
             onSave={onSave}
+            isArabicUi={isArabicUi}
           />
 
 
@@ -221,6 +226,7 @@ function WordToken({
   tapped,
   saved,
   onSave,
+  isArabicUi,
 }: {
   word: string;
   normalized: string;
@@ -234,6 +240,7 @@ function WordToken({
     entry: { ar: string; def: string; example: string },
     opts?: { alreadyKnown?: boolean },
   ) => void;
+  isArabicUi: boolean;
 }) {
 
 
@@ -374,7 +381,11 @@ function WordToken({
                 : "text-green-600 hover:bg-green-50 disabled:opacity-40"
             }`}
           >
-            ✅ أعرفها مسبقًا
+            {saved ? (
+              <>✅ {isArabicUi ? "معروفة" : "Known"}</>
+            ) : (
+              <>✅ {isArabicUi ? "أعرفها مسبقًا" : "Already know it"}</>
+            )}
           </button>
           <button
             type="button"
@@ -387,9 +398,9 @@ function WordToken({
             }`}
           >
             {saved ? (
-              <><Check className="h-4 w-4" /> Saved</>
+              <><Check className="h-4 w-4" /> {isArabicUi ? "تم الحفظ" : "Saved"}</>
             ) : (
-              <><BookmarkPlus className="h-4 w-4" /> Save to vocab</>
+              <><BookmarkPlus className="h-4 w-4" /> {isArabicUi ? "حفظ في المفردات" : "Save to vocab"}</>
             )}
           </button>
         </div>
