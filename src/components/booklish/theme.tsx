@@ -27,14 +27,17 @@ export function useSettings() {
 }
 
 export function ThemeSync() {
-  const [settings] = useSettings();
+  const [settings, , hydrated] = useSettings();
   useEffect(() => {
     if (typeof document === "undefined") return;
+    // قبل ما تكتمل القراءة من التخزين، لا تلمس الـ DOM أبدًا —
+    // خلي الـ anti-FOUC script (اللي اشتغل قبل React) هو المتحكم مؤقتًا
+    if (!hydrated) return;
     const root = document.documentElement;
     if (settings.theme === "dark") root.classList.add("dark");
     else root.classList.remove("dark");
     root.lang = settings.uiLanguage;
     root.dir = settings.uiLanguage === "ar" ? "rtl" : "ltr";
-  }, [settings.theme, settings.uiLanguage]);
+  }, [settings.theme, settings.uiLanguage, hydrated]);
   return null;
 }
