@@ -1,5 +1,24 @@
-type Accent = "US" | "GB";
-type Gender = "male" | "female";
+import { useLocalStore } from "@/lib/store";
+
+export type Accent = "US" | "GB";
+export type Gender = "male" | "female";
+
+export interface VoicePrefs {
+  accent: Accent;
+  gender: Gender;
+}
+
+const VOICE_PREFS_KEY = "booklish.voicePrefs";
+const DEFAULT_VOICE_PREFS: VoicePrefs = { accent: "US", gender: "female" };
+
+/**
+ * تفضيل اللكنة/الصوت مشترك بين كل الميزات (شريك المحادثة + نطق الكلمات بالقصص).
+ * محفوظ بالمتصفح (localStorage) عبر useLocalStore، فأي تغيير بأي مكان
+ * ينعكس تلقائيًا بباقي الأماكن.
+ */
+export function useVoicePrefs() {
+  return useLocalStore<VoicePrefs>(VOICE_PREFS_KEY, DEFAULT_VOICE_PREFS);
+}
 
 // هذي أسماء أصوات حقيقية تم التأكد منها فعليًا على جهاز المستخدم (Safari/iOS)
 // ملاحظة: ما فيه صوت بنت بريطاني (en-GB) حقيقي على iOS، لذا نستخدم
