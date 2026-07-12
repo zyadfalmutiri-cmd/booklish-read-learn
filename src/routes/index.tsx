@@ -7,7 +7,7 @@ import { useStreak } from "@/lib/streak";
 import { useXp, LEVELS } from "@/lib/xp";
 import { useStats } from "@/lib/stats";
 import type { SavedWord } from "@/lib/types";
-import { getPreferredVoice } from "@/lib/voices";
+import { getPreferredVoice, useVoicePrefs } from "@/lib/voices";
 import { Flame, BookOpen, ArrowRight, Target, Zap, Mic, MicOff, MessageCircle, Loader2 } from "lucide-react";
 import { useT } from "@/lib/i18n";
 import { useState, useRef } from "react";
@@ -114,8 +114,11 @@ function SpeakingPartner({ ar }: { ar: boolean }) {
   const historyRef = useRef<ChatTurn[]>([]);
   const recognitionRef = useRef<any>(null);
   const silenceTimerRef = useRef<any>(null);
-  const [accent, setAccent] = useState<"US" | "GB">("US");
-  const [gender, setGender] = useState<"male" | "female">("female");
+  const [voicePrefs, setVoicePrefs] = useVoicePrefs();
+const { accent, gender } = voicePrefs;
+const setAccent = (a: "US" | "GB") => setVoicePrefs((p) => ({ ...p, accent: a }));
+const setGender = (g: "male" | "female") => setVoicePrefs((p) => ({ ...p, gender: g }));
+
 
   const speak = (text: string) => {
     // نتأكد إن المايك متوقف كليًا عشان ما يصير تعارض بجلسة الصوت على آيفون
