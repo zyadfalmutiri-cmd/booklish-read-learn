@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/hooks/use-auth";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { stories } from "@/data/stories";
@@ -11,6 +10,11 @@ import type { SavedWord } from "@/lib/types";
 import { Flame, BookOpen, ArrowRight, Target, Zap, Mic, MicOff, MessageCircle, Loader2 } from "lucide-react";
 import { useT } from "@/lib/i18n";
 import { useState, useRef } from "react";
+
+// 🔓 تحميل مبكر لقائمة الأصوات (بعض المتصفحات تحتاجها قبل أول استخدام)
+if (typeof window !== "undefined" && "speechSynthesis" in window) {
+  window.speechSynthesis.getVoices();
+}
 
 type ProgressMap = Record<string, { pct: number; lastAt: number; finished: boolean }>;
 
@@ -198,6 +202,12 @@ LEVEL: <A1|A2|B1|B2|C1>`;
   };
 
   const startListening = () => {
+    // 🔓 تحضير/فتح إذن الصوت داخل حدث الضغطة مباشرة (يحل مشكلة سفاري/آيفون
+    // اللي يرفض speechSynthesis.speak() إذا انتظرنا await الشبكة أول)
+    const unlock = new SpeechSynthesisUtterance("");
+    window.speechSynthesis.speak(unlock);
+    window.speechSynthesis.cancel();
+
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
