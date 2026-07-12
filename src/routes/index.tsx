@@ -115,10 +115,32 @@ function SpeakingPartner({ ar }: { ar: boolean }) {
   const silenceTimerRef = useRef<any>(null);
 
   const speak = (text: string) => {
+    // نتأكد إن المايك متوقف كليًا عشان ما يصير تعارض بجلسة الصوت على آيفون
+    try {
+      recognitionRef.current?.abort();
+    } catch {}
+
     window.speechSynthesis.cancel();
+
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = "en-US";
-    window.speechSynthesis.speak(utter);
+    utter.volume = 1;
+    utter.rate = 1;
+    utter.pitch = 1;
+
+    // نحاول نلقط صوت إنجليزي صريح (بعض أجهزة آيفون تحتاج هذا)
+    const voices = window.speechSynthesis.getVoices();
+    const enVoice = voices.find((v) => v.lang?.toLowerCase().startsWith("en"));
+    if (enVoice) utter.voice = enVoice;
+
+    utter.onerror = (e: any) => {
+      console.warn("TTS error:", e?.error || e);
+    };
+
+    // تأخير بسيط جدًا يساعد آيفون يحرر جلسة المايك قبل التشغيل
+    setTimeout(() => {
+      window.speechSynthesis.speak(utter);
+    }, 150);
   };
 
   const processText = async (text: string) => {
