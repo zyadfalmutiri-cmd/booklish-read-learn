@@ -411,13 +411,19 @@ function Home() {
   const { t, lang, dir } = useT();
 const isPro = true;
 const subLoading = false;
-  const { user } = useAuth();
+const { user, loading: authLoading } = useAuth();
   const ar = lang === "ar";
+
+    // لسا نتحقق من الجلسة — لا نعرض شي لين نتأكد
+  if (authLoading) {
+    return null;
+  }
 
   // Public landing page for visitors who aren't logged in
   if (!user) {
     return <PublicLanding ar={ar} />;
   }
+
 
   const continueEntry = Object.entries(progress)
     .filter(([, v]) => !v.finished && v.pct > 0)
