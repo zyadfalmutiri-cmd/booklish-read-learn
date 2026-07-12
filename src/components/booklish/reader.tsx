@@ -10,6 +10,7 @@ import { SRS_INTERVALS_MS } from "@/lib/srs";
 import { recordWordTap } from "@/lib/stats";
 import { useXp, XP_REWARDS } from "@/lib/xp";
 import { storyScenes } from "@/data/illustrations";
+import { getPreferredVoice, useVoicePrefs } from "@/lib/voices";
 
 export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct: number) => void }) {
   const [settings] = useSettings();
@@ -209,14 +210,6 @@ function Sentence({
   );
 }
 
-function speak(word: string) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-  const utt = new SpeechSynthesisUtterance(word);
-  utt.lang = "en-US";
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utt);
-}
-
 function WordToken({
   word,
   normalized,
@@ -247,6 +240,7 @@ function WordToken({
   const [open, setOpen] = useState(false);
   const [result, setResult] = useState<WordLookup | null>(null);
   const [loading, setLoading] = useState(false);
+  const [voicePrefs] = useVoicePrefs();
 
   useEffect(() => {
     if (!open) return;
@@ -267,6 +261,30 @@ function WordToken({
     });
     return () => { cancelled = true; };
   }, [open, word, normalized, sentence, storyVocab]);
+
+  const speak = () => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+
+    window.speechSynthesis.cancel();
+
+    const utter = new SpeechSynthesisUtterance(word);
+    utter.lang = voicePrefs.accent === "US" ? "en-US" : "en-GB";
+    utter.rate = 1;
+    utter.pitch = 1;
+    utter.volume = 1;
+
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = getPreferredVoice(voices, voicePrefs.accent, voicePrefs.gender);
+    if (preferredVoice) utter.voice = preferredVoice;
+
+    utter.onerror = (e: any) => {
+      console.warn("TTS error:", e?.error || e);
+    };
+
+    setTimeout(() => {
+      window.speechSynthesis.speak(utter);
+    }, 150);
+  };
 
   const handleSave = () => {
     if (!result) return;
@@ -320,7 +338,7 @@ function WordToken({
               <span className="font-serif text-lg font-semibold leading-none" dir="ltr">{word}</span>
               <button
                 type="button"
-                onClick={() => speak(word)}
+                onClick={speak}
                 className="grid h-6 w-6 place-items-center rounded-full hover:bg-muted text-muted-foreground hover:text-primary transition-colors"
                 aria-label="Hear pronunciation"
               >
