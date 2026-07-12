@@ -7,6 +7,7 @@ import { useStreak } from "@/lib/streak";
 import { useXp, LEVELS } from "@/lib/xp";
 import { useStats } from "@/lib/stats";
 import type { SavedWord } from "@/lib/types";
+import { getPreferredVoice } from "@/lib/voices";
 import { Flame, BookOpen, ArrowRight, Target, Zap, Mic, MicOff, MessageCircle, Loader2 } from "lucide-react";
 import { useT } from "@/lib/i18n";
 import { useState, useRef } from "react";
@@ -113,6 +114,8 @@ function SpeakingPartner({ ar }: { ar: boolean }) {
   const historyRef = useRef<ChatTurn[]>([]);
   const recognitionRef = useRef<any>(null);
   const silenceTimerRef = useRef<any>(null);
+  const [accent, setAccent] = useState<"US" | "GB">("US");
+  const [gender, setGender] = useState<"male" | "female">("female");
 
   const speak = (text: string) => {
     // نتأكد إن المايك متوقف كليًا عشان ما يصير تعارض بجلسة الصوت على آيفون
@@ -123,15 +126,15 @@ function SpeakingPartner({ ar }: { ar: boolean }) {
     window.speechSynthesis.cancel();
 
     const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = "en-US";
+    utter.lang = accent === "US" ? "en-US" : "en-GB";
     utter.volume = 1;
     utter.rate = 1;
     utter.pitch = 1;
 
-    // نحاول نلقط صوت إنجليزي صريح (بعض أجهزة آيفون تحتاج هذا)
+    // نحاول نلقط الصوت المفضل حسب اللكنة والجنس المختارين
     const voices = window.speechSynthesis.getVoices();
-    const enVoice = voices.find((v) => v.lang?.toLowerCase().startsWith("en"));
-    if (enVoice) utter.voice = enVoice;
+    const preferredVoice = getPreferredVoice(voices, accent, gender);
+    if (preferredVoice) utter.voice = preferredVoice;
 
     utter.onerror = (e: any) => {
       console.warn("TTS error:", e?.error || e);
@@ -318,6 +321,25 @@ LEVEL: <A1|A2|B1|B2|C1>`;
             {level} · {ar ? LEVEL_LABELS_AR[level] : level}
           </div>
         )}
+      </div>
+
+      <div className="px-5 pt-3 flex items-center gap-2">
+        <select
+          value={accent}
+          onChange={(e) => setAccent(e.target.value as "US" | "GB")}
+          className="text-xs rounded-full border border-border bg-muted/30 px-3 py-1.5 text-foreground"
+        >
+          <option value="US">{ar ? "أمريكي 🇺🇸" : "American 🇺🇸"}</option>
+          <option value="GB">{ar ? "بريطاني 🇬🇧" : "British 🇬🇧"}</option>
+        </select>
+        <select
+          value={gender}
+          onChange={(e) => setGender(e.target.value as "male" | "female")}
+          className="text-xs rounded-full border border-border bg-muted/30 px-3 py-1.5 text-foreground"
+        >
+          <option value="female">{ar ? "صوت بنت" : "Female voice"}</option>
+          <option value="male">{ar ? "صوت ولد" : "Male voice"}</option>
+        </select>
       </div>
 
       <div className="p-5 space-y-4">
