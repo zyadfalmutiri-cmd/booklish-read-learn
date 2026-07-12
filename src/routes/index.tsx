@@ -323,10 +323,6 @@ LEVEL: <A1|A2|B1|B2|C1>`;
         )}
       </div>
 
-      <pre className="text-[8px] whitespace-pre-wrap p-2 bg-muted overflow-auto max-h-40">
-        {typeof window !== "undefined" ? window.speechSynthesis.getVoices().map((v) => `${v.name} | ${v.lang}`).join("\n") : ""}
-      </pre>
-
 
       <div className="px-5 pt-3 flex items-center gap-2">
         <select
