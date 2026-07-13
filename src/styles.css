@@ -1,20 +1,12 @@
-import "tailwindcss";
+@import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 @font-face {
-  font-family: 'Thmanyah';
-  src: url('/fonts/thmanyahserifdisplay-Medium.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
   font-family: 'Inter';
-  src: url('/fonts/Inter-ExtraBold.otf') format('opentype');
-  font-weight: 800;
+  src: url('/fonts/Inter-SemiBold.otf') format('opentype');
+  font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
@@ -97,7 +89,7 @@ body {
 
   color: var(--foreground);
 
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 
   -webkit-font-smoothing: antialiased;
 
@@ -109,20 +101,10 @@ body {
   font-family: Georgia, "Times New Roman", serif;
 }
 
-/* خط Inter Extra Bold — استخدمه بالعناصر اللي تبيها ثقيلة (عناوين، أزرار بارزة، إلخ) */
-.font-inter-extrabold {
+/* خط Inter SemiBold — استخدمه بالعناصر اللي تبيها بارزة شوي (عناوين، أزرار) بدون ما تصير ثقيلة زيادة */
+.font-inter-semibold {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  font-weight: 800;
-}
-
-html[dir="rtl"] body,
-
-html[dir="rtl"] *,
-
-[dir="rtl"] {
-
-  font-family: 'Thmanyah', 'Segoe UI', Tahoma, system-ui, sans-serif;
-
+  font-weight: 600;
 }
 
 .reading-column {
