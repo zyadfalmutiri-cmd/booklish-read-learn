@@ -1,4 +1,4 @@
-@import "tailwindcss";
+import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -7,6 +7,14 @@
   font-family: 'Thmanyah';
   src: url('/fonts/thmanyahserifdisplay-Medium.otf') format('opentype');
   font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-ExtraBold.otf') format('opentype');
+  font-weight: 800;
   font-style: normal;
   font-display: swap;
 }
@@ -99,6 +107,12 @@ body {
 
 .font-serif {
   font-family: Georgia, "Times New Roman", serif;
+}
+
+/* خط Inter Extra Bold — استخدمه بالعناصر اللي تبيها ثقيلة (عناوين، أزرار بارزة، إلخ) */
+.font-inter-extrabold {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 800;
 }
 
 html[dir="rtl"] body,
