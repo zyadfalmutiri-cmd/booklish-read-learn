@@ -7,6 +7,7 @@ export interface VocabEntry {
   ar: string;
   def: string;
   example: string;
+  pos?: string; // نوع الكلمة: Noun, Verb, Adjective, Adverb, Preposition... (اختياري)
 }
 
 export interface SavedWord {
@@ -18,6 +19,8 @@ export interface SavedWord {
   at: number;
   level?: number;
   nextReview?: number;
+  pos?: string; // نوع الكلمة (اختياري، يُعبّى وقت الحفظ من VocabEntry.pos إذا متوفر)
+  favorite?: boolean; // هل المستخدم علّمها كمفضلة (نجمة)
 }
 
 export interface QuizQuestion {
