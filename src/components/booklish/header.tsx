@@ -16,6 +16,7 @@ import {
   Loader2,
   MapPin,
   User,
+  GraduationCap,
 } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useSettings } from "./theme";
@@ -36,6 +37,7 @@ const bottomTabs = [
 // Everything else lives in the ☰ menu
 const menuLinks = [
   { to: "/", labelAr: "الرئيسية", labelEn: "Home", icon: Home },
+  { to: "/step", labelAr: "التحضير لـ STEP", labelEn: "STEP Prep", icon: GraduationCap },
   { to: "/vocab-games", labelAr: "ألعاب المفردات", labelEn: "Vocabulary Games", icon: Brain },
 ] as const;
 
@@ -155,7 +157,7 @@ export function Header() {
         </div>
       </header>
 
-      {/* ☰ menu — extra items (Home + Vocabulary Games) */}
+      {/* ☰ menu — extra items (Home + STEP + Vocabulary Games) */}
       {mobileOpen && (
         <div
           className="fixed inset-0 top-14 z-40 bg-background/95 backdrop-blur-sm sm:hidden"
