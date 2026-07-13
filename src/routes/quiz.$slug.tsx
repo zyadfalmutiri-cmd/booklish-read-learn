@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { Check, X, RotateCcw, BookmarkPlus, Zap } from "lucide-react";
+import { Check, X, RotateCcw, BookmarkPlus, Zap, PartyPopper } from "lucide-react";
 import { getStory } from "@/data/stories";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useT } from "@/lib/i18n";
@@ -8,6 +8,8 @@ import { useXp, XP_REWARDS } from "@/lib/xp";
 import { syncNow } from "@/lib/sync";
 import { useAuth } from "@/hooks/use-auth";
 import { ShareQuizResult } from "@/components/booklish/share-quiz-result";
+import { useUserLevel, CEFR_TO_STORY_LEVEL, LEVEL_INFO } from "@/lib/reading-level";
+import { toast } from "sonner";
 
 import type { SavedWord } from "@/lib/types";
 
@@ -27,11 +29,13 @@ export const Route = createFileRoute("/quiz/$slug")({
 
 function QuizPage() {
   const { story } = Route.useLoaderData() as { story: import("@/lib/types").Story };
-  const { t } = useT();
+  const { t, lang } = useT();
+  const ar = lang === "ar";
   const { addXp } = useXp();
   const { user } = useAuth();
   const [scores, setScores] = useLocalStore<ScoreMap>(storeKeys.quizScores, {});
   const [, setVocab] = useLocalStore<SavedWord[]>(storeKeys.vocab, []);
+  const { data: levelData, recordStoryFinished } = useUserLevel();
 
   const priorResult = scores[story.slug];
   const [retaking, setRetaking] = useState(false);
@@ -39,16 +43,40 @@ function QuizPage() {
   const [answers, setAnswers] = useState<(number | null)[]>(() => story.quiz.map(() => null));
   const [submitted, setSubmitted] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
+  const [promotion, setPromotion] = useState<{ promoted: boolean; newLevel: string | null }>({
+    promoted: false,
+    newLevel: null,
+  });
 
   const score = answers.reduce<number>((acc, a, i) => acc + (a === story.quiz[i].answer ? 1 : 0), 0);
 
   const submit = () => {
+    // مهم: هذا الاختبار هو الشرط الرسمي لاحتساب القصة ضمن السبع قصص المطلوبة للترقية.
+    // نتأكد إنها أول مرة يكمل فيها هذا الاختبار (مو إعادة) وإن القصة من نفس مستواه الحالي.
+    const isFirstAttempt = !priorResult;
+    const storyMatchesCurrentLevel = CEFR_TO_STORY_LEVEL[levelData.cefrLevel]?.includes(story.level);
+
     setScores((prev) => ({ ...prev, [story.slug]: { score, total: story.quiz.length, at: Date.now() } }));
+
     const earned = score * XP_REWARDS.quizCorrect;
     if (earned > 0) {
       addXp(earned, `quiz:${story.slug}`);
       setXpEarned(earned);
     }
+
+    if (isFirstAttempt && storyMatchesCurrentLevel) {
+      const result = recordStoryFinished();
+      if (result.promoted && result.newLevel) {
+        setPromotion({ promoted: true, newLevel: result.newLevel });
+        const info = LEVEL_INFO[result.newLevel as keyof typeof LEVEL_INFO];
+        toast.success(
+          ar
+            ? `🎉 ترقيت للمستوى ${result.newLevel} — ${info.nameAr}!`
+            : `🎉 You leveled up to ${result.newLevel} — ${info.nameEn}!`
+        );
+      }
+    }
+
     setSubmitted(true);
     if (user) syncNow(user.id);
   };
@@ -189,6 +217,12 @@ function QuizPage() {
               +{xpEarned} XP {t("quiz.xpEarned")}
             </div>
           )}
+          {promotion.promoted && (
+            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+              <PartyPopper className="h-4 w-4" />
+              {ar ? `ترقيت للمستوى ${promotion.newLevel}!` : `Leveled up to ${promotion.newLevel}!`}
+            </div>
+          )}
           <div className="mt-4 flex justify-center">
             <ShareQuizResult storyTitle={story.title} score={score} total={story.quiz.length} />
           </div>
@@ -206,10 +240,10 @@ function QuizPage() {
               <RotateCcw className="h-4 w-4" /> {t("quiz.tryAgain")}
             </button>
             <Link
-              to="/library"
+              to={promotion.promoted ? "/journey" : "/library"}
               className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"
             >
-              {t("quiz.backLibrary")}
+              {promotion.promoted ? (ar ? "شوف رحلتك الجديدة" : "See your new journey") : t("quiz.backLibrary")}
             </Link>
           </div>
         </div>
