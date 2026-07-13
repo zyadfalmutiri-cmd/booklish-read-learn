@@ -1836,26 +1836,16 @@ export const VOCAB_DATA: Record<string, VocabWord[]> = {
     { word: "subject", ar: "لـ / ِضع / خا", example: "The decision is subject to board review.", level: "B2" },
     { word: "subsequent", ar: "ٍل / تا / لاحق", example: "She improved in subsequent attempts after practicing more.", level: "B2" },
     { word: "suburb", ar: "اس / ضاحية", example: "The suburb is connected to the city by train.", level: "B2" },
-  ],
+    ],
 };
 
-// كلمات فيها خلل بالاستخراج (نوع الكلمة انحط بدال المعنى)
-const BROKEN_MEANINGS = new Set([
-  "اسم",
-  "فعل",
-  "صفة",
-  "ضمير",
-  "حرف",
-  "أداة",
-  "ظرف",
-  "عدد",
-  "رقم",
-]);
-
-export function hasValidMeaning(w: VocabWord): boolean {
-  return !BROKEN_MEANINGS.has(w.ar.trim());
-}
+import { VOCAB_FIXES } from "./vocab-fixes";
 
 export function getCleanVocab(level: string): VocabWord[] {
-  return (VOCAB_DATA[level] ?? VOCAB_DATA["A1"]).filter(hasValidMeaning);
+  const list = VOCAB_DATA[level] ?? VOCAB_DATA["A1"];
+  const fixes = VOCAB_FIXES[level] ?? {};
+  return list.map((w) => {
+    const fixed = fixes[w.word.toLowerCase()];
+    return fixed ? { ...w, ar: fixed } : w;
+  });
 }
