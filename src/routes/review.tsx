@@ -154,7 +154,7 @@ function ReviewPage() {
 
   // ---------------- الوضع الرئيسي: My Vocabulary ----------------
   return (
-    <main className="mx-auto max-w-3xl px-4 pb-32 pt-8">
+    <main className="mx-auto max-w-3xl px-4 pb-44 pt-8 sm:pb-28">
       <SyncBanner />
 
       <div className="mb-6 flex items-center justify-between">
@@ -325,8 +325,23 @@ function ReviewPage() {
         </ul>
       )}
 
-      {/* زر Practice ثابت بالأسفل */}
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 px-4 pb-6 pt-3 backdrop-blur">
+      {/* زر Practice ثابت بالأسفل — فوق شريط التبويبات الرئيسي (الرحلة/مفردات/المكتبة/البروفايل) في الجوال */}
+      <div
+        className="fixed inset-x-0 z-40 border-t border-border bg-background/95 px-4 pb-3 pt-3 backdrop-blur sm:hidden"
+        style={{ bottom: "calc(4rem + env(safe-area-inset-bottom))" }}
+      >
+        <div className="mx-auto max-w-3xl">
+          <button
+            onClick={() => setSheetOpen(true)}
+            className="w-full rounded-full bg-primary py-3.5 text-base font-semibold text-primary-foreground hover:bg-primary/90"
+          >
+            {isAr ? "تدرّب" : "Practice"}
+          </button>
+        </div>
+      </div>
+
+      {/* نفس الزر لكن ملاصق للأسفل في الديسكتوب (ما فيه شريط تبويبات ثابت هناك) */}
+      <div className="fixed inset-x-0 bottom-0 z-40 hidden border-t border-border bg-background/95 px-4 pb-6 pt-3 backdrop-blur sm:block">
         <div className="mx-auto max-w-3xl">
           <button
             onClick={() => setSheetOpen(true)}
@@ -339,9 +354,10 @@ function ReviewPage() {
 
       {/* شيت خيارات التدريب */}
       {sheetOpen && (
-        <div className="fixed inset-0 z-30 flex items-end justify-center bg-black/40" onClick={() => setSheetOpen(false)}>
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setSheetOpen(false)}>
           <div
-            className="w-full max-w-3xl rounded-t-3xl bg-card p-6 pb-8"
+            className="w-full max-w-3xl rounded-t-3xl bg-card p-6 pb-8 sm:mb-0"
+            style={{ marginBottom: "calc(4rem + env(safe-area-inset-bottom))" }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-muted" />
