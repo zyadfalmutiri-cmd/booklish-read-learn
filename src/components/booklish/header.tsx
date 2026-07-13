@@ -14,6 +14,8 @@ import {
   Home,
   Trash2,
   Loader2,
+  MapPin,
+  User,
 } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useSettings } from "./theme";
@@ -25,15 +27,16 @@ import { useState } from "react";
 
 // The 4 items in the bottom tab bar (mobile)
 const bottomTabs = [
-  { to: "/review", labelAr: "المراجعة", labelEn: "Review", icon: RotateCcw },
-  { to: "/", labelAr: "الرئيسية", labelEn: "Home", icon: Home },
+  { to: "/journey", labelAr: "الرحلة", labelEn: "Journey", icon: MapPin },
+  { to: "/review", labelAr: "مفردات", labelEn: "Vocabulary", icon: RotateCcw },
   { to: "/library", labelAr: "المكتبة", labelEn: "Library", icon: Library },
-  { to: "/vocab-games", labelAr: "مفردات", labelEn: "Vocabulary", icon: Brain },
+  { to: "/dashboard", labelAr: "البروفايل", labelEn: "Profile", icon: User },
 ] as const;
 
 // Everything else lives in the ☰ menu
 const menuLinks = [
-  { to: "/dashboard", labelAr: "الإحصائيات", labelEn: "Stats", icon: LayoutDashboard },
+  { to: "/", labelAr: "الرئيسية", labelEn: "Home", icon: Home },
+  { to: "/vocab-games", labelAr: "ألعاب المفردات", labelEn: "Vocabulary Games", icon: Brain },
 ] as const;
 
 export function Header() {
@@ -64,8 +67,6 @@ export function Header() {
     if (deleteConfirmText !== confirmWord) return;
     setDeleting(true);
     try {
-      // Requires a Supabase Edge Function named "delete-account"
-      // (see setup instructions provided separately).
       const { error } = await supabase.functions.invoke("delete-account");
       if (error) throw error;
       await signOut();
@@ -98,7 +99,7 @@ export function Header() {
 
           {/* Desktop nav keeps everything visible */}
           <nav className="ms-2 hidden flex-1 items-center gap-1 text-sm sm:flex sm:gap-3 sm:text-[15px]">
-            {[...bottomTabs.filter((l) => l.to !== "/"), ...menuLinks].map(({ to, labelAr, labelEn }) => (
+            {[...bottomTabs, ...menuLinks].map(({ to, labelAr, labelEn }) => (
               <NavItem key={to} to={to}>
                 {lang === "ar" ? labelAr : labelEn}
               </NavItem>
@@ -154,7 +155,7 @@ export function Header() {
         </div>
       </header>
 
-      {/* ☰ menu — only the "extra" items now (bottom tabs removed from here) */}
+      {/* ☰ menu — extra items (Home + Vocabulary Games) */}
       {mobileOpen && (
         <div
           className="fixed inset-0 top-14 z-40 bg-background/95 backdrop-blur-sm sm:hidden"
@@ -282,8 +283,6 @@ export function Header() {
         </div>
       </nav>
 
-      {/* Reliably pushes page content up above the fixed bottom bar on mobile,
-          regardless of where <Header /> sits relative to <Outlet /> in the DOM. */}
       <style>{`
         @media (max-width: 639px) {
           body {
