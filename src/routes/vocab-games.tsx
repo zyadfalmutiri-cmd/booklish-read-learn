@@ -13,7 +13,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
 import { useUserLevel } from "@/lib/reading-level";
-import { VOCAB_DATA, type VocabWord } from "@/data/vocab-data";
+import { getCleanVocab, type VocabWord } from "@/data/vocab-data";
 import {
   Shuffle,
   CheckCircle2,
@@ -67,7 +67,8 @@ function VocabGamesPage() {
   const { data } = useUserLevel();
   const [game, setGame] = useState<GameId>("menu");
 
-  const words = VOCAB_DATA[data.cefrLevel] ?? VOCAB_DATA["A1"];
+const words = getCleanVocab(data.cefrLevel);
+
 
   if (game === "menu") return <GameMenu level={data.cefrLevel} wordCount={words.length} onSelect={setGame} />;
   if (game === "drag") return <DragGame words={words} onBack={() => setGame("menu")} />;
