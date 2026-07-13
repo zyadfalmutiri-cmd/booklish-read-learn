@@ -1837,6 +1837,8 @@ export const VOCAB_DATA: Record<string, VocabWord[]> = {
     { word: "subsequent", ar: "ٍل / تا / لاحق", example: "She improved in subsequent attempts after practicing more.", level: "B2" },
     { word: "suburb", ar: "اس / ضاحية", example: "The suburb is connected to the city by train.", level: "B2" },
   ],
+};
+
 // كلمات فيها خلل بالاستخراج (نوع الكلمة انحط بدال المعنى)
 const BROKEN_MEANINGS = new Set([
   "اسم",
@@ -1857,4 +1859,3 @@ export function hasValidMeaning(w: VocabWord): boolean {
 export function getCleanVocab(level: string): VocabWord[] {
   return (VOCAB_DATA[level] ?? VOCAB_DATA["A1"]).filter(hasValidMeaning);
 }
-};
