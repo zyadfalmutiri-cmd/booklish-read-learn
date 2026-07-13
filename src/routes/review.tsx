@@ -12,6 +12,14 @@ import {
   Trash2,
   ListChecks,
   X,
+  Star,
+  ChevronDown,
+  ChevronUp,
+  ArrowDownAZ,
+  History as HistoryIcon,
+  Layers,
+  Swords,
+  Plus,
 } from "lucide-react";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { stories } from "@/data/stories";
@@ -24,44 +32,369 @@ import type { SavedWord } from "@/lib/types";
 import { SyncBanner } from "@/components/booklish/sync-banner";
 
 export const Route = createFileRoute("/review")({
-  head: () => ({ meta: [{ title: "Review — Booklish" }] }),
+  head: () => ({ meta: [{ title: "My Vocabulary — Booklish" }] }),
   component: ReviewPage,
 });
 
-type Tab = "review" | "browse" | "quiz";
+// كلمة تعتبر "متقنة" إذا وصل مستواها لهذا الحد أو أعلى
+const KNOWN_LEVEL_THRESHOLD = 5;
+
+type MainTab = "learning" | "know";
+type SortMode = "az" | "recent";
+type Mode = "browse" | "flashcards" | "quiz";
+
+function wordId(v: SavedWord) {
+  return `${v.slug}:${v.word}`;
+}
+
+function isKnown(v: SavedWord) {
+  return (v.level ?? 0) >= KNOWN_LEVEL_THRESHOLD;
+}
 
 function ReviewPage() {
   const [vocab, setVocab] = useLocalStore<SavedWord[]>(storeKeys.vocab, []);
-  const { t, lang } = useT();
+  const { t, lang, dir } = useT();
   const isAr = lang === "ar";
-  const [tab, setTab] = useState<Tab>("review");
+  const isRtl = dir === "rtl";
 
-  const dueCount = vocab.filter((v) => isDue(v)).length;
+  const [mode, setMode] = useState<Mode>("browse");
+  const [mainTab, setMainTab] = useState<MainTab>("learning");
+  const [sortMode, setSortMode] = useState<SortMode>("az");
+  const [onlyFavorites, setOnlyFavorites] = useState(false);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [sheetOpen, setSheetOpen] = useState(false);
 
+  const knowCount = vocab.filter(isKnown).length;
+  const learnCount = vocab.length - knowCount;
+  const total = vocab.length;
+  const knowPct = total > 0 ? Math.round((knowCount / total) * 100) : 0;
+
+  const toggleFavorite = (v: SavedWord) => {
+    setVocab((prev) =>
+      prev.map((x) =>
+        x.word === v.word && x.slug === v.slug ? { ...x, favorite: !x.favorite } : x,
+      ),
+    );
+  };
+
+  const deleteWord = (v: SavedWord) => {
+    setVocab((prev) => prev.filter((x) => !(x.word === v.word && x.slug === v.slug)));
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const filtered = useMemo(() => {
+    let list = vocab.filter((v) => (mainTab === "know" ? isKnown(v) : !isKnown(v)));
+    if (onlyFavorites) list = list.filter((v) => v.favorite);
+    const q = query.trim().toLowerCase();
+    if (q) {
+      list = list.filter(
+        (v) =>
+          v.word.toLowerCase().includes(q) ||
+          v.ar.includes(q) ||
+          v.def.toLowerCase().includes(q),
+      );
+    }
+    list = [...list].sort((a, b) =>
+      sortMode === "az" ? a.word.localeCompare(b.word) : b.at - a.at,
+    );
+    return list;
+  }, [vocab, mainTab, onlyFavorites, query, sortMode]);
+
+  const allExpanded = filtered.length > 0 && filtered.every((v) => expandedIds.has(wordId(v)));
+
+  const toggleExpandAll = () => {
+    if (allExpanded) {
+      setExpandedIds(new Set());
+    } else {
+      setExpandedIds(new Set(filtered.map(wordId)));
+    }
+  };
+
+  // ---------------- وضع البطاقات التعليمية (Flash Cards) ----------------
+  if (mode === "flashcards") {
+    return (
+      <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
+        <button
+          onClick={() => setMode("browse")}
+          className="mb-5 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className={`h-4 w-4 ${isRtl ? "rotate-180" : ""}`} />
+          {isAr ? "رجوع" : "Back"}
+        </button>
+        <FlashCardsTab vocab={filtered.length > 0 ? filtered : vocab} setVocab={setVocab} />
+      </main>
+    );
+  }
+
+  // ---------------- وضع الاختبار (Multiple choice) ----------------
+  if (mode === "quiz") {
+    return (
+      <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
+        <button
+          onClick={() => setMode("browse")}
+          className="mb-5 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className={`h-4 w-4 ${isRtl ? "rotate-180" : ""}`} />
+          {isAr ? "رجوع" : "Back"}
+        </button>
+        <QuizTab vocab={vocab} />
+      </main>
+    );
+  }
+
+  // ---------------- الوضع الرئيسي: My Vocabulary ----------------
   return (
-    <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
+    <main className="mx-auto max-w-3xl px-4 pb-32 pt-8">
       <SyncBanner />
-      <h1 className="mb-2 font-serif text-3xl">{t("review.title")}</h1>
-      <p className="mb-6 text-sm text-muted-foreground">
-        {vocab.length} {isAr ? "كلمة محفوظة" : "saved words"} · {dueCount} {isAr ? "بحاجة للمراجعة" : "due now"}
-      </p>
 
-      <div className="mb-6 flex gap-2 rounded-full border border-border bg-card p-1">
-        <TabButton active={tab === "review"} onClick={() => setTab("review")}>
-          {isAr ? "المراجعة" : "Review"}
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="font-serif text-3xl">{isAr ? "مفرداتي" : "My Vocabulary"}</h1>
+        <button
+          onClick={() => setSearchOpen((s) => !s)}
+          className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card hover:bg-muted"
+          aria-label="search"
+        >
+          <Search className="h-4 w-4" />
+        </button>
+      </div>
+
+      {searchOpen && (
+        <div className={`mb-5 flex items-center gap-2 rounded-full border border-border bg-card ${isRtl ? "pr-3 pl-2" : "pl-3 pr-2"}`}>
+          <Search className="h-4 w-4 text-muted-foreground" />
+          <input
+            autoFocus
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t("vocab.searchPh")}
+            className={`h-10 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground ${isRtl ? "text-right" : "text-left"}`}
+          />
+          {query && (
+            <button onClick={() => setQuery("")} className="text-muted-foreground">
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* بطاقة الإحصائيات */}
+      <div className="mb-6 rounded-2xl border border-border bg-card p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="rounded-full bg-primary px-3 py-1 text-sm font-semibold text-primary-foreground">
+              {knowCount} {isAr ? "أعرفها" : "Know"}
+            </span>
+            <span className="rounded-full bg-yellow-500/90 px-3 py-1 text-sm font-semibold text-white">
+              {learnCount} {isAr ? "تعلّم" : "Learn"}
+            </span>
+          </div>
+          <span className="text-sm font-medium text-muted-foreground">
+            {total} {isAr ? "كلمة" : "Words"}
+          </span>
+        </div>
+        <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-muted">
+          <div className="h-full bg-yellow-500" style={{ width: `${100 - knowPct}%` }} />
+          <div className="h-full bg-primary" style={{ width: `${knowPct}%` }} />
+        </div>
+      </div>
+
+      {/* تبويبات Learning / I know */}
+      <div className="mb-4 flex gap-2 rounded-full border border-border bg-card p-1">
+        <TabButton active={mainTab === "learning"} onClick={() => setMainTab("learning")}>
+          {isAr ? "أتعلمها" : "Learning"}
         </TabButton>
-        <TabButton active={tab === "browse"} onClick={() => setTab("browse")}>
-          {isAr ? "كل كلماتي" : "All Words"}
-        </TabButton>
-        <TabButton active={tab === "quiz"} onClick={() => setTab("quiz")}>
-          {isAr ? "اختبار" : "Quiz"}
+        <TabButton active={mainTab === "know"} onClick={() => setMainTab("know")}>
+          {isAr ? "أعرفها" : "I know"}
         </TabButton>
       </div>
 
-      {tab === "review" && <ReviewTab vocab={vocab} setVocab={setVocab} />}
-      {tab === "browse" && <BrowseTab vocab={vocab} setVocab={setVocab} />}
-      {tab === "quiz" && <QuizTab vocab={vocab} />}
+      {/* فلاتر: ترتيب / حديث / مفضلة / توسيع الكل */}
+      <div className="mb-5 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setSortMode("az")}
+            className={`grid h-9 w-9 place-items-center rounded-full border ${sortMode === "az" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:bg-muted"}`}
+            aria-label="sort a-z"
+            title={isAr ? "ترتيب أبجدي" : "Sort A-Z"}
+          >
+            <ArrowDownAZ className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setSortMode("recent")}
+            className={`grid h-9 w-9 place-items-center rounded-full border ${sortMode === "recent" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:bg-muted"}`}
+            aria-label="sort recent"
+            title={isAr ? "الأحدث" : "Recent"}
+          >
+            <HistoryIcon className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setOnlyFavorites((v) => !v)}
+            className={`grid h-9 w-9 place-items-center rounded-full border ${onlyFavorites ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:bg-muted"}`}
+            aria-label="favorites only"
+            title={isAr ? "المفضلة فقط" : "Favorites only"}
+          >
+            <Star className={`h-4 w-4 ${onlyFavorites ? "fill-current" : ""}`} />
+          </button>
+        </div>
+        <button onClick={toggleExpandAll} className="text-sm font-medium text-primary hover:underline">
+          {allExpanded ? (isAr ? "طي الكل" : "Collapse All") : (isAr ? "توسيع الكل" : "Expand All")}
+        </button>
+      </div>
+
+      {/* زر إضافة كلمات جديدة */}
+      <Link
+        to="/library"
+        className="mb-5 flex items-center justify-center gap-2 rounded-xl border border-border bg-card py-3.5 text-sm font-medium hover:bg-muted"
+      >
+        <Plus className="h-4 w-4 text-primary" />
+        {isAr ? "أضف كلمات جديدة" : "Add new words"}
+      </Link>
+
+      {/* قائمة الكلمات */}
+      {vocab.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground">
+          <p className="mb-2">{t("vocab.empty")}</p>
+          <p className="text-sm">{t("vocab.emptyHint")}</p>
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+          {t("vocab.noMatch")}
+        </div>
+      ) : (
+        <ul className="space-y-2">
+          {filtered.map((v) => {
+            const id = wordId(v);
+            const expanded = expandedIds.has(id);
+            const story = stories.find((s) => s.slug === v.slug);
+            return (
+              <li key={id} className="overflow-hidden rounded-xl border border-border bg-card">
+                <div className="flex items-center gap-3 p-4">
+                  <SpeakIconButton word={v.word} idPrefix="vocab" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline gap-2">
+                      <span className="truncate font-serif text-lg" dir="ltr">{v.word}</span>
+                      {v.pos && <span className="text-xs text-muted-foreground">{v.pos}</span>}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => toggleFavorite(v)}
+                    className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${v.favorite ? "text-yellow-500" : "text-muted-foreground hover:bg-muted"}`}
+                    aria-label="favorite"
+                  >
+                    <Star className={`h-4 w-4 ${v.favorite ? "fill-current" : ""}`} />
+                  </button>
+                  <button
+                    onClick={() => toggleExpand(id)}
+                    className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+                    aria-label="expand"
+                  >
+                    {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </button>
+                </div>
+
+                {expanded && (
+                  <div className="space-y-2 border-t border-border bg-muted/40 px-4 py-3">
+                    <div dir="rtl" lang="ar" className="text-lg text-foreground">{v.ar || "—"}</div>
+                    <div className="text-sm text-muted-foreground" dir="ltr">{v.def}</div>
+                    {v.example && (
+                      <div className="text-sm italic text-foreground/75" dir="ltr">"{v.example}"</div>
+                    )}
+                    <div className="flex items-center justify-between pt-1 text-xs text-muted-foreground">
+                      <span className="truncate">{t("vocab.fromStory")}: {story?.title ?? v.slug}</span>
+                      <button
+                        onClick={() => deleteWord(v)}
+                        className="inline-flex shrink-0 items-center gap-1 rounded px-2 py-1 hover:bg-muted hover:text-destructive"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" /> {t("vocab.delete")}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {/* زر Practice ثابت بالأسفل */}
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 px-4 pb-6 pt-3 backdrop-blur">
+        <div className="mx-auto max-w-3xl">
+          <button
+            onClick={() => setSheetOpen(true)}
+            className="w-full rounded-full bg-primary py-3.5 text-base font-semibold text-primary-foreground hover:bg-primary/90"
+          >
+            {isAr ? "تدرّب" : "Practice"}
+          </button>
+        </div>
+      </div>
+
+      {/* شيت خيارات التدريب */}
+      {sheetOpen && (
+        <div className="fixed inset-0 z-30 flex items-end justify-center bg-black/40" onClick={() => setSheetOpen(false)}>
+          <div
+            className="w-full max-w-3xl rounded-t-3xl bg-card p-6 pb-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-muted" />
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <PracticeOption
+                icon={<Layers className="h-6 w-6" />}
+                label={isAr ? "بطاقات" : "Flash Cards"}
+                onClick={() => {
+                  setSheetOpen(false);
+                  setMode("flashcards");
+                }}
+              />
+              <PracticeOption
+                icon={<ListChecks className="h-6 w-6" />}
+                label={isAr ? "اختيار من متعدد" : "Multiple choice"}
+                onClick={() => {
+                  setSheetOpen(false);
+                  setMode("quiz");
+                }}
+              />
+              <PracticeOption
+                icon={<Swords className="h-6 w-6" />}
+                label={isAr ? "تحدي" : "Challenge"}
+                onClick={() => setSheetOpen(false)}
+                comingSoon
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </main>
+  );
+}
+
+function PracticeOption({
+  icon,
+  label,
+  onClick,
+  comingSoon,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+  comingSoon?: boolean;
+}) {
+  return (
+    <button onClick={onClick} className="flex flex-col items-center gap-2">
+      <div className="grid h-16 w-16 place-items-center rounded-full bg-primary/10 text-primary">
+        {icon}
+      </div>
+      <span className="text-sm font-medium">{label}</span>
+      {comingSoon && <span className="text-[10px] text-muted-foreground">قريبًا</span>}
+    </button>
   );
 }
 
@@ -86,32 +419,29 @@ function TabButton({
   );
 }
 
-/* ----------------------------- تبويب المراجعة (SRS) ----------------------------- */
+/* ----------------------------- وضع البطاقات التعليمية (Flash Cards) ----------------------------- */
 
-function ReviewTab({
+function FlashCardsTab({
   vocab,
   setVocab,
 }: {
   vocab: SavedWord[];
   setVocab: (v: SavedWord[] | ((prev: SavedWord[]) => SavedWord[])) => void;
 }) {
-  const { t } = useT();
+  const { t, lang } = useT();
+  const isAr = lang === "ar";
   const { addXp } = useXp();
 
-  const [queue] = useState<string[]>(() =>
-    vocab.filter((v) => isDue(v)).map((v) => `${v.slug}:${v.word}`),
-  );
+  const [order] = useState<string[]>(() => vocab.map(wordId));
   const [idx, setIdx] = useState(0);
-  const [revealed, setRevealed] = useState(false);
-  const [reviewed, setReviewed] = useState(0);
-  const [correct, setCorrect] = useState(0);
+  const [flipped, setFlipped] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
 
-  const currentId = queue[idx];
-  const current = useMemo(
-    () => vocab.find((v) => `${v.slug}:${v.word}` === currentId),
-    [vocab, currentId],
-  );
+  const currentId = order[idx];
+  const current = useMemo(() => vocab.find((v) => wordId(v) === currentId), [vocab, currentId]);
+
+  const total = order.length;
+  const done = idx >= total;
 
   const grade = (g: Grade) => {
     if (!current) return;
@@ -121,29 +451,18 @@ function ReviewTab({
         v.word === current.word && v.slug === current.slug ? { ...v, ...next } : v,
       ),
     );
-    setReviewed((n) => n + 1);
     if (g !== "again") {
-      setCorrect((n) => n + 1);
-      addXp(XP_REWARDS.reviewGood, `review:${current.word}`);
+      addXp(XP_REWARDS.reviewGood, `flashcard:${current.word}`);
       setXpEarned((n) => n + XP_REWARDS.reviewGood);
     }
-    setRevealed(false);
+    setFlipped(false);
     setIdx((i) => i + 1);
   };
 
-  const total = queue.length;
-  const done = idx >= total;
-
   if (total === 0) {
     return (
-      <div className="pt-6 text-center">
-        <p className="mb-4 text-sm text-muted-foreground">{t("review.nothingDue")}</p>
-        <Link
-          to="/library"
-          className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
-        >
-          <BookOpen className="h-4 w-4" /> {t("vocab.browse")}
-        </Link>
+      <div className="pt-6 text-center text-muted-foreground">
+        {isAr ? "ما فيه كلمات هنا حالياً" : "No words here right now"}
       </div>
     );
   }
@@ -154,12 +473,9 @@ function ReviewTab({
         <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-full bg-primary/15 text-primary">
           <Check className="h-7 w-7" />
         </div>
-        <h2 className="mb-2 font-serif text-2xl">{t("review.done")}</h2>
-        <p className="mb-3 text-sm text-muted-foreground">
-          {reviewed} {t("review.reviewed")} · {correct} {t("review.correct")}
-        </p>
+        <h2 className="mb-2 font-serif text-2xl">{isAr ? "خلصت البطاقات!" : "Done!"}</h2>
         {xpEarned > 0 && (
-          <div className="mb-6 inline-flex items-center gap-1.5 rounded-full bg-yellow-500/10 px-4 py-1.5 text-sm font-medium text-yellow-700 dark:text-yellow-400">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-yellow-500/10 px-4 py-1.5 text-sm font-medium text-yellow-700 dark:text-yellow-400">
             <Zap className="h-4 w-4" />
             +{xpEarned} XP
           </div>
@@ -174,66 +490,55 @@ function ReviewTab({
   }
 
   const pct = Math.round((idx / total) * 100);
-  const units = { m: t("review.minutesShort"), h: t("review.hoursShort"), d: t("review.daysShort") };
 
   return (
     <div>
-      <div className="mb-6 flex items-center gap-3">
-        <div className="flex-1">
-          <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
-            <span>{t("review.progress")}</span>
-            <span className="tabular-nums">{idx} / {total}</span>
-          </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-            <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
-          </div>
+      <div className="mb-6">
+        <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
+          <span>{idx} / {total}</span>
+          {xpEarned > 0 && (
+            <span className="inline-flex items-center gap-1 font-medium text-yellow-600 dark:text-yellow-400">
+              <Zap className="h-3.5 w-3.5" />+{xpEarned}
+            </span>
+          )}
         </div>
-        {xpEarned > 0 && (
-          <div className="flex items-center gap-1 text-xs font-medium text-yellow-600 dark:text-yellow-400">
-            <Zap className="h-3.5 w-3.5" />+{xpEarned}
-          </div>
-        )}
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+          <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
+        </div>
       </div>
 
-      <div className="rounded-2xl border border-border bg-card p-8 text-center">
+      <button
+        onClick={() => setFlipped((f) => !f)}
+        className="w-full rounded-2xl border border-border bg-card p-10 text-center"
+      >
         <div className="mb-2 flex items-center justify-center gap-2">
-          <h2 className="font-serif text-4xl" dir="ltr">{current.word}</h2>
-          <SpeakIconButton word={current.word} idPrefix="review" />
+          <span className="font-serif text-4xl" dir="ltr">{current.word}</span>
+          <SpeakIconButton word={current.word} idPrefix="flash" />
         </div>
-        <p className="text-xs text-muted-foreground">
-          {t("review.nextDue")}: {formatInterval(SRS_INTERVALS_MS[Math.min(SRS_INTERVALS_MS.length - 1, (current.level ?? 0) + 1)], units)}
-        </p>
+        {current.pos && <p className="text-xs text-muted-foreground">{current.pos}</p>}
 
-        {revealed ? (
+        {flipped ? (
           <div className="mt-6 space-y-3 animate-fade-in">
             <div dir="rtl" lang="ar" className="text-2xl text-foreground">{current.ar || "—"}</div>
             <div className="text-sm text-muted-foreground" dir="ltr">{current.def}</div>
-            {current.example && (
-              <div className="border-t border-border pt-3 text-sm italic text-foreground/80" dir="ltr">
-                "{current.example}"
-              </div>
-            )}
           </div>
         ) : (
-          <button
-            onClick={() => setRevealed(true)}
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-          >
-            {t("review.showAnswer")}
-          </button>
+          <p className="mt-8 text-sm text-muted-foreground">
+            {isAr ? "اضغط لعرض المعنى" : "Tap to reveal meaning"}
+          </p>
         )}
-      </div>
+      </button>
 
-      {revealed && (
+      {flipped && (
         <div className="mt-5 grid grid-cols-3 gap-2 animate-fade-in">
           <GradeButton onClick={() => grade("again")} tone="destructive" icon={<RotateCcw className="h-4 w-4" />}>
-            {t("review.again")}
+            {isAr ? "أعيد" : "Again"}
           </GradeButton>
           <GradeButton onClick={() => grade("hard")} tone="muted">
-            {t("review.hard")}
+            {isAr ? "صعبة" : "Hard"}
           </GradeButton>
           <GradeButton onClick={() => grade("good")} tone="primary" icon={<Check className="h-4 w-4" />}>
-            {t("review.good")}
+            {isAr ? "أعرفها" : "Good"}
           </GradeButton>
         </div>
       )}
@@ -266,93 +571,7 @@ function GradeButton({
   );
 }
 
-/* ----------------------------- تبويب كل كلماتي (نُقل من صفحة كلماتي) ----------------------------- */
-
-function BrowseTab({
-  vocab,
-  setVocab,
-}: {
-  vocab: SavedWord[];
-  setVocab: (v: SavedWord[] | ((prev: SavedWord[]) => SavedWord[])) => void;
-}) {
-  const { t, dir } = useT();
-  const isRtl = dir === "rtl";
-  const [query, setQuery] = useState("");
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const list = [...vocab].sort((a, b) => b.at - a.at);
-    if (!q) return list;
-    return list.filter(
-      (v) => v.word.toLowerCase().includes(q) || v.ar.includes(q) || v.def.toLowerCase().includes(q),
-    );
-  }, [vocab, query]);
-
-  if (vocab.length === 0) {
-    return (
-      <div className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground">
-        <p className="mb-2">{t("vocab.empty")}</p>
-        <p className="text-sm">{t("vocab.emptyHint")}</p>
-        <Link
-          to="/library"
-          className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-        >
-          <BookOpen className="h-4 w-4" /> {t("vocab.browse")}
-        </Link>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <div className={`mb-6 flex items-center gap-2 rounded-full border border-border bg-card ${isRtl ? "pr-3 pl-2" : "pl-3 pr-2"}`}>
-        <Search className="h-4 w-4 text-muted-foreground" />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={t("vocab.searchPh")}
-          className={`h-10 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground ${isRtl ? "text-right" : "text-left"}`}
-        />
-      </div>
-
-      <ul className="space-y-2">
-        {filtered.map((v) => {
-          const story = stories.find((s) => s.slug === v.slug);
-          return (
-            <li key={`${v.slug}:${v.word}`} className="rounded-xl border border-border bg-card p-4 transition-shadow hover:shadow-sm">
-              <div className="flex items-baseline justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="font-serif text-xl" dir="ltr">{v.word}</span>
-                  <SpeakIconButton word={v.word} idPrefix="browse" />
-                </div>
-                <span dir="rtl" lang="ar" className="text-base text-foreground/85">{v.ar}</span>
-              </div>
-              <p className="mt-1 text-sm text-muted-foreground">{v.def}</p>
-              {v.example && <p className="mt-2 text-sm italic text-foreground/75" dir="ltr">"{v.example}"</p>}
-              <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-                <span className="truncate">{t("vocab.fromStory")}: {story?.title ?? v.slug}</span>
-                <button
-                  onClick={() => setVocab((prev) => prev.filter((x) => !(x.word === v.word && x.slug === v.slug)))}
-                  className="inline-flex shrink-0 items-center gap-1 rounded px-2 py-1 hover:bg-muted hover:text-destructive"
-                  aria-label={`Remove ${v.word}`}
-                >
-                  <Trash2 className="h-3.5 w-3.5" /> {t("vocab.delete")}
-                </button>
-              </div>
-            </li>
-          );
-        })}
-        {filtered.length === 0 && (
-          <li className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-            {t("vocab.noMatch")}
-          </li>
-        )}
-      </ul>
-    </div>
-  );
-}
-
-/* ----------------------------- تبويب الاختبار (جديد) ----------------------------- */
+/* ----------------------------- تبويب الاختبار (Multiple choice) ----------------------------- */
 
 interface QuizQuestion {
   key: string;
@@ -530,7 +749,7 @@ function SpeakIconButton({ word, idPrefix }: { word: string; idPrefix: string })
   return (
     <button
       onClick={() => toggle(word, "en-US")}
-      className={`rounded-full p-1 transition-colors ${speaking ? "text-primary bg-primary/10" : "text-muted-foreground hover:bg-muted hover:text-primary"}`}
+      className={`grid h-9 w-9 shrink-0 place-items-center rounded-full transition-colors ${speaking ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-primary"}`}
       aria-label={speaking ? t("vocab.stopSpeak") : t("vocab.speak")}
       title={speaking ? t("vocab.stopSpeak") : t("vocab.speak")}
     >
