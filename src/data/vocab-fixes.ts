@@ -1,5 +1,4 @@
- (المصدر الموثوق للمعاني)
-// لا تعدل هذا الملف يدويًا — إذا احتجت تصحيح كلمة، أضفها هنا مباشرة
+
 export const VOCAB_FIXES: Record<string, Record<string, string>> = {
   A1: {
     "about": "تقريبا ً /حوالي / عن",
