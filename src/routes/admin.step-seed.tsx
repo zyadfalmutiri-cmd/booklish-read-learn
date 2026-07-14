@@ -8,7 +8,7 @@ import {
 import type { ParsedVocabPair } from "@/types/step-vocab";
 
 // ⚠️ بدّل هذا بإيميلك الفعلي — حماية بسيطة عشان محد غيرك يفتح الصفحة
-const ADMIN_EMAIL = "your-email@example.com";
+const ADMIN_EMAIL = "zyadf.almutiri@gmail.com";
 
 export const Route = createFileRoute("/admin/step-seed")({
   component: StepSeedAdminPage,
