@@ -1,3 +1,4 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
@@ -13,6 +14,7 @@ import {
   CalendarCheck,
   Timer,
   BarChart3,
+  MessageSquareText, // ← جديد
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useT } from "@/lib/i18n";
@@ -24,6 +26,7 @@ export const Route = createFileRoute("/step")({
 });
 
 const sections = [
+  { icon: MessageSquareText, ar: "عبارات يومية", en: "Daily Phrases", to: "/step/daily-phrases" },
   { icon: BookOpen, ar: "القراءة", en: "Reading" },
   { icon: SpellCheck, ar: "القواعد", en: "Grammar" },
   { icon: ListChecks, ar: "المفردات", en: "Vocabulary" },
@@ -100,24 +103,49 @@ function StepPrepPage() {
       )}
 
       <div className="grid grid-cols-2 gap-3">
-        {sections.map(({ icon: Icon, ar, en }) => (
-          <div
-            key={en}
-            className="relative flex flex-col items-start gap-2 rounded-2xl border border-border bg-background p-4 opacity-60"
-          >
-            <span className="absolute end-3 top-3 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-              {isAr ? "قريبًا" : "Soon"}
-            </span>
-            <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
-              <Icon className="h-5 w-5" />
-            </div>
-            <span className="text-sm font-medium text-foreground">
-              {isAr ? ar : en}
-            </span>
-          </div>
-        ))}
+  {sections.map((section) => {
+    const { icon: Icon, ar, en } = section;
+    const to = "to" in section ? section.to : undefined;
+
+    const cardContent = (
+      <>
+        {!to && (
+          <span className="absolute end-3 top-3 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+            {isAr ? "قريبًا" : "Soon"}
+          </span>
+        )}
+        <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
+          <Icon className="h-5 w-5" />
+        </div>
+        <span className="text-sm font-medium text-foreground">
+          {isAr ? ar : en}
+        </span>
+      </>
+    );
+
+    if (to) {
+      return (
+        <Link
+          key={en}
+          to={to}
+          className="relative flex flex-col items-start gap-2 rounded-2xl border border-border bg-background p-4 transition-colors hover:bg-muted"
+        >
+          {cardContent}
+        </Link>
+      );
+    }
+
+    return (
+      <div
+        key={en}
+        className="relative flex flex-col items-start gap-2 rounded-2xl border border-border bg-background p-4 opacity-60"
+      >
+        {cardContent}
       </div>
-    </div>
+    );
+  })}
+</div>
+
   );
 }
 
