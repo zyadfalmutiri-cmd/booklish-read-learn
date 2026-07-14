@@ -9,21 +9,37 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VocabGamesRouteImport } from './routes/vocab-games'
 import { Route as VocabRouteImport } from './routes/vocab'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RefundRouteImport } from './routes/refund'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StorySlugRouteImport } from './routes/story.$slug'
+import { Route as ShadowSlugRouteImport } from './routes/shadow.$slug'
 import { Route as ReadSlugRouteImport } from './routes/read.$slug'
 import { Route as QuizSlugRouteImport } from './routes/quiz.$slug'
+import { Route as ListenSlugRouteImport } from './routes/listen.$slug'
 
+const VocabGamesRoute = VocabGamesRouteImport.update({
+  id: '/vocab-games',
+  path: '/vocab-games',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VocabRoute = VocabRouteImport.update({
   id: '/vocab',
   path: '/vocab',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReviewRoute = ReviewRouteImport.update({
@@ -34,6 +50,16 @@ const ReviewRoute = ReviewRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefundRoute = RefundRouteImport.update({
+  id: '/refund',
+  path: '/refund',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -66,6 +92,11 @@ const StorySlugRoute = StorySlugRouteImport.update({
   path: '/story/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShadowSlugRoute = ShadowSlugRouteImport.update({
+  id: '/shadow/$slug',
+  path: '/shadow/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReadSlugRoute = ReadSlugRouteImport.update({
   id: '/read/$slug',
   path: '/read/$slug',
@@ -76,6 +107,11 @@ const QuizSlugRoute = QuizSlugRouteImport.update({
   path: '/quiz/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ListenSlugRoute = ListenSlugRouteImport.update({
+  id: '/listen/$slug',
+  path: '/listen/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -83,11 +119,17 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/library': typeof LibraryRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/review': typeof ReviewRoute
+  '/terms': typeof TermsRoute
   '/vocab': typeof VocabRoute
+  '/vocab-games': typeof VocabGamesRoute
+  '/listen/$slug': typeof ListenSlugRoute
   '/quiz/$slug': typeof QuizSlugRoute
   '/read/$slug': typeof ReadSlugRoute
+  '/shadow/$slug': typeof ShadowSlugRoute
   '/story/$slug': typeof StorySlugRoute
 }
 export interface FileRoutesByTo {
@@ -96,11 +138,17 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/library': typeof LibraryRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/review': typeof ReviewRoute
+  '/terms': typeof TermsRoute
   '/vocab': typeof VocabRoute
+  '/vocab-games': typeof VocabGamesRoute
+  '/listen/$slug': typeof ListenSlugRoute
   '/quiz/$slug': typeof QuizSlugRoute
   '/read/$slug': typeof ReadSlugRoute
+  '/shadow/$slug': typeof ShadowSlugRoute
   '/story/$slug': typeof StorySlugRoute
 }
 export interface FileRoutesById {
@@ -110,11 +158,17 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/library': typeof LibraryRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/review': typeof ReviewRoute
+  '/terms': typeof TermsRoute
   '/vocab': typeof VocabRoute
+  '/vocab-games': typeof VocabGamesRoute
+  '/listen/$slug': typeof ListenSlugRoute
   '/quiz/$slug': typeof QuizSlugRoute
   '/read/$slug': typeof ReadSlugRoute
+  '/shadow/$slug': typeof ShadowSlugRoute
   '/story/$slug': typeof StorySlugRoute
 }
 export interface FileRouteTypes {
@@ -125,11 +179,17 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/library'
     | '/pricing'
+    | '/privacy'
+    | '/refund'
     | '/reset-password'
     | '/review'
+    | '/terms'
     | '/vocab'
+    | '/vocab-games'
+    | '/listen/$slug'
     | '/quiz/$slug'
     | '/read/$slug'
+    | '/shadow/$slug'
     | '/story/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -138,11 +198,17 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/library'
     | '/pricing'
+    | '/privacy'
+    | '/refund'
     | '/reset-password'
     | '/review'
+    | '/terms'
     | '/vocab'
+    | '/vocab-games'
+    | '/listen/$slug'
     | '/quiz/$slug'
     | '/read/$slug'
+    | '/shadow/$slug'
     | '/story/$slug'
   id:
     | '__root__'
@@ -151,11 +217,17 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/library'
     | '/pricing'
+    | '/privacy'
+    | '/refund'
     | '/reset-password'
     | '/review'
+    | '/terms'
     | '/vocab'
+    | '/vocab-games'
+    | '/listen/$slug'
     | '/quiz/$slug'
     | '/read/$slug'
+    | '/shadow/$slug'
     | '/story/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -165,21 +237,41 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   LibraryRoute: typeof LibraryRoute
   PricingRoute: typeof PricingRoute
+  PrivacyRoute: typeof PrivacyRoute
+  RefundRoute: typeof RefundRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ReviewRoute: typeof ReviewRoute
+  TermsRoute: typeof TermsRoute
   VocabRoute: typeof VocabRoute
+  VocabGamesRoute: typeof VocabGamesRoute
+  ListenSlugRoute: typeof ListenSlugRoute
   QuizSlugRoute: typeof QuizSlugRoute
   ReadSlugRoute: typeof ReadSlugRoute
+  ShadowSlugRoute: typeof ShadowSlugRoute
   StorySlugRoute: typeof StorySlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/vocab-games': {
+      id: '/vocab-games'
+      path: '/vocab-games'
+      fullPath: '/vocab-games'
+      preLoaderRoute: typeof VocabGamesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/vocab': {
       id: '/vocab'
       path: '/vocab'
       fullPath: '/vocab'
       preLoaderRoute: typeof VocabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/review': {
@@ -194,6 +286,20 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refund': {
+      id: '/refund'
+      path: '/refund'
+      fullPath: '/refund'
+      preLoaderRoute: typeof RefundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -238,6 +344,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shadow/$slug': {
+      id: '/shadow/$slug'
+      path: '/shadow/$slug'
+      fullPath: '/shadow/$slug'
+      preLoaderRoute: typeof ShadowSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/read/$slug': {
       id: '/read/$slug'
       path: '/read/$slug'
@@ -252,6 +365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QuizSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/listen/$slug': {
+      id: '/listen/$slug'
+      path: '/listen/$slug'
+      fullPath: '/listen/$slug'
+      preLoaderRoute: typeof ListenSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -261,11 +381,17 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   LibraryRoute: LibraryRoute,
   PricingRoute: PricingRoute,
+  PrivacyRoute: PrivacyRoute,
+  RefundRoute: RefundRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ReviewRoute: ReviewRoute,
+  TermsRoute: TermsRoute,
   VocabRoute: VocabRoute,
+  VocabGamesRoute: VocabGamesRoute,
+  ListenSlugRoute: ListenSlugRoute,
   QuizSlugRoute: QuizSlugRoute,
   ReadSlugRoute: ReadSlugRoute,
+  ShadowSlugRoute: ShadowSlugRoute,
   StorySlugRoute: StorySlugRoute,
 }
 export const routeTree = rootRouteImport
