@@ -2,65 +2,28 @@ import { createServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import type { ParsedVocabPair } from "@/types/step-vocab";
 
-const GEMINI_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
-
-async function callGemini(prompt: string, retries = 3): Promise<string> {
-  const res = await fetch(`${GEMINI_URL}?key=${process.env.GEMINI_API_KEY}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-    }),
+// ─── Google Translate (مجاني، بدون مفتاح) ───
+async function googleTranslate(
+  text: string,
+  from = "en",
+  to = "ar"
+): Promise<string> {
+  const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`;
+  const res = await fetch(url, {
+    headers: { "User-Agent": "Mozilla/5.0" },
   });
-  const data = await res.json();
-
-  // لو تجاوزنا حد الاستخدام (429)، ننتظر ونعيد المحاولة
-  if (data?.error?.code === 429 && retries > 0) {
-    const delaySeconds =
-      data.error.details?.find((d: any) => d["@type"]?.includes("RetryInfo"))
-        ?.retryDelay ?? "20s";
-    const waitMs = (parseInt(delaySeconds) || 20) * 1000 + 2000;
-    console.log(`Rate limited, waiting ${waitMs}ms before retry...`);
-    await new Promise((r) => setTimeout(r, waitMs));
-    return callGemini(prompt, retries - 1);
-  }
-
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-  if (!text) {
-    console.error("Gemini raw response:", JSON.stringify(data));
-  }
-
-  return text?.trim() ?? "";
+  if (!res.ok) throw new Error(`Google Translate error: ${res.status}`);
+  const json = await res.json();
+  const translated =
+    json?.[0]?.map((x: unknown[]) => x?.[0]).filter(Boolean).join("") ?? "";
+  return translated.trim();
 }
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-export const parseVocabChunk = createServerFn({ method: "POST" })
-  .inputValidator((data: { rawText: string }) => data)
-  .handler(async ({ data }): Promise<ParsedVocabPair[]> => {
-    const prompt = `From the following messy extracted text (English word list with Arabic meanings and English example sentences mixed together), extract ONLY the English word/phrase and its English example sentence for each entry. Ignore the Arabic meaning column completely — it may be corrupted.
-
-Return ONLY a valid JSON array, no markdown, no explanation, in this exact format:
-[{"word":"example word","example":"Example sentence here."}]
-
-Text:
-${data.rawText}`;
-
-    const raw = await callGemini(prompt);
-    const cleaned = raw.replace(/```json|```/g, "").trim();
-    try {
-      const parsed = JSON.parse(cleaned);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (err) {
-      console.error("Parse error:", err, cleaned);
-      return [];
-    }
-  });
-
+// ─── تخزين الكلمات + ترجمتها (بدون أي AI) ───
 export const seedVocabBatch = createServerFn({ method: "POST" })
   .inputValidator(
     (data: {
@@ -74,14 +37,7 @@ export const seedVocabBatch = createServerFn({ method: "POST" })
 
     for (const item of data.items) {
       try {
-        const prompt = `أعطني المعنى العربي المختصر (كلمة أو كلمتين فقط، بدون أي شرح إضافي) للكلمة الإنجليزية التالية بناءً على السياق:
-
-الكلمة: ${item.word}
-المثال: ${item.example}
-
-اكتب فقط المعنى العربي، بدون أي نص إضافي.`;
-
-        const meaning = await callGemini(prompt);
+        const meaning = await googleTranslate(item.word);
 
         const { error } = await supabase.from("step_vocabulary").upsert(
           {
@@ -101,7 +57,7 @@ export const seedVocabBatch = createServerFn({ method: "POST" })
         console.error(`Failed for word "${item.word}":`, err);
         results.push({ word: item.word, ok: false });
       }
-      await sleep(2000); // ثانيتين بين كل كلمة عشان حد 5 طلبات/دقيقة
+      await sleep(250);
     }
 
     return results;
