@@ -25,9 +25,11 @@ function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+// يصير:
 export const parseVocabChunk = createServerFn({ method: "POST" })
-  .validator((data: { rawText: string }) => data)
+  .inputValidator((data: { rawText: string }) => data)
   .handler(async ({ data }): Promise<ParsedVocabPair[]> => {
+
     const prompt = `From the following messy extracted text (English word list with Arabic meanings and English example sentences mixed together), extract ONLY the English word/phrase and its English example sentence for each entry. Ignore the Arabic meaning column completely — it may be corrupted.
 
 Return ONLY a valid JSON array, no markdown, no explanation, in this exact format:
@@ -47,8 +49,10 @@ ${data.rawText}`;
     }
   });
 
+// يصير:
 export const seedVocabBatch = createServerFn({ method: "POST" })
-  .validator(
+  .inputValidator(
+
     (data: {
       items: ParsedVocabPair[];
       source: "daily800" | "oxford3000";
