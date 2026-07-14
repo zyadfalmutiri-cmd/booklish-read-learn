@@ -5,18 +5,26 @@ import type { ParsedVocabPair } from "@/types/step-vocab";
 const GEMINI_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
-async function callGemini(prompt: string): Promise<string> {
-  const res = await fetch(
-    `${GEMINI_URL}?key=${process.env.GEMINI_API_KEY}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-      }),
-    }
-  );
+async function callGemini(prompt: string, retries = 3): Promise<string> {
+  const res = await fetch(`${GEMINI_URL}?key=${process.env.GEMINI_API_KEY}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+    }),
+  });
   const data = await res.json();
+
+  // لو تجاوزنا حد الاستخدام (429)، ننتظر ونعيد المحاولة
+  if (data?.error?.code === 429 && retries > 0) {
+    const delaySeconds =
+      data.error.details?.find((d: any) => d["@type"]?.includes("RetryInfo"))
+        ?.retryDelay ?? "20s";
+    const waitMs = (parseInt(delaySeconds) || 20) * 1000 + 2000;
+    console.log(`Rate limited, waiting ${waitMs}ms before retry...`);
+    await new Promise((r) => setTimeout(r, waitMs));
+    return callGemini(prompt, retries - 1);
+  }
 
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
@@ -93,7 +101,7 @@ export const seedVocabBatch = createServerFn({ method: "POST" })
         console.error(`Failed for word "${item.word}":`, err);
         results.push({ word: item.word, ok: false });
       }
-      await sleep(400);
+      await sleep(2000); // ثانيتين بين كل كلمة عشان حد 5 طلبات/دقيقة
     }
 
     return results;
