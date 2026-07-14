@@ -1,11 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { parseVocabChunk, seedVocabBatch } from "@/lib/api/step-vocab-admin";
+import {
+  parseVocabChunk,
+  seedVocabBatch,
+} from "@/lib/api/step-vocab-admin";
 import type { ParsedVocabPair } from "@/types/step-vocab";
 
-// ⚠️ بدّل هذا بإيميلك الفعلي — حماية بسيطة عشان محد غيرك يفتح الصفحة
-const ADMIN_EMAIL = "zyadf.almutiri@gmail.com";
+// ⚠️ بدّل هذا بإيميلك الفعلي
+const ADMIN_EMAIL = "your-email@example.com";
 
 export const Route = createFileRoute("/admin/step-seed")({
   component: StepSeedAdminPage,
@@ -36,7 +39,6 @@ function StepSeedAdminPage() {
     setParsed([]);
     setLog([]);
     try {
-      // نقسم النص لمقاطع كل ~4000 حرف عشان ما نتجاوز حد الموديل
       const chunks: string[] = [];
       for (let i = 0; i < rawText.length; i += 4000) {
         chunks.push(rawText.slice(i, i + 4000));
@@ -47,6 +49,7 @@ function StepSeedAdminPage() {
         addLog(`تحليل الجزء ${i + 1}/${chunks.length}...`);
         const result = await parseVocabChunk({ data: { rawText: chunks[i] } });
         all = [...all, ...result];
+        await new Promise((r) => setTimeout(r, 3000)); // انتظار بين الأجزاء
       }
 
       setParsed(all);
