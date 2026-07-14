@@ -13,7 +13,7 @@ import {
   CalendarCheck,
   Timer,
   BarChart3,
-  MessageSquareText, // ← جديد
+  MessageSquareText,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useT } from "@/lib/i18n";
@@ -24,8 +24,20 @@ export const Route = createFileRoute("/step")({
   component: StepPrepPage,
 });
 
-const sections = [
-  { icon: MessageSquareText, ar: "عبارات يومية", en: "Daily Phrases", to: "/step/daily-phrases" },
+type StepSection = {
+  icon: typeof BookOpen;
+  ar: string;
+  en: string;
+  to?: string;
+};
+
+const sections: StepSection[] = [
+  {
+    icon: MessageSquareText,
+    ar: "عبارات يومية",
+    en: "Daily Phrases",
+    to: "/step/daily-phrases",
+  },
   { icon: BookOpen, ar: "القراءة", en: "Reading" },
   { icon: SpellCheck, ar: "القواعد", en: "Grammar" },
   { icon: ListChecks, ar: "المفردات", en: "Vocabulary" },
@@ -34,7 +46,7 @@ const sections = [
   { icon: CalendarCheck, ar: "التحدي اليومي", en: "Daily Challenge" },
   { icon: Timer, ar: "اختبار تجريبي", en: "Mock Exam" },
   { icon: BarChart3, ar: "الإحصائيات", en: "Statistics" },
-] as const;
+];
 
 function StepPrepPage() {
   const { user } = useAuth();
@@ -102,49 +114,48 @@ function StepPrepPage() {
       )}
 
       <div className="grid grid-cols-2 gap-3">
-  {sections.map((section) => {
-    const { icon: Icon, ar, en } = section;
-    const to = "to" in section ? section.to : undefined;
+        {sections.map((section) => {
+          const { icon: Icon, ar, en, to } = section;
 
-    const cardContent = (
-      <>
-        {!to && (
-          <span className="absolute end-3 top-3 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-            {isAr ? "قريبًا" : "Soon"}
-          </span>
-        )}
-        <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
-          <Icon className="h-5 w-5" />
-        </div>
-        <span className="text-sm font-medium text-foreground">
-          {isAr ? ar : en}
-        </span>
-      </>
-    );
+          const inner = (
+            <>
+              {!to && (
+                <span className="absolute end-3 top-3 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                  {isAr ? "قريبًا" : "Soon"}
+                </span>
+              )}
+              <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
+                <Icon className="h-5 w-5" />
+              </div>
+              <span className="text-sm font-medium text-foreground">
+                {isAr ? ar : en}
+              </span>
+            </>
+          );
 
-    if (to) {
-      return (
-        <Link
-          key={en}
-          to={to}
-          className="relative flex flex-col items-start gap-2 rounded-2xl border border-border bg-background p-4 transition-colors hover:bg-muted"
-        >
-          {cardContent}
-        </Link>
-      );
-    }
+          if (to) {
+            return (
+              <Link
+                key={en}
+                to={to}
+                className="relative flex flex-col items-start gap-2 rounded-2xl border border-border bg-background p-4 transition-colors hover:bg-muted"
+              >
+                {inner}
+              </Link>
+            );
+          }
 
-    return (
-      <div
-        key={en}
-        className="relative flex flex-col items-start gap-2 rounded-2xl border border-border bg-background p-4 opacity-60"
-      >
-        {cardContent}
+          return (
+            <div
+              key={en}
+              className="relative flex flex-col items-start gap-2 rounded-2xl border border-border bg-background p-4 opacity-60"
+            >
+              {inner}
+            </div>
+          );
+        })}
       </div>
-    );
-  })}
-</div>
-
+    </div>
   );
 }
 
