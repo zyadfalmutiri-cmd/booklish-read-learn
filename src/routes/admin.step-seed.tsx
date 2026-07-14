@@ -1,10 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import {
-  parseVocabChunk,
-  seedVocabBatch,
-} from "@/lib/api/step-vocab-admin.server";
+import { parseVocabChunk, seedVocabBatch } from "@/lib/api/step-vocab-admin";
 import type { ParsedVocabPair } from "@/types/step-vocab";
 
 // ⚠️ بدّل هذا بإيميلك الفعلي — حماية بسيطة عشان محد غيرك يفتح الصفحة
