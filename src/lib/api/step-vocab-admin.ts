@@ -2,34 +2,38 @@ import { createServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import type { ParsedVocabPair } from "@/types/step-vocab";
 
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "google/gemini-2.5-flash:free";
+const GEMINI_URL =
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
-async function callOpenRouter(prompt: string): Promise<string> {
-  const res = await fetch(OPENROUTER_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [{ role: "user", content: prompt }],
-    }),
-  });
+async function callGemini(prompt: string): Promise<string> {
+  const res = await fetch(
+    `${GEMINI_URL}?key=${process.env.GEMINI_API_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+      }),
+    }
+  );
   const data = await res.json();
-  return data?.choices?.[0]?.message?.content?.trim() ?? "";
+
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+  if (!text) {
+    console.error("Gemini raw response:", JSON.stringify(data));
+  }
+
+  return text?.trim() ?? "";
 }
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-// يصير:
 export const parseVocabChunk = createServerFn({ method: "POST" })
   .inputValidator((data: { rawText: string }) => data)
   .handler(async ({ data }): Promise<ParsedVocabPair[]> => {
-
     const prompt = `From the following messy extracted text (English word list with Arabic meanings and English example sentences mixed together), extract ONLY the English word/phrase and its English example sentence for each entry. Ignore the Arabic meaning column completely — it may be corrupted.
 
 Return ONLY a valid JSON array, no markdown, no explanation, in this exact format:
@@ -38,7 +42,7 @@ Return ONLY a valid JSON array, no markdown, no explanation, in this exact forma
 Text:
 ${data.rawText}`;
 
-    const raw = await callOpenRouter(prompt);
+    const raw = await callGemini(prompt);
     const cleaned = raw.replace(/```json|```/g, "").trim();
     try {
       const parsed = JSON.parse(cleaned);
@@ -49,10 +53,8 @@ ${data.rawText}`;
     }
   });
 
-// يصير:
 export const seedVocabBatch = createServerFn({ method: "POST" })
   .inputValidator(
-
     (data: {
       items: ParsedVocabPair[];
       source: "daily800" | "oxford3000";
@@ -71,7 +73,7 @@ export const seedVocabBatch = createServerFn({ method: "POST" })
 
 اكتب فقط المعنى العربي، بدون أي نص إضافي.`;
 
-        const meaning = await callOpenRouter(prompt);
+        const meaning = await callGemini(prompt);
 
         const { error } = await supabase.from("step_vocabulary").upsert(
           {
