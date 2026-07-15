@@ -2,6 +2,7 @@ import {
   Moon,
   Sun,
   BookOpen,
+  BookOpenText,
   Languages,
   LogOut,
   LogIn,
@@ -38,6 +39,7 @@ const bottomTabs = [
 const menuLinks = [
   { to: "/", labelAr: "الرئيسية", labelEn: "Home", icon: Home },
   { to: "/step", labelAr: "التحضير لـ STEP", labelEn: "STEP Prep", icon: GraduationCap },
+  { to: "/oxford3000", labelAr: "أهم 3000 كلمة", labelEn: "Top 3000 Words", icon: BookOpenText },
   { to: "/vocab-games", labelAr: "ألعاب المفردات", labelEn: "Vocabulary Games", icon: Brain },
 ] as const;
 
@@ -157,7 +159,7 @@ export function Header() {
         </div>
       </header>
 
-      {/* ☰ menu — extra items (Home + STEP + Vocabulary Games) */}
+      {/* ☰ menu — extra items (Home + STEP + Top 3000 Words + Vocabulary Games) */}
       {mobileOpen && (
         <div
           className="fixed inset-0 top-14 z-40 bg-background/95 backdrop-blur-sm sm:hidden"
