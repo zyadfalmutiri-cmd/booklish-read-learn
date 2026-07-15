@@ -50,6 +50,14 @@ function Oxford3000Page() {
       .eq("source", "oxford3000")
       .order("word", { ascending: true })
       .then(({ data, error }) => {
+        // TEMPORARY DIAGNOSTIC — remove after we find the issue
+        if (error) {
+          console.error("SUPABASE ERROR:", error);
+          alert("Supabase error: " + JSON.stringify(error));
+        } else {
+          console.log("SUPABASE DATA COUNT:", data?.length);
+          alert("Fetched rows: " + (data?.length ?? 0));
+        }
         if (!error && data) setItems(data as StepVocabItem[]);
         setLoading(false);
       });
