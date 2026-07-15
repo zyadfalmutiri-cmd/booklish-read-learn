@@ -37,7 +37,8 @@ const sections: StepSection[] = [
     icon: MessageSquareText,
     ar: "عبارات يومية",
     en: "Daily Phrases",
-    to: "/step/daily-phrases",
+to: "/daily-phrases",
+
   },
   {
     icon: BookOpenText,
