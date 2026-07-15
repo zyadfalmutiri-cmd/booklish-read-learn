@@ -42,9 +42,7 @@ function DailyPhrasesPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 pb-24">
       <Link
-to: "/daily-phrases",
-
-
+        to="/step"
         className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowRight className="h-4 w-4" />
