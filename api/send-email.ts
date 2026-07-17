@@ -25,8 +25,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const rawBody = await getRawBody(req);
 
     // التحقق من التوقيع بمعيار Standard Webhooks
-    const webhookSecret = process.env.WEBHOOK_SECRET as string;
-    const wh = new Webhook(webhookSecret);
+    const webhookSecret = (process.env.WEBHOOK_SECRET as string).replace('v1,whsec_', '');
+const wh = new Webhook(webhookSecret);
+
 
     let payload: any;
     try {
