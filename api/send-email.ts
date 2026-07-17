@@ -1,24 +1,41 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import nodemailer from 'nodemailer';
+import { Webhook } from 'standardwebhooks';
+
+export const config = {
+  api: {
+    bodyParser: false, // نحتاج الـ raw body عشان نتحقق من التوقيع بشكل صحيح
+  },
+};
+
+async function getRawBody(req: VercelRequest): Promise<string> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks).toString('utf8');
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // نسمح فقط بطلبات POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    // التحقق من الأمان: نتأكد إن الطلب جاي من Supabase فعلاً
-    const incomingSecret = req.headers['webhook-signature'] || req.headers['x-webhook-secret'];
-    const expectedSecret = process.env.WEBHOOK_SECRET;
+    const rawBody = await getRawBody(req);
 
-    if (!expectedSecret || incomingSecret !== expectedSecret) {
-      console.log('Webhook secret mismatch or missing');
-      return res.status(401).json({ error: 'Unauthorized' });
+    // التحقق من التوقيع بمعيار Standard Webhooks
+    const webhookSecret = process.env.WEBHOOK_SECRET as string;
+    const wh = new Webhook(webhookSecret);
+
+    let payload: any;
+    try {
+      payload = wh.verify(rawBody, req.headers as Record<string, string>);
+    } catch (err) {
+      console.log('Webhook signature verification failed:', err);
+      return res.status(401).json({ error: 'Invalid signature' });
     }
 
-    // استخراج البيانات من الطلب اللي يرسله Supabase
-    const payload = req.body;
     const userEmail = payload?.user?.email;
     const emailData = payload?.email_data;
 
@@ -30,10 +47,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { token_hash, redirect_to, email_action_type } = emailData;
     const supabaseUrl = process.env.SUPABASE_URL;
 
-    // بناء رابط التأكيد
     const confirmUrl = `${supabaseUrl}/auth/v1/verify?token=${token_hash}&type=${email_action_type}&redirect_to=${encodeURIComponent(redirect_to || '')}`;
 
-    // تجهيز محتوى الإيميل حسب نوع العملية
     let subject = 'تأكيد حسابك في Booklish';
     let actionText = 'تأكيد الحساب';
 
@@ -65,7 +80,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       </div>
     `;
 
-    // إعداد Nodemailer عبر Gmail SMTP
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -74,7 +88,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
     });
 
-    // إرسال الإيميل فعليًا
     await transporter.sendMail({
       from: `"Booklish" <${process.env.GMAIL_USER}>`,
       to: userEmail,
