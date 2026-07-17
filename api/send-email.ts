@@ -48,7 +48,8 @@ const wh = new Webhook(webhookSecret);
     const { token_hash, redirect_to, email_action_type } = emailData;
     const supabaseUrl = process.env.SUPABASE_URL;
 
-    const confirmUrl = `${supabaseUrl}/auth/v1/verify?token=${token_hash}&type=${email_action_type}&redirect_to=${encodeURIComponent(redirect_to || '')}`;
+const confirmUrl = `${supabaseUrl}/auth/v1/verify?token_hash=${token_hash}&type=${email_action_type}&redirect_to=${encodeURIComponent(redirect_to || '')}`;
+
 
     let subject = 'تأكيد حسابك في Booklish';
     let actionText = 'تأكيد الحساب';
