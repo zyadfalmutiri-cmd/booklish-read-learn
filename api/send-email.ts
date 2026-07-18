@@ -4,7 +4,7 @@ import { Webhook } from 'standardwebhooks';
 
 export const config = {
   api: {
-    bodyParser: false, // نحتاج الـ raw body عشان نتحقق من التوقيع بشكل صحيح
+    bodyParser: false,
   },
 };
 
@@ -24,10 +24,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const rawBody = await getRawBody(req);
 
-    // التحقق من التوقيع بمعيار Standard Webhooks
     const webhookSecret = (process.env.WEBHOOK_SECRET as string).replace('v1,whsec_', '');
-const wh = new Webhook(webhookSecret);
-
+    const wh = new Webhook(webhookSecret);
 
     let payload: any;
     try {
@@ -46,18 +44,14 @@ const wh = new Webhook(webhookSecret);
     }
 
     const { token_hash, redirect_to, email_action_type } = emailData;
-const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseUrl = process.env.SUPABASE_URL;
 
-console.log('DEBUG email_data:', JSON.stringify(emailData));
-console.log('DEBUG token_hash value:', token_hash);
+    console.log('DEBUG email_data:', JSON.stringify(emailData));
+    console.log('DEBUG token_hash value:', token_hash);
 
-const confirmUrl = `${supabaseUrl}/auth/v1/verify?token_hash=${token_hash}&type=${email_action_type}&redirect_to=${encodeURIComponent(redirect_to || '')}`;
+    const confirmUrl = `${supabaseUrl}/auth/v1/verify?token_hash=${token_hash}&type=${email_action_type}&redirect_to=${encodeURIComponent(redirect_to || '')}`;
 
-console.log('DEBUG confirmUrl:', confirmUrl);
-
-
-const confirmUrl = `${supabaseUrl}/auth/v1/verify?token_hash=${token_hash}&type=${email_action_type}&redirect_to=${encodeURIComponent(redirect_to || '')}`;
-
+    console.log('DEBUG confirmUrl:', confirmUrl);
 
     let subject = 'تأكيد حسابك في Booklish';
     let actionText = 'تأكيد الحساب';
