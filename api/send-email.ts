@@ -46,7 +46,15 @@ const wh = new Webhook(webhookSecret);
     }
 
     const { token_hash, redirect_to, email_action_type } = emailData;
-    const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseUrl = process.env.SUPABASE_URL;
+
+console.log('DEBUG email_data:', JSON.stringify(emailData));
+console.log('DEBUG token_hash value:', token_hash);
+
+const confirmUrl = `${supabaseUrl}/auth/v1/verify?token_hash=${token_hash}&type=${email_action_type}&redirect_to=${encodeURIComponent(redirect_to || '')}`;
+
+console.log('DEBUG confirmUrl:', confirmUrl);
+
 
 const confirmUrl = `${supabaseUrl}/auth/v1/verify?token_hash=${token_hash}&type=${email_action_type}&redirect_to=${encodeURIComponent(redirect_to || '')}`;
 
