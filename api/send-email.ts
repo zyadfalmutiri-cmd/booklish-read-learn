@@ -50,7 +50,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('DEBUG token_hash value:', token_hash);
 
 const siteUrl = 'https://booklish-read-learn.vercel.app';
-const confirmUrl = `${siteUrl}/auth/confirm?token_hash=${token_hash}&type=${email_action_type}&redirect_to=${encodeURIComponent(redirect_to || '')}`;
+const confirmUrl = `${siteUrl}/auth-confirm?token_hash=${token_hash}&type=${email_action_type}&redirect_to=${encodeURIComponent(redirect_to || '')}`;
+
 
 
     console.log('DEBUG confirmUrl:', confirmUrl);
