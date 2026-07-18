@@ -43,12 +43,31 @@ function ConfirmPage() {
         return;
       }
 
-      setStatus("success");
-      toast.success(ar ? "تم تأكيد حسابك بنجاح" : "Account confirmed successfully");
+            setStatus("success");
+
+      // تحديد الوجهة الصحيحة حسب نوع العملية
+      let destination = "/dashboard";
+
+      if (type === "recovery") {
+        destination = "/reset-password";
+      } else if (redirect_to) {
+        try {
+          // استخراج المسار الداخلي فقط من الرابط الكامل
+          const url = new URL(redirect_to);
+          destination = url.pathname !== "/" ? url.pathname : "/dashboard";
+        } catch {
+          destination = "/dashboard";
+        }
+      }
+
+      if (type !== "recovery") {
+        toast.success(ar ? "تم تأكيد حسابك بنجاح" : "Account confirmed successfully");
+      }
 
       setTimeout(() => {
-        navigate({ to: redirect_to || "/dashboard" });
-      }, 1500);
+        navigate({ to: destination });
+      }, type === "recovery" ? 300 : 1500);
+
     };
 
     run();
