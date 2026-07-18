@@ -80,6 +80,14 @@ const confirmUrl = `${siteUrl}/auth/confirm?token_hash=${token_hash}&type=${emai
             ${actionText}
           </a>
         </div>
+        <p style="color: #666; font-size: 13px; text-align: center; margin-top: 24px;">
+          إذا لم يعمل الزر، اضغط على الرابط التالي مباشرة:
+        </p>
+        <p style="text-align: center; margin: 8px 0 24px;">
+          <a href="${confirmUrl}" style="color: #9D381F; font-size: 13px; word-break: break-all;">
+            ${confirmUrl}
+          </a>
+        </p>
         <p style="color: #888; font-size: 13px; text-align: center;">
           إذا لم تطلب هذا الإجراء، تجاهل هذا الإيميل.
         </p>
