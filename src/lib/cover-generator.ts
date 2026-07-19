@@ -79,25 +79,26 @@ export async function generateAIStoryCover(
 }
 
 /**
- * الأسلوب الفني الثابت لكل الأغلفة — رسم فلات (Flat Vector Illustration)
- * بألوان جريئة وأشكال هندسية بسيطة، بنفس أسلوب باقي أغلفة المكتبة
- * (زي أغلفة هاري بوتر وأجاثا كريستي وقصص السفر بالتطبيق). هذا الأسلوب
- * ثابت لكل القصص بغض النظر عن نوعها، عشان هوية بصرية موحدة بالمكتبة كاملة.
+ * الأسلوب الفني الثابت لكل الأغلفة — رسم رقمي غني بالتفاصيل والإضاءة
+ * (Rich Digital Illustration) بألوان دافئة وعمق وظلال ناعمة، بنفس أسلوب
+ * باقي أغلفة المكتبة (زي أغلفة هاري بوتر وأجاثا كريستي وقصص السفر
+ * "London Calling" و"Paris Awaits"). هذا الأسلوب ثابت لكل القصص بغض
+ * النظر عن نوعها، عشان هوية بصرية موحدة بالمكتبة كاملة.
  */
 const BASE_ILLUSTRATION_STYLE =
-  "flat vector illustration book cover art, minimalist flat design, bold saturated flat colors, simple clean geometric shapes, 2D graphic illustration style, modern flat book cover design, no gradients shading or realistic textures, no photorealism, no painterly brushwork, crisp clean vector shapes, limited color palette, simple silhouettes and iconic shapes";
+  "rich digital illustration book cover art, detailed painterly digital painting style, atmospheric warm lighting, soft glowing light sources, cinematic composition, deep vibrant saturated colors, subtle gradients and soft shading for depth, storybook illustration aesthetic, polished professional book cover art, high detail, evocative mood lighting";
 
 /**
  * تلميحات لوحة ألوان/مزاج حسب نوع القصة (Genre) — تعديل بسيط على لوحة
- * الألوان فقط، مع الحفاظ على نفس الأسلوب الفلات الثابت أعلاه
+ * الألوان فقط، مع الحفاظ على نفس الأسلوب الغني الثابت أعلاه
  */
 const GENRE_MOOD_MAP: Record<string, string> = {
-  "non-fiction": "warm inspiring color palette, greens and golds",
-  mystery: "dark moody color palette, deep purples and navy blues",
-  romance: "soft warm color palette, pinks and warm oranges",
-  "sci-fi": "cool futuristic color palette, blues and purples with bright accents",
-  adventure: "vibrant energetic color palette, bright blues and oranges",
-  drama: "bold contrast color palette, deep reds and dark tones",
+  "non-fiction": "warm inviting color palette, golden hour tones with deep greens and ambers",
+  mystery: "dark moody color palette, deep purples and navy blues with dramatic shadows",
+  romance: "soft warm color palette, pinks and warm oranges with gentle glow",
+  "sci-fi": "cool futuristic color palette, blues and purples with glowing bright accents",
+  adventure: "vibrant energetic color palette, bright blues and oranges with sunlit atmosphere",
+  drama: "bold contrast color palette, deep reds and dark tones with dramatic lighting",
 };
 
 /**
