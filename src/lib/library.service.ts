@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase"; // adjust to your existing client import path
+import { supabase } from "@/integrations/supabase/client";
 import type { LibraryBook, LibraryBookContent } from "@/types/library";
 
 export async function getLibraryBooks(): Promise<LibraryBook[]> {
