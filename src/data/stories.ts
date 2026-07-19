@@ -1,3 +1,16 @@
+import {
+  VitaminDSunshineVitamin,
+  QueenElizabethLongestReign,
+  Covid19GlobalPandemic,
+  BeesTinyWorkers,
+  MatryoshkaRussianDoll,
+  NanotechnologyTinyMachines,
+  MadainSalehHegra,
+  UnderstandingEmotions,
+  InflationRisingPrices,
+  ChildAggressionUnderstanding,
+} from "./stories.knowledge"; // عدّل المسار حسب مكان الملف عندك
+
 import { storyCoverUrls } from "@/data/story-covers-map";
 import { storyAudio } from "@/data/story-audio";
 import type { Story, Category } from "@/lib/types";
@@ -191,6 +204,17 @@ export const stories: Story[] = [
   GloryOfRonldo,
   messiGrowthHormone,
   DiedStanding,
+  // Knowledge / non-fiction category (10)
+  VitaminDSunshineVitamin,
+  QueenElizabethLongestReign,
+  Covid19GlobalPandemic,
+  BeesTinyWorkers,
+  MatryoshkaRussianDoll,
+  NanotechnologyTinyMachines,
+  MadainSalehHegra,
+  UnderstandingEmotions,
+  InflationRisingPrices,
+  ChildAggressionUnderstanding,
 ].map(withDefaults);
 
 
