@@ -85,7 +85,7 @@ export async function generateAIStoryCover(
  * هذا الأسلوب ثابت لكل القصص بغض النظر عن نوعها، عشان هوية بصرية موحدة.
  */
 const BASE_ILLUSTRATION_STYLE =
-  "vibrant stylized digital illustration book cover art, illustrated poster art style, NOT a photograph, not photorealistic, not realistic, simplified and stylized shapes and characters, bold saturated colors, warm atmospheric lighting with soft color gradients, clean modern illustration aesthetic similar to young-adult book cover art, richly colored illustrated scene, professional book cover design, high detail illustration";
+"vibrant stylized digital illustration book cover art, illustrated poster art style, NOT a photograph, not photorealistic, not realistic, simplified and stylized shapes and characters, bold saturated colors, warm atmospheric lighting with soft color gradients, clean modern illustration aesthetic similar to young-adult book cover art, richly colored illustrated scene, professional book cover design, high detail illustration, always include one clear symbolic focal subject prominently in the foreground that represents the story’s main theme or subject (this could be a person, an animal, an object, or an iconic symbol depending on what best fits the story), the focal subject is the clear center of the composition, with a fitting background setting behind it that matches the story’s theme"
 
 /**
  * تلميحات لوحة ألوان/مزاج حسب نوع القصة (Genre) — تعديل بسيط على لوحة
