@@ -7,7 +7,8 @@ import {
   saveReadingProgress,
 } from "@/lib/library.service";
 import type { LibraryBookContent } from "@/types/library";
-import { useAuth } from "@/hooks/useAuth"; // adjust to your existing auth hook path
+import { useAuth } from "@/hooks/use-auth";
+
 
 export const Route = createFileRoute("/library/$slug")({
   component: LibraryReaderPage,
