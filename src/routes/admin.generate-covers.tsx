@@ -13,18 +13,7 @@ export const Route = createFileRoute("/admin/generate-covers")({
 
 // ✅ حط هنا فقط الـ slugs للقصص الجديدة اللي تبي تولّد أغلفتها.
 // فرّغ المصفوفة (اتركها []) عشان تشغّل الأداة على كل القصص زي القديم.
-const NEW_STORY_SLUGS: string[] = [
-  "vitamin-d-sunshine-vitamin",
-  "queen-elizabeth-longest-reign",
-  "covid-19-global-pandemic",
-  "bees-tiny-workers",
-  "matryoshka-russian-doll",
-  "nanotechnology-tiny-machines",
-  "madain-saleh-hegra",
-  "understanding-emotions",
-  "inflation-rising-prices",
-  "child-aggression-understanding",
-];
+const NEW_STORY_SLUGS: string[] = [];
 
 interface ResultRow {
   slug: string;
