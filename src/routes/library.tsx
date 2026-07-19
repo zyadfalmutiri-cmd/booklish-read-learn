@@ -34,11 +34,15 @@ function Library() {
 
   const [fullBooks, setFullBooks] = useState<LibraryBook[]>([]);
   const [fullBooksLoading, setFullBooksLoading] = useState(true);
+  const [fullBooksError, setFullBooksError] = useState<string | null>(null);
 
   useEffect(() => {
     getLibraryBooks()
       .then(setFullBooks)
-      .catch((err) => console.error("[library] failed to load full books", err))
+      .catch((err) => {
+        console.error("[library] failed to load full books", err);
+        setFullBooksError(err?.message ?? String(err));
+      })
       .finally(() => setFullBooksLoading(false));
   }, []);
 
@@ -160,6 +164,14 @@ function Library() {
             <GenreRow key={g} title={t(`genre.${g}`)} stories={list} />
           ))}
           {sportsStories.length > 0 && <GenreRow title="رياضة" stories={sportsStories} />}
+          {!fullBooksLoading && fullBooksError && (
+            <p className="rounded-lg border border-red-400 bg-red-50 p-3 text-xs text-red-700 dir-ltr text-left">
+              library_books error: {fullBooksError}
+            </p>
+          )}
+          {!fullBooksLoading && !fullBooksError && fullBooks.length === 0 && (
+            <p className="text-xs text-muted-foreground">لا توجد كتب كاملة حالياً (fullBooks = 0)</p>
+          )}
           {!fullBooksLoading && fullBooks.length > 0 && <FullBooksRow title="روايات كاملة" books={fullBooks} />}
         </div>
       ) : filtered.length === 0 ? (
