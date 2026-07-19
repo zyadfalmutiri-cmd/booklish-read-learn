@@ -13,7 +13,18 @@ export const Route = createFileRoute("/admin/generate-covers")({
 
 // ✅ حط هنا فقط الـ slugs للقصص الجديدة اللي تبي تولّد أغلفتها.
 // فرّغ المصفوفة (اتركها []) عشان تشغّل الأداة على كل القصص زي القديم.
-const NEW_STORY_SLUGS: string[] = [];
+const NEW_STORY_SLUGS: string[] = [
+  "vitamin-d-sunshine-vitamin",
+  "queen-elizabeth-longest-reign",
+  "covid-19-global-pandemic",
+  "bees-tiny-workers",
+  "matryoshka-russian-doll",
+  "nanotechnology-tiny-machines",
+  "madain-saleh-hegra",
+  "understanding-emotions",
+  "inflation-rising-prices",
+  "child-aggression-understanding",
+];
 
 interface ResultRow {
   slug: string;
@@ -28,11 +39,15 @@ function GenerateCoversPage() {
   const [running, setRunning] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // ✅ إذا القائمة معبّية، نفلتر بس عليها. إذا فاضية، نشتغل على كل القصص.
-  const targetStories =
-    NEW_STORY_SLUGS.length > 0
-      ? stories.filter((s) => NEW_STORY_SLUGS.includes(s.slug))
-      : stories;
+  // ✅ نستبعد أي قصة عندها غلاف موجود مسبقًا (coverImage)، ونفلتر
+  // على NEW_STORY_SLUGS فقط لو معبّية. إذا فاضية، تشتغل على كل القصص
+  // اللي ما عندها غلاف بعد.
+  const targetStories = stories.filter((s) => {
+    const matchesSlugFilter =
+      NEW_STORY_SLUGS.length === 0 || NEW_STORY_SLUGS.includes(s.slug);
+    const hasNoCoverYet = !s.coverImage || s.coverImage.trim().length === 0;
+    return matchesSlugFilter && hasNoCoverYet;
+  });
 
   const successCount = results.filter((r) => r.status === "success").length;
 
