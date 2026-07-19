@@ -101,13 +101,17 @@ function GenerateCoversPage() {
           .from("story-covers")
           .getPublicUrl(filePath);
 
+        // ✅ نضيف رقم عشوائي لآخر الرابط (cache-busting) عشان نتجنب
+        // عرض نسخة قديمة مخزنة (cached) من نفس المسار بعد كل توليد جديد
+        const bustedUrl = `${publicUrlData.publicUrl}?v=${Date.now()}`;
+
         setResults((prev) =>
           prev.map((r) =>
             r.slug === story.slug
               ? {
                   ...r,
                   status: "success",
-                  url: publicUrlData.publicUrl,
+                  url: bustedUrl,
                   prompt,
                 }
               : r
