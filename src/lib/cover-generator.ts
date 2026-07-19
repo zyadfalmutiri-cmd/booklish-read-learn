@@ -79,14 +79,13 @@ export async function generateAIStoryCover(
 }
 
 /**
- * الأسلوب الفني الثابت لكل الأغلفة — رسم رقمي غني بالتفاصيل والإضاءة
- * (Rich Digital Illustration) بألوان دافئة وعمق وظلال ناعمة، بنفس أسلوب
- * باقي أغلفة المكتبة (زي أغلفة هاري بوتر وأجاثا كريستي وقصص السفر
- * "London Calling" و"Paris Awaits"). هذا الأسلوب ثابت لكل القصص بغض
- * النظر عن نوعها، عشان هوية بصرية موحدة بالمكتبة كاملة.
+ * الأسلوب الفني الثابت لكل الأغلفة — رسم توضيحي ملوّن (Stylized Illustration)
+ * بنفس روح أغلفة "London Calling" و"Paris Awaits" وسلسلة هاري بوتر بالمكتبة:
+ * أشكال مبسّطة وملونة بغنى، إضاءة دافئة، لكن بشكل صريح غير فوتوغرافي وغير واقعي.
+ * هذا الأسلوب ثابت لكل القصص بغض النظر عن نوعها، عشان هوية بصرية موحدة.
  */
 const BASE_ILLUSTRATION_STYLE =
-  "rich digital illustration book cover art, detailed painterly digital painting style, atmospheric warm lighting, soft glowing light sources, cinematic composition, deep vibrant saturated colors, subtle gradients and soft shading for depth, storybook illustration aesthetic, polished professional book cover art, high detail, evocative mood lighting";
+  "vibrant stylized digital illustration book cover art, illustrated poster art style, NOT a photograph, not photorealistic, not realistic, simplified and stylized shapes and characters, bold saturated colors, warm atmospheric lighting with soft color gradients, clean modern illustration aesthetic similar to young-adult book cover art, richly colored illustrated scene, professional book cover design, high detail illustration";
 
 /**
  * تلميحات لوحة ألوان/مزاج حسب نوع القصة (Genre) — تعديل بسيط على لوحة
