@@ -9,7 +9,7 @@ import {
   UnderstandingEmotions,
   InflationRisingPrices,
   ChildAggressionUnderstanding,
-} from "./stories.knowledge"; // عدّل المسار حسب مكان الملف عندك
+} from "./stories/stories.knowledge";
 
 import { storyCoverUrls } from "@/data/story-covers-map";
 import { storyAudio } from "@/data/story-audio";
