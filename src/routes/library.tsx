@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { Search, TrendingUp, GraduationCap, X } from "lucide-react";
 import { stories } from "@/data/stories";
@@ -8,6 +8,8 @@ import type { Category, Genre } from "@/lib/types";
 import { useT } from "@/lib/i18n";
 import { useUserLevel, CEFR_TO_STORY_LEVEL, STORIES_TO_ADVANCE } from "@/lib/reading-level";
 import { PlacementTest } from "@/components/booklish/placement-test";
+import { getLibraryBooks } from "@/lib/library.service";
+import type { LibraryBook } from "@/types/library";
 
 export const Route = createFileRoute("/library")({
   component: Library,
@@ -16,6 +18,12 @@ export const Route = createFileRoute("/library")({
 const GENRES: Genre[] = ["mystery", "romance", "sci-fi", "adventure", "drama", "non-fiction"];
 const CATEGORIES: Category[] = ["short", "fiction", "non-fiction", "sports"];
 
+const LEVEL_COLORS: Record<string, string> = {
+  B2: "bg-blue-500/90 text-white",
+  C1: "bg-[oklch(0.48_0.14_35)] text-white",
+  C2: "bg-[oklch(0.48_0.14_35)] text-white",
+};
+
 function Library() {
   const { t, dir } = useT();
   const { data, hydrated, storiesLeft, isMaxLevel, info, completePlacement } = useUserLevel();
@@ -23,6 +31,16 @@ function Library() {
   const [category, setCategory] = useState<Category | "all">("all");
   const [q, setQ] = useState("");
   const [showPlacementTest, setShowPlacementTest] = useState(false);
+
+  const [fullBooks, setFullBooks] = useState<LibraryBook[]>([]);
+  const [fullBooksLoading, setFullBooksLoading] = useState(true);
+
+  useEffect(() => {
+    getLibraryBooks()
+      .then(setFullBooks)
+      .catch((err) => console.error("[library] failed to load full books", err))
+      .finally(() => setFullBooksLoading(false));
+  }, []);
 
   const allowedStoryLevels = null;
   const progressPct = hydrated ? Math.round((data.storiesFinishedAtLevel / STORIES_TO_ADVANCE) * 100) : 0;
@@ -142,6 +160,7 @@ function Library() {
             <GenreRow key={g} title={t(`genre.${g}`)} stories={list} />
           ))}
           {sportsStories.length > 0 && <GenreRow title="رياضة" stories={sportsStories} />}
+          {!fullBooksLoading && fullBooks.length > 0 && <FullBooksRow title="روايات كاملة" books={fullBooks} />}
         </div>
       ) : filtered.length === 0 ? (
         <p className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">{t("common.noMatch")}</p>
@@ -161,6 +180,39 @@ function GenreRow({ title, stories: rowStories }: { title: string; stories: type
           <div key={s.slug} className="w-40 shrink-0">
             <StoryCard story={s} />
           </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function FullBooksRow({ title, books }: { title: string; books: LibraryBook[] }) {
+  return (
+    <section>
+      <h2 className="mb-3 font-serif text-xl">{title}</h2>
+      <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {books.map((b) => (
+          <Link
+            key={b.slug}
+            to="/library/book/$slug"
+            params={{ slug: b.slug }}
+            className="w-40 shrink-0 rounded-xl border border-border bg-card p-3 flex flex-col gap-2 hover:bg-muted transition-colors"
+          >
+            <div className="aspect-[2/3] rounded-lg bg-muted flex items-center justify-center overflow-hidden">
+              {b.cover_url ? (
+                <img src={b.cover_url} alt={b.title} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-3xl">📖</span>
+              )}
+            </div>
+            <div>
+              <p className="font-medium text-sm leading-tight line-clamp-2">{b.title}</p>
+              <p className="text-xs text-muted-foreground">{b.author}</p>
+            </div>
+            <span className={`self-start text-[10px] font-semibold px-1.5 py-0.5 rounded ${LEVEL_COLORS[b.level] ?? "bg-muted text-foreground"}`}>
+              {b.level}
+            </span>
+          </Link>
         ))}
       </div>
     </section>
