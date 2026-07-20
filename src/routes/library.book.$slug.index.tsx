@@ -3,10 +3,11 @@ import { useEffect, useState } from "react";
 import { Lock, LockOpen, CheckCircle2, ChevronLeft } from "lucide-react";
 import {
   getLibraryBookMeta,
-  getLibraryBookContent,
+  getLibraryChapterList,
   getReadingProgress,
+  type LibraryChapterMeta,
 } from "@/lib/library.service";
-import type { LibraryBook, LibraryBookContent } from "@/types/library";
+import type { LibraryBook } from "@/types/library";
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/library/book/$slug")({
@@ -26,25 +27,27 @@ function BookDetailPage() {
   const { slug } = Route.useParams();
   const { user } = useAuth();
   const [meta, setMeta] = useState<LibraryBook | null>(null);
-  const [content, setContent] = useState<LibraryBookContent | null>(null);
-  const [unlockedCount, setUnlockedCount] = useState(1); // at least chapter 1 always unlocked
+  const [chapters, setChapters] = useState<LibraryChapterMeta[]>([]);
+  const [unlockedCount, setUnlockedCount] = useState(1);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const m = await getLibraryBookMeta(slug);
+      const [m, ch] = await Promise.all([
+        getLibraryBookMeta(slug),
+        getLibraryChapterList(slug),
+      ]);
       setMeta(m);
-      const c = await getLibraryBookContent(m.storage_path);
-      setContent(c);
+      setChapters(ch);
       if (user) {
         const saved = await getReadingProgress(user.id, slug);
-        setUnlockedCount(Math.max(1, Math.min(saved + 1, c.chapters.length)));
+        setUnlockedCount(Math.max(1, Math.min(saved, ch.length)));
       }
       setLoading(false);
     })();
   }, [slug, user]);
 
-  if (loading || !meta || !content) {
+  if (loading || !meta) {
     return <div className="p-4 text-center text-muted-foreground">جاري التحميل...</div>;
   }
 
@@ -60,13 +63,13 @@ function BookDetailPage() {
       </Link>
 
       <div className="text-center mb-6">
-        <h1 className="text-2xl font-semibold">{content.title}</h1>
-        <p className="text-muted-foreground mt-1">By {content.author}</p>
+        <h1 className="text-2xl font-semibold">{meta.title}</h1>
+        <p className="text-muted-foreground mt-1">By {meta.author}</p>
 
         {meta.cover_url && (
           <img
             src={meta.cover_url}
-            alt={content.title}
+            alt={meta.title}
             className="w-40 mx-auto mt-4 rounded-lg shadow-lg"
           />
         )}
@@ -76,20 +79,19 @@ function BookDetailPage() {
             {meta.level}
           </span>
           <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-muted">
-            {completedCount}/{content.chapters.length} فصل
+            {completedCount}/{chapters.length} فصل
           </span>
         </div>
       </div>
 
       <div className="space-y-3">
-        {content.chapters.map((chapter, index) => {
+        {chapters.map((chapter, index) => {
           const isCompleted = index < completedCount;
           const isCurrent = index === completedCount;
-          const isLocked = index > completedCount;
 
           return (
             <div
-              key={index}
+              key={chapter.chapter_index}
               className={`rounded-xl border p-4 transition-colors ${
                 isCurrent
                   ? "border-[oklch(0.48_0.14_35)] bg-[oklch(0.48_0.14_35_/_0.05)]"
@@ -123,7 +125,7 @@ function BookDetailPage() {
               </div>
 
               <p className="text-xs text-muted-foreground mt-2">
-                {formatDuration(chapter.text.split(/\s+/).length)} دقيقة
+                {formatDuration(chapter.word_count)} دقيقة
               </p>
 
               {isCurrent && (
