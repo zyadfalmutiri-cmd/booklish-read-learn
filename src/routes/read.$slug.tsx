@@ -1,10 +1,11 @@
 import { createFileRoute, Link, notFound, useSearch } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Minus, Plus, Languages, Clock, Maximize2, Minimize2 } from "lucide-react";
+import { ArrowLeft, Languages, Clock, Maximize2, Minimize2 } from "lucide-react";
 import { getStory } from "@/data/stories";
 import { Reader } from "@/components/booklish/reader";
 import { useLocalStore, storeKeys } from "@/lib/store";
-import { useSettings } from "@/components/booklish/theme";
+import { useSettings, READER_THEME_STYLES } from "@/components/booklish/theme";
+import { ReadingSettingsSheet } from "@/components/booklish/reading-settings-sheet";
 import { useStreak } from "@/lib/streak";
 import { useReadingTimer } from "@/lib/stats";
 import { useT } from "@/lib/i18n";
@@ -50,8 +51,11 @@ function ReadPage() {
   const { t } = useT();
   const { addXp, xp } = useXp();
 
+  const isArabicUi = settings.uiLanguage === "ar";
   const isFocusMode = settings.focusMode;
   const setFocusMode = (v: boolean) => setSettings({ ...settings, focusMode: v });
+  const [showReadingSettings, setShowReadingSettings] = useState(false);
+  const readerThemeStyle = READER_THEME_STYLES[settings.readerTheme];
 
   const finishXpGranted = useRef(false);
   const readStartRef = useRef<number>(Date.now());
@@ -134,11 +138,6 @@ function ReadPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pct, progressHydrated, progressKey]);
 
-  const adjustFont = (delta: number) => {
-    const next = Math.min(1.3, Math.max(0.85, +(settings.fontScale + delta).toFixed(2)));
-    setSettings({ ...settings, fontScale: next });
-  };
-
   const cycleTranslate = () => {
     const order: typeof settings.translateMode[] = ["off", "words", "sentences"];
     const idx = order.indexOf(settings.translateMode);
@@ -171,11 +170,13 @@ function ReadPage() {
           <span className="hidden items-center gap-1 text-xs text-muted-foreground sm:inline-flex">
             <Clock className="h-3 w-3" /> {remaining} {t("common.minLeft")}
           </span>
-          <button onClick={() => adjustFont(-0.05)} className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border hover:bg-muted" aria-label={t("read.smaller")}>
-            <Minus className="h-3.5 w-3.5" />
-          </button>
-          <button onClick={() => adjustFont(0.05)} className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border hover:bg-muted" aria-label={t("read.larger")}>
-            <Plus className="h-3.5 w-3.5" />
+          <button
+            onClick={() => setShowReadingSettings(true)}
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border text-xs font-semibold hover:bg-muted"
+            aria-label={isArabicUi ? "إعدادات القراءة" : "Reading settings"}
+            title={isArabicUi ? "إعدادات القراءة" : "Reading settings"}
+          >
+            Aa
           </button>
           <button
             onClick={cycleTranslate}
@@ -207,7 +208,10 @@ function ReadPage() {
         </div>
       </div>
 
-      <div className={isFocusMode ? "focus-mode-active" : ""}>
+      <div
+        className={isFocusMode ? "focus-mode-active" : ""}
+        style={{ background: readerThemeStyle.background, color: readerThemeStyle.color }}
+      >
         <Reader story={{ ...story, paragraphs: displayParagraphs }} onScrollPct={setPct} />
 
         {!isFocusMode && (
@@ -267,6 +271,8 @@ function ReadPage() {
         )}
       </div>
 
+      <ReadingSettingsSheet open={showReadingSettings} onClose={() => setShowReadingSettings(false)} />
+
       {showCompletion && (
         <StoryCompletion
           storySlug={story.slug}
@@ -280,4 +286,3 @@ function ReadPage() {
     </div>
   );
 }
-
