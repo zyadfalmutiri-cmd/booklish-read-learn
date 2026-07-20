@@ -27,22 +27,37 @@ function ChapterQuizPage() {
   const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const [meta, chapterList, chapter] = await Promise.all([
-        getLibraryBookMeta(slug),
-        getLibraryChapterList(slug),
-        getLibraryChapterContent(slug, index),
-      ]);
-      setBookTitle(meta.title);
-      setChapterCount(chapterList.length);
-      const q = await getChapterQuiz(slug, index, chapter.content, chapter.heading);
-      setQuestions(q);
-      setAnswers(q.map(() => null));
-      setLoading(false);
+      try {
+        const [meta, chapterList, chapter] = await Promise.all([
+          getLibraryBookMeta(slug),
+          getLibraryChapterList(slug),
+          getLibraryChapterContent(slug, index),
+        ]);
+        setBookTitle(meta.title);
+        setChapterCount(chapterList.length);
+        const q = await getChapterQuiz(slug, index, chapter.content, chapter.heading);
+        setQuestions(q);
+        setAnswers(q.map(() => null));
+      } catch (err: any) {
+        console.error("[library quiz] failed to load", err);
+        setError(err?.message ?? String(err));
+      } finally {
+        setLoading(false);
+      }
     })();
   }, [slug, index]);
+
+  if (error) {
+    return (
+      <div className="p-4 text-center text-red-600 text-sm" dir="ltr">
+        library quiz error: {error}
+      </div>
+    );
+  }
 
   if (loading || !questions) {
     return (
