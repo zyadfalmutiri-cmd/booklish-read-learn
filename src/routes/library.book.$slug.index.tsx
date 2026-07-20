@@ -30,22 +30,37 @@ function BookDetailPage() {
   const [chapters, setChapters] = useState<LibraryChapterMeta[]>([]);
   const [unlockedCount, setUnlockedCount] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const [m, ch] = await Promise.all([
-        getLibraryBookMeta(slug),
-        getLibraryChapterList(slug),
-      ]);
-      setMeta(m);
-      setChapters(ch);
-      if (user) {
-        const saved = await getReadingProgress(user.id, slug);
-        setUnlockedCount(Math.max(1, Math.min(saved, ch.length)));
+      try {
+        const [m, ch] = await Promise.all([
+          getLibraryBookMeta(slug),
+          getLibraryChapterList(slug),
+        ]);
+        setMeta(m);
+        setChapters(ch);
+        if (user) {
+          const saved = await getReadingProgress(user.id, slug);
+          setUnlockedCount(Math.max(1, Math.min(saved, ch.length)));
+        }
+      } catch (err: any) {
+        console.error("[library book] failed to load", err);
+        setError(err?.message ?? String(err));
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     })();
   }, [slug, user]);
+
+  if (error) {
+    return (
+      <div className="p-4 text-center text-red-600 text-sm" dir="ltr">
+        library book error: {error}
+      </div>
+    );
+  }
 
   if (loading || !meta) {
     return <div className="p-4 text-center text-muted-foreground">جاري التحميل...</div>;
