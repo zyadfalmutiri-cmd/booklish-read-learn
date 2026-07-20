@@ -70,34 +70,63 @@ Respond with ONLY a raw JSON array (no markdown, no code fences, no explanation)
 ]
 "answer" is the zero-based index of the correct choice in "choices".`;
 
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash:free",
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
+    // قائمة نماذج مجانية (fallback chain) — إذا وحد فشل (404 أو حصة منتهية أو استجابة غير صالحة)
+    // نجرب اللي بعده تلقائيًا. النماذج المجانية بـ OpenRouter ممكن تُحذف أو تتوقف بدون إشعار،
+    // فهذا التسلسل يقلل احتمال توقف الميزة كاملة بسبب نموذج واحد.
+    const FREE_MODELS = [
+      "tencent/hy3:free",
+      "nvidia/nemotron-3-super-120b-a12b:free",
+      "openai/gpt-oss-20b:free",
+      "google/gemma-4-31b-it:free",
+    ];
 
-    if (!res.ok) {
-      throw new Error(`OpenRouter error: ${res.status}`);
+    let questions: z.infer<typeof QuizResponseSchema> | null = null;
+    let lastError: unknown = null;
+
+    for (const model of FREE_MODELS) {
+      try {
+        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model,
+            messages: [{ role: "user", content: prompt }],
+          }),
+        });
+
+        if (!res.ok) {
+          lastError = new Error(`OpenRouter error (${model}): ${res.status}`);
+          continue; // جرّب النموذج التالي
+        }
+
+        const json = await res.json();
+        const raw: string = json?.choices?.[0]?.message?.content ?? "";
+        const cleaned = raw.replace(/```json|```/g, "").trim();
+
+        let parsed: unknown;
+        try {
+          parsed = JSON.parse(cleaned);
+        } catch {
+          lastError = new Error(`Failed to parse quiz JSON from ${model} response`);
+          continue; // جرّب النموذج التالي
+        }
+
+        questions = QuizResponseSchema.parse(parsed);
+        break; // نجح — نوقف التسلسل
+      } catch (err) {
+        lastError = err;
+        continue; // جرّب النموذج التالي
+      }
     }
 
-    const json = await res.json();
-    const raw: string = json?.choices?.[0]?.message?.content ?? "";
-    const cleaned = raw.replace(/```json|```/g, "").trim();
-
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(cleaned);
-    } catch {
-      throw new Error("Failed to parse quiz JSON from model response");
+    if (!questions) {
+      throw lastError instanceof Error
+        ? lastError
+        : new Error("All free models failed to generate a valid quiz");
     }
-
-    const questions = QuizResponseSchema.parse(parsed);
 
     // خزّن الأسئلة عشان ما نعيد التوليد لنفس الفصل مرة ثانية
     await supabase.from("library_chapter_quiz").insert({
