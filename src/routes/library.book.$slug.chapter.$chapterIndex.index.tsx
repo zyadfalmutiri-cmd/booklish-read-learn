@@ -29,25 +29,40 @@ function ChapterReaderPage() {
   const [chapter, setChapter] = useState<{ heading: string; content: string } | null>(null);
   const [unlockedCount, setUnlockedCount] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const [meta, chapterList, ch] = await Promise.all([
-        getLibraryBookMeta(slug),
-        getLibraryChapterList(slug),
-        getLibraryChapterContent(slug, index),
-      ]);
-      setBookTitle(meta.title);
-      setBookMeta({ level: meta.level, genre: meta.genre });
-      setChapterCount(chapterList.length);
-      setChapter({ heading: ch.heading, content: ch.content });
-      if (user) {
-        const saved = await getReadingProgress(user.id, slug);
-        setUnlockedCount(Math.max(1, saved));
+      try {
+        const [meta, chapterList, ch] = await Promise.all([
+          getLibraryBookMeta(slug),
+          getLibraryChapterList(slug),
+          getLibraryChapterContent(slug, index),
+        ]);
+        setBookTitle(meta.title);
+        setBookMeta({ level: meta.level, genre: meta.genre });
+        setChapterCount(chapterList.length);
+        setChapter({ heading: ch.heading, content: ch.content });
+        if (user) {
+          const saved = await getReadingProgress(user.id, slug);
+          setUnlockedCount(Math.max(1, saved));
+        }
+      } catch (err: any) {
+        console.error("[library chapter] failed to load", err);
+        setError(err?.message ?? String(err));
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     })();
   }, [slug, index, user]);
+
+  if (error) {
+    return (
+      <div className="p-4 text-center text-red-600 text-sm" dir="ltr">
+        library chapter error: {error}
+      </div>
+    );
+  }
 
   if (loading || !chapter || !bookMeta) {
     return <div className="p-4 text-center text-muted-foreground">جاري التحميل...</div>;
