@@ -1,5 +1,13 @@
 import { supabase } from "@/integrations/supabase/client";
+import { getOrGenerateChapterQuiz } from "@/lib/api/library-quiz.functions";
 import type { LibraryBook } from "@/types/library";
+
+export interface QuizQuestion {
+  kind: "comprehension";
+  q: string;
+  choices: string[];
+  answer: number;
+}
 
 export interface LibraryChapterMeta {
   chapter_index: number;
@@ -94,4 +102,17 @@ export async function unlockChapter(
 
   if (error) throw error;
   return data as number;
+}
+
+// يجيب أسئلة الفصل من الكاش، أو يولّدها أول مرة عبر السيرفر فنكشن (AI) ويخزّنها
+export async function getChapterQuiz(
+  bookSlug: string,
+  chapterIndex: number,
+  chapterText: string,
+  chapterHeading?: string
+): Promise<QuizQuestion[]> {
+  const result = await getOrGenerateChapterQuiz({
+    data: { bookSlug, chapterIndex, chapterText, chapterHeading },
+  });
+  return result.questions;
 }
