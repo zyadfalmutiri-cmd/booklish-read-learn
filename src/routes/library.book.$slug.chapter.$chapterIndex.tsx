@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import {
   getLibraryBookMeta,
-  getLibraryBookContent,
+  getLibraryChapterList,
+  getLibraryChapterContent,
   getReadingProgress,
-  saveReadingProgress,
+  unlockChapter,
 } from "@/lib/library.service";
-import type { LibraryBookContent } from "@/types/library";
 import { useAuth } from "@/hooks/use-auth";
+import { Reader } from "@/components/booklish/reader"; // ⚠️ عدّل هذا المسار ليطابق مكان ملف الـ Reader الفعلي عندك
+import type { Story } from "@/lib/types";
 
 export const Route = createFileRoute("/library/book/$slug/chapter/$chapterIndex")({
   component: ChapterReaderPage,
@@ -19,28 +21,37 @@ function ChapterReaderPage() {
   const index = Number(chapterIndex);
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [content, setContent] = useState<LibraryBookContent | null>(null);
+
+  const [bookTitle, setBookTitle] = useState("");
+  const [bookMeta, setBookMeta] = useState<{ level: string; genre: string } | null>(null);
+  const [chapterCount, setChapterCount] = useState(0);
+  const [chapter, setChapter] = useState<{ heading: string; content: string } | null>(null);
   const [unlockedCount, setUnlockedCount] = useState(1);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const meta = await getLibraryBookMeta(slug);
-      const full = await getLibraryBookContent(meta.storage_path);
-      setContent(full);
+      const [meta, chapterList, ch] = await Promise.all([
+        getLibraryBookMeta(slug),
+        getLibraryChapterList(slug),
+        getLibraryChapterContent(slug, index),
+      ]);
+      setBookTitle(meta.title);
+      setBookMeta({ level: meta.level, genre: meta.genre });
+      setChapterCount(chapterList.length);
+      setChapter({ heading: ch.heading, content: ch.content });
       if (user) {
         const saved = await getReadingProgress(user.id, slug);
-        setUnlockedCount(Math.max(1, saved + 1));
+        setUnlockedCount(Math.max(1, saved));
       }
       setLoading(false);
     })();
-  }, [slug, user]);
+  }, [slug, index, user]);
 
-  if (loading || !content) {
+  if (loading || !chapter || !bookMeta) {
     return <div className="p-4 text-center text-muted-foreground">جاري التحميل...</div>;
   }
 
-  // Guard: don't allow reading chapters ahead of what's unlocked
   if (index > unlockedCount - 1 && index !== 0) {
     return (
       <div className="p-4 text-center text-muted-foreground">
@@ -49,12 +60,27 @@ function ChapterReaderPage() {
     );
   }
 
-  const chapter = content.chapters[index];
-  const isLast = index === content.chapters.length - 1;
+  const isLast = index === chapterCount - 1;
+
+  const fakeStory: Story = {
+    slug: `${slug}-ch${index}`,
+    title: chapter.heading,
+    minutes: Math.max(1, Math.round(chapter.content.split(/\s+/).length / 200)),
+    genre: bookMeta.genre as Story["genre"],
+    level: bookMeta.level as Story["level"],
+    paragraphs: chapter.content.split(/\n\n+/),
+    vocab: {},
+  } as unknown as Story;
 
   const handleContinue = async () => {
-    if (user && index >= unlockedCount - 1) {
-      await saveReadingProgress(user.id, slug, index + 1);
+    if (user) {
+      try {
+        // دالة قاعدة البيانات bump_library_progress تضمن رياضيًا إن العدد
+        // لا يتراجع أبد، بغض النظر عن أي تأخير أو تزامن طلبات
+        await unlockChapter(slug, index + 2);
+      } catch (err) {
+        console.error("[library] failed to unlock next chapter", err);
+      }
     }
     if (isLast) {
       navigate({ to: "/library/book/$slug", params: { slug } });
@@ -67,25 +93,21 @@ function ChapterReaderPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4 pb-28">
-      <Link
-        to="/library/book/$slug"
-        params={{ slug }}
-        className="mb-4 inline-grid h-9 w-9 place-items-center rounded-full bg-muted"
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </Link>
-
-      <div className="mb-4">
+    <div className="max-w-2xl mx-auto pb-28">
+      <div className="px-4 pt-4">
+        <Link
+          to="/library/book/$slug"
+          params={{ slug }}
+          className="mb-2 inline-grid h-9 w-9 place-items-center rounded-full bg-muted"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Link>
         <p className="text-xs text-muted-foreground">
-          {content.title} — الفصل {index + 1} من {content.chapters.length}
+          {bookTitle} — الفصل {index + 1} من {chapterCount}
         </p>
-        <h1 className="text-lg font-semibold mt-1">{chapter.heading}</h1>
       </div>
 
-      <article className="prose prose-sm max-w-none whitespace-pre-line leading-relaxed">
-        {chapter.text}
-      </article>
+      <Reader story={fakeStory} onScrollPct={() => {}} />
 
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-3 z-40">
         <button
