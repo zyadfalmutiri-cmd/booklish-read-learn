@@ -1,5 +1,17 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { LibraryBook, LibraryBookContent } from "@/types/library";
+import type { LibraryBook } from "@/types/library";
+
+export interface LibraryChapterMeta {
+  chapter_index: number;
+  heading: string;
+  word_count: number;
+}
+
+export interface LibraryChapterContent {
+  chapter_index: number;
+  heading: string;
+  content: string;
+}
 
 export async function getLibraryBooks(): Promise<LibraryBook[]> {
   const { data, error } = await supabase
@@ -22,17 +34,35 @@ export async function getLibraryBookMeta(slug: string): Promise<LibraryBook> {
   return data as LibraryBook;
 }
 
-// Fetches the full chaptered text from Supabase Storage (bucket: library-content)
-export async function getLibraryBookContent(
-  storagePath: string
-): Promise<LibraryBookContent> {
-  const { data, error } = await supabase.storage
-    .from("library-content")
-    .download(storagePath.replace(/^library-content\//, ""));
+// خفيف — يجيب عناوين الفصول وعدد كلماتها بس، بدون النص الكامل
+// يستخدم بصفحة قائمة الفصول
+export async function getLibraryChapterList(
+  bookSlug: string
+): Promise<LibraryChapterMeta[]> {
+  const { data, error } = await supabase
+    .from("library_chapters")
+    .select("chapter_index, heading, word_count")
+    .eq("book_slug", bookSlug)
+    .order("chapter_index", { ascending: true });
 
   if (error) throw error;
-  const text = await data.text();
-  return JSON.parse(text) as LibraryBookContent;
+  return data as LibraryChapterMeta[];
+}
+
+// يجيب نص فصل واحد بس — يستخدم بصفحة القراءة
+export async function getLibraryChapterContent(
+  bookSlug: string,
+  chapterIndex: number
+): Promise<LibraryChapterContent> {
+  const { data, error } = await supabase
+    .from("library_chapters")
+    .select("chapter_index, heading, content")
+    .eq("book_slug", bookSlug)
+    .eq("chapter_index", chapterIndex)
+    .single();
+
+  if (error) throw error;
+  return data as LibraryChapterContent;
 }
 
 export async function getReadingProgress(
@@ -41,26 +71,27 @@ export async function getReadingProgress(
 ): Promise<number> {
   const { data, error } = await supabase
     .from("library_progress")
-    .select("current_chapter")
+    .select("unlocked_count")
     .eq("user_id", userId)
     .eq("book_slug", bookSlug)
     .maybeSingle();
 
   if (error) throw error;
-  return data?.current_chapter ?? 0;
+  return data?.unlocked_count ?? 1;
 }
 
-export async function saveReadingProgress(
-  userId: string,
+// يستدعي دالة قاعدة البيانات bump_library_progress بدل upsert مباشر —
+// هذي الدالة تضمن رياضيًا إن عدد الفصول المفتوحة ما يرجع يقل أبد
+// (تحل مشاكل التزامن نهائيًا، عكس القراءة-ثم-الكتابة العادية)
+export async function unlockChapter(
   bookSlug: string,
-  currentChapter: number
-): Promise<void> {
-  const { error } = await supabase.from("library_progress").upsert({
-    user_id: userId,
-    book_slug: bookSlug,
-    current_chapter: currentChapter,
-    updated_at: new Date().toISOString(),
+  newUnlockedCount: number
+): Promise<number> {
+  const { data, error } = await supabase.rpc("bump_library_progress", {
+    p_book_slug: bookSlug,
+    p_unlocked_count: newUnlockedCount,
   });
 
   if (error) throw error;
+  return data as number;
 }
