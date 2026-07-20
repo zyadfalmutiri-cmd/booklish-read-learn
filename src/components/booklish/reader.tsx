@@ -4,7 +4,7 @@ import { BookmarkPlus, Languages, Sparkles, Loader2, Check, Volume2 } from "luci
 import { tokenize, splitSentences } from "@/lib/tokenize";
 import type { Story, VocabEntry, SavedWord } from "@/lib/types";
 import { useLocalStore, storeKeys } from "@/lib/store";
-import { useSettings } from "./theme";
+import { useSettings, READER_FONT_FAMILY_MAP } from "./theme";
 import { lookupLocal, lookupAI, preWarmCache, normalizeWord, type WordLookup } from "@/lib/lookup";
 import { SRS_INTERVALS_MS } from "@/lib/srs";
 import { recordWordTap } from "@/lib/stats";
@@ -44,6 +44,8 @@ export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct
   );
 
   const fontSize = `${settings.fontScale}rem`;
+  const fontFamily = READER_FONT_FAMILY_MAP[settings.readerFontFamily]?.css;
+  const lineHeight = settings.readerLineHeight;
   const showWordsAlways = settings.translateMode === "words";
 
     const saveWord = (
@@ -71,7 +73,12 @@ export function Reader({ story, onScrollPct }: { story: Story; onScrollPct: (pct
   );
 
   return (
-    <div ref={containerRef} dir="ltr" className="reading-column px-4 pb-24 pt-6 sm:px-0" style={{ fontSize }}>
+    <div
+      ref={containerRef}
+      dir="ltr"
+      className="reading-column px-4 pb-24 pt-6 sm:px-0"
+      style={{ fontSize, fontFamily, lineHeight }}
+    >
       <h1 className="mb-2 text-balance text-3xl font-semibold leading-tight sm:text-4xl">{story.title}</h1>
       <p className="mb-8 text-sm font-sans text-muted-foreground">
         {story.minutes} min · {story.genre} · {story.level}
