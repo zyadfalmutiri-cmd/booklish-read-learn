@@ -8,8 +8,10 @@ import {
   getReadingProgress,
 } from "@/lib/library.service";
 import { useAuth } from "@/hooks/use-auth";
-import { Reader } from "@/components/booklish/reader"; // ⚠️ عدّل هذا المسار ليطابق مكان ملف الـ Reader الفعلي عندك
-import { useSpeaking } from "@/lib/tts"; // ⚠️ عدّل المسار لو ملف tts.ts محفوظ بمكان ثاني
+import { Reader } from "@/components/booklish/reader";
+import { useSettings, READER_THEME_STYLES } from "@/components/booklish/theme";
+import { ReadingSettingsSheet } from "@/components/booklish/reading-settings-sheet";
+import { useSpeaking } from "@/lib/tts";
 import type { Story } from "@/lib/types";
 
 export const Route = createFileRoute("/library/book/$slug/chapter/$chapterIndex")({
@@ -22,6 +24,10 @@ function ChapterReaderPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { speaking, toggle } = useSpeaking(`library-${slug}-${chapterIndex}`);
+  const [settings] = useSettings();
+  const isArabicUi = settings.uiLanguage === "ar";
+  const readerThemeStyle = READER_THEME_STYLES[settings.readerTheme];
+  const [showReadingSettings, setShowReadingSettings] = useState(false);
 
   const [bookTitle, setBookTitle] = useState("");
   const [bookMeta, setBookMeta] = useState<{ level: string; genre: string } | null>(null);
@@ -89,8 +95,6 @@ function ChapterReaderPage() {
   } as unknown as Story;
 
   const handleContinue = () => {
-    // فتح الفصل التالي (unlockChapter) صار جوا صفحة الأسئلة نفسها بعد التأكيد،
-    // هذا الزر بس ينتقل لصفحة أسئلة الاستيعاب حق هذا الفصل
     navigate({
       to: "/library/book/$slug/chapter/$chapterIndex/quiz",
       params: { slug, chapterIndex: String(index) },
@@ -111,21 +115,36 @@ function ChapterReaderPage() {
           <p className="text-xs text-muted-foreground">
             {bookTitle} — الفصل {index + 1} من {chapterCount}
           </p>
-          <button
-            type="button"
-            onClick={() => toggle(chapter.content)}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs shrink-0"
-          >
-            {speaking ? (
-              <><Square className="h-3 w-3" /> إيقاف</>
-            ) : (
-              <><Volume2 className="h-3 w-3" /> استماع للفصل</>
-            )}
-          </button>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setShowReadingSettings(true)}
+              className="inline-grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border text-xs font-semibold"
+              aria-label={isArabicUi ? "إعدادات القراءة" : "Reading settings"}
+              title={isArabicUi ? "إعدادات القراءة" : "Reading settings"}
+            >
+              Aa
+            </button>
+            <button
+              type="button"
+              onClick={() => toggle(chapter.content)}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs"
+            >
+              {speaking ? (
+                <><Square className="h-3 w-3" /> إيقاف</>
+              ) : (
+                <><Volume2 className="h-3 w-3" /> استماع للفصل</>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
-      <Reader story={fakeStory} onScrollPct={() => {}} />
+      <div style={{ background: readerThemeStyle.background, color: readerThemeStyle.color }}>
+        <Reader story={fakeStory} onScrollPct={() => {}} />
+      </div>
+
+      <ReadingSettingsSheet open={showReadingSettings} onClose={() => setShowReadingSettings(false)} />
 
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-3 z-40">
         <button
