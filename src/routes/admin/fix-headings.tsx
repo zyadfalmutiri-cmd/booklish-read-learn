@@ -82,83 +82,99 @@ function FixHeadingsPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [bookFilter, setBookFilter] = useState('')
   const [copied, setCopied] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
+  const [scannedCount, setScannedCount] = useState(0)
 
   async function scan() {
     setLoading(true)
-    let query = supabase
-      .from('library_chapters')
-      .select('id, book_slug, chapter_index, heading, content')
-      .order('book_slug', { ascending: true })
-      .order('chapter_index', { ascending: true })
+    setErrorMsg('')
+    try {
+      let query = supabase
+        .from('library_chapters')
+        .select('id, book_slug, chapter_index, heading, content')
+        .order('book_slug', { ascending: true })
+        .order('chapter_index', { ascending: true })
 
-    if (bookFilter.trim()) {
-      query = query.eq('book_slug', bookFilter.trim())
-    }
-
-    const { data, error } = await query
-
-    if (error) {
-      alert('خطأ بجلب البيانات: ' + error.message)
-      setLoading(false)
-      return
-    }
-
-    const rows = (data ?? []) as ChapterRow[]
-    const results: FixPreview[] = rows.map((row) => {
-      const fixed = stripLeadingDuplicateParagraphs(row.heading, row.content)
-      return {
-        id: row.id,
-        book_slug: row.book_slug,
-        chapter_index: row.chapter_index,
-        heading: row.heading,
-        originalStart: row.content.slice(0, 150),
-        fixedStart: fixed.slice(0, 150),
-        changed: fixed !== row.content,
+      if (bookFilter.trim()) {
+        query = query.eq('book_slug', bookFilter.trim())
       }
-    })
 
-    setPreviews(results.filter((r) => r.changed))
-    setSelected(new Set(results.filter((r) => r.changed).map((r) => r.id)))
-    setLoading(false)
+      const { data, error } = await query
+
+      if (error) {
+        setErrorMsg('خطأ من Supabase: ' + error.message)
+        setLoading(false)
+        return
+      }
+
+      const rows = (data ?? []) as ChapterRow[]
+      setScannedCount(rows.length)
+
+      const results: FixPreview[] = rows.map((row) => {
+        const fixed = stripLeadingDuplicateParagraphs(row.heading, row.content)
+        return {
+          id: row.id,
+          book_slug: row.book_slug,
+          chapter_index: row.chapter_index,
+          heading: row.heading,
+          originalStart: row.content.slice(0, 150),
+          fixedStart: fixed.slice(0, 150),
+          changed: fixed !== row.content,
+        }
+      })
+
+      setPreviews(results.filter((r) => r.changed))
+      setSelected(new Set(results.filter((r) => r.changed).map((r) => r.id)))
+    } catch (err) {
+      setErrorMsg('استثناء غير متوقع: ' + (err instanceof Error ? err.message : String(err)))
+    } finally {
+      setLoading(false)
+    }
   }
 
   async function applyFixes() {
     if (!confirm(`راح يتم تعديل ${selected.size} فصل. متأكد؟`)) return
     setApplying(true)
+    setErrorMsg('')
 
-    const ids = Array.from(selected)
+    try {
+      const ids = Array.from(selected)
 
-    const { data, error } = await supabase
-      .from('library_chapters')
-      .select('id, heading, content')
-      .in('id', ids)
-
-    if (error || !data) {
-      alert('خطأ: ' + error?.message)
-      setApplying(false)
-      return
-    }
-
-    let done = 0
-    for (const row of data as { id: string; heading: string; content: string }[]) {
-      const fixed = stripLeadingDuplicateParagraphs(row.heading, row.content)
-      const { error: updateError } = await supabase
+      const { data, error } = await supabase
         .from('library_chapters')
-        .update({ content: fixed })
-        .eq('id', row.id)
+        .select('id, heading, content')
+        .in('id', ids)
 
-      done++
-      setProgress(`${done} / ${data.length}`)
-
-      if (updateError) {
-        console.error(`فشل تحديث ${row.id}:`, updateError.message)
+      if (error || !data) {
+        setErrorMsg('خطأ: ' + error?.message)
+        setApplying(false)
+        return
       }
-    }
 
-    setApplying(false)
-    setProgress('')
-    alert('تم التطبيق')
-    setPreviews([])
+      let done = 0
+      for (const row of data as { id: string; heading: string; content: string }[]) {
+        const fixed = stripLeadingDuplicateParagraphs(row.heading, row.content)
+        const { error: updateError } = await supabase
+          .from('library_chapters')
+          .update({ content: fixed })
+          .eq('id', row.id)
+
+        done++
+        setProgress(`${done} / ${data.length}`)
+
+        if (updateError) {
+          console.error(`فشل تحديث ${row.id}:`, updateError.message)
+        }
+      }
+
+      setProgress('')
+      alert('تم التطبيق')
+      setPreviews([])
+    } catch (err) {
+      setErrorMsg('استثناء غير متوقع أثناء التطبيق: ' + (err instanceof Error ? err.message : String(err)))
+    } finally {
+      setApplying(false)
+    }
   }
 
   function toggleSelected(id: string) {
@@ -224,6 +240,18 @@ function FixHeadingsPage() {
       >
         {loading ? 'جاري الفحص...' : 'ابدأ الفحص'}
       </button>
+
+      {errorMsg && (
+        <div style={{ padding: '1rem', background: '#5a1a1a', color: 'white', borderRadius: 8, marginBottom: '1rem' }}>
+          {errorMsg}
+        </div>
+      )}
+
+      {!loading && scannedCount > 0 && (
+        <p style={{ marginBottom: '1rem', color: '#888' }}>
+          تم فحص {scannedCount} فصل إجمالاً.
+        </p>
+      )}
 
       {previews.length > 0 && (
         <>
