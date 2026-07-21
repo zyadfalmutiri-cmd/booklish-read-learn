@@ -37,6 +37,7 @@ function stripLeadingDuplicateParagraphs(heading: string, rawContent: string): s
   const para0 = paragraphs[0].trim()
   const para1 = paragraphs[1]?.trim() ?? ''
 
+  // حالة 1: "HEADING: Title" ثم فقرة ثانية = "Title" بس (مكررة)، بمقارنة متساهلة تتجاهل الترقيم والفراغات
   const escapedHeading = heading.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   const prefixPattern = new RegExp(`^${escapedHeading}\\s*[:.]\\s*(.+)$`, 'i')
   const match = para0.match(prefixPattern)
@@ -49,38 +50,7 @@ function stripLeadingDuplicateParagraphs(heading: string, rawContent: string): s
     }
   }
 
-  const normHeading = heading.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
-  if (normHeading.length >= 3) {
-    const searchWindow = content.slice(0, 600)
-    let normalized = ''
-    const indexMap: number[] = []
-    for (let i = 0; i < searchWindow.length; i++) {
-      const ch = searchWindow[i]
-      if (/[a-zA-Z0-9]/.test(ch)) {
-        normalized += ch.toLowerCase()
-        indexMap.push(i)
-      } else if (/\s/.test(ch) && normalized.length && normalized[normalized.length - 1] !== ' ') {
-        normalized += ' '
-        indexMap.push(i)
-      }
-    }
-    const firstIdx = normalized.indexOf(normHeading)
-    if (firstIdx !== -1) {
-      const secondIdx = normalized.indexOf(normHeading, firstIdx + normHeading.length)
-      if (secondIdx !== -1) {
-        const secondEndNormIdx = secondIdx + normHeading.length - 1
-        const cutIndex = indexMap[secondEndNormIdx] + 1
-        let rest = content.slice(cutIndex)
-        rest = rest.replace(/^[\s\n]+/, '')
-        return rest
-      }
-    }
-  }
-
-  return content
-}
-
-
+  // حالة 2: النمط العادي (heading يتكرر داخل أول 600 حرف)
   const normHeading = heading.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
   if (normHeading.length >= 3) {
     const searchWindow = content.slice(0, 600)
@@ -153,12 +123,7 @@ function FixHeadingsPage() {
       setScannedCount(rows.length)
 
       const results: FixPreview[] = rows.map((row) => {
-        // ننظف الرموز الخفية من النص الأصلي أيضًا حتى لو ما فيه تكرار عنوان،
-        // عشان يزول العطل اللي كان يظهر كرمز "﻿" غريب بالقارئ
-        const cleanedOriginal = stripInvisibleChars(row.content)
         const fixed = stripLeadingDuplicateParagraphs(row.heading, row.content)
-        const changed = fixed !== row.content
-
         return {
           id: row.id,
           book_slug: row.book_slug,
@@ -166,7 +131,7 @@ function FixHeadingsPage() {
           heading: row.heading,
           originalStart: row.content.slice(0, 150),
           fixedStart: fixed.slice(0, 150),
-          changed,
+          changed: fixed !== row.content,
         }
       })
 
