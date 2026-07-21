@@ -20,16 +20,21 @@ interface FixPreview {
   changed: boolean
 }
 
-// يشيل أول فقرة لو كانت "HEADING: Title" وبعدها فقرة ثانية = "Title" بس (مكررة)
-function stripLeadingDuplicateParagraphs(heading: string, content: string): string {
+// يشيل الرموز الخفية (BOM, zero-width chars, word joiner) اللي تسبب مشاكل بالمطابقة والعرض
+function stripInvisibleChars(text: string): string {
+  return text.replace(/[\uFEFF\u200B\u200C\u200D\u2060\u00AD]/g, '')
+}
+
+function stripLeadingDuplicateParagraphs(heading: string, rawContent: string): string {
+  const content = stripInvisibleChars(rawContent)
   const paragraphs = content.split(/\n{2,}/)
   if (paragraphs.length < 2) return content
 
   const para0 = paragraphs[0].trim()
   const para1 = paragraphs[1]?.trim() ?? ''
 
-  // حالة 1: "II: The Raid" ثم "The Raid" (نمط Memoirs)
-  const prefixPattern = new RegExp(`^${heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*:\\s*(.+)$`, 'i')
+  const escapedHeading = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const prefixPattern = new RegExp(`^${escapedHeading}\\s*:\\s*(.+)$`, 'i')
   const match = para0.match(prefixPattern)
   if (match) {
     const titleAfterColon = match[1].trim()
@@ -38,7 +43,6 @@ function stripLeadingDuplicateParagraphs(heading: string, content: string): stri
     }
   }
 
-  // حالة 2: النمط العادي (heading يتكرر داخل أول 600 حرف)
   const normHeading = heading.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
   if (normHeading.length >= 3) {
     const searchWindow = content.slice(0, 600)
@@ -111,7 +115,12 @@ function FixHeadingsPage() {
       setScannedCount(rows.length)
 
       const results: FixPreview[] = rows.map((row) => {
+        // ننظف الرموز الخفية من النص الأصلي أيضًا حتى لو ما فيه تكرار عنوان،
+        // عشان يزول العطل اللي كان يظهر كرمز "﻿" غريب بالقارئ
+        const cleanedOriginal = stripInvisibleChars(row.content)
         const fixed = stripLeadingDuplicateParagraphs(row.heading, row.content)
+        const changed = fixed !== row.content
+
         return {
           id: row.id,
           book_slug: row.book_slug,
@@ -119,7 +128,7 @@ function FixHeadingsPage() {
           heading: row.heading,
           originalStart: row.content.slice(0, 150),
           fixedStart: fixed.slice(0, 150),
-          changed: fixed !== row.content,
+          changed,
         }
       })
 
