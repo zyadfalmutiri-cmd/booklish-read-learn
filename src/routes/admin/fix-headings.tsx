@@ -25,23 +25,61 @@ function stripInvisibleChars(text: string): string {
   return text.replace(/[\uFEFF\u200B\u200C\u200D\u2060\u00AD]/g, '')
 }
 
+function normalizeForCompare(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]/g, '')
+}
+
 function stripLeadingDuplicateParagraphs(heading: string, rawContent: string): string {
   const content = stripInvisibleChars(rawContent)
-  const paragraphs = content.split(/\n{2,}/)
+  const paragraphs = content.split(/\n\s*\n+/)
   if (paragraphs.length < 2) return content
 
   const para0 = paragraphs[0].trim()
   const para1 = paragraphs[1]?.trim() ?? ''
 
-  const escapedHeading = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  const prefixPattern = new RegExp(`^${escapedHeading}\\s*:\\s*(.+)$`, 'i')
+  const escapedHeading = heading.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const prefixPattern = new RegExp(`^${escapedHeading}\\s*[:.]\\s*(.+)$`, 'i')
   const match = para0.match(prefixPattern)
   if (match) {
     const titleAfterColon = match[1].trim()
-    if (para1 && titleAfterColon.toLowerCase() === para1.toLowerCase()) {
+    const normTitle = normalizeForCompare(titleAfterColon)
+    const normPara1 = normalizeForCompare(para1)
+    if (normTitle.length > 0 && normTitle === normPara1) {
       return paragraphs.slice(2).join('\n\n').replace(/^\s+/, '')
     }
   }
+
+  const normHeading = heading.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+  if (normHeading.length >= 3) {
+    const searchWindow = content.slice(0, 600)
+    let normalized = ''
+    const indexMap: number[] = []
+    for (let i = 0; i < searchWindow.length; i++) {
+      const ch = searchWindow[i]
+      if (/[a-zA-Z0-9]/.test(ch)) {
+        normalized += ch.toLowerCase()
+        indexMap.push(i)
+      } else if (/\s/.test(ch) && normalized.length && normalized[normalized.length - 1] !== ' ') {
+        normalized += ' '
+        indexMap.push(i)
+      }
+    }
+    const firstIdx = normalized.indexOf(normHeading)
+    if (firstIdx !== -1) {
+      const secondIdx = normalized.indexOf(normHeading, firstIdx + normHeading.length)
+      if (secondIdx !== -1) {
+        const secondEndNormIdx = secondIdx + normHeading.length - 1
+        const cutIndex = indexMap[secondEndNormIdx] + 1
+        let rest = content.slice(cutIndex)
+        rest = rest.replace(/^[\s\n]+/, '')
+        return rest
+      }
+    }
+  }
+
+  return content
+}
+
 
   const normHeading = heading.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
   if (normHeading.length >= 3) {
