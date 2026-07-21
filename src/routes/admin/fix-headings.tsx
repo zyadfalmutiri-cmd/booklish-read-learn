@@ -34,12 +34,11 @@ function stripLeadingDuplicateParagraphs(heading: string, content: string): stri
   if (match) {
     const titleAfterColon = match[1].trim()
     if (para1 && titleAfterColon.toLowerCase() === para1.toLowerCase()) {
-      // شيل أول فقرتين (العنوان المكرر)، خل الباقي
       return paragraphs.slice(2).join('\n\n').replace(/^\s+/, '')
     }
   }
 
-  // حالة 2: نفس النص العادي القديم (heading يتكرر داخل أول 600 حرف)
+  // حالة 2: النمط العادي (heading يتكرر داخل أول 600 حرف)
   const normHeading = heading.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
   if (normHeading.length >= 3) {
     const searchWindow = content.slice(0, 600)
@@ -82,6 +81,7 @@ function FixHeadingsPage() {
   const [progress, setProgress] = useState('')
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [bookFilter, setBookFilter] = useState('')
+  const [copied, setCopied] = useState(false)
 
   async function scan() {
     setLoading(true)
@@ -127,7 +127,6 @@ function FixHeadingsPage() {
     setApplying(true)
 
     const ids = Array.from(selected)
-    let done = 0
 
     const { data, error } = await supabase
       .from('library_chapters')
@@ -140,6 +139,7 @@ function FixHeadingsPage() {
       return
     }
 
+    let done = 0
     for (const row of data as { id: string; heading: string; content: string }[]) {
       const fixed = stripLeadingDuplicateParagraphs(row.heading, row.content)
       const { error: updateError } = await supabase
@@ -168,6 +168,26 @@ function FixHeadingsPage() {
       else next.add(id)
       return next
     })
+  }
+
+  async function copyResults() {
+    const text = previews
+      .map(
+        (p) =>
+          `الكتاب: ${p.book_slug} — فصل ${p.chapter_index} — ${p.heading}\n` +
+          `قبل: ${p.originalStart}...\n` +
+          `بعد: ${p.fixedStart}...\n` +
+          `---`
+      )
+      .join('\n\n')
+
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      alert('فشل النسخ، جرب تحديد النص يدويًا')
+    }
   }
 
   return (
@@ -210,6 +230,20 @@ function FixHeadingsPage() {
           <p style={{ marginBottom: '1rem' }}>
             لقيت {previews.length} فصل فيه تكرار. الفصول المحددة (✓) هي اللي بتتصلح.
           </p>
+
+          <button
+            onClick={copyResults}
+            style={{
+              padding: '0.5rem 1rem',
+              background: '#444',
+              color: 'white',
+              borderRadius: 8,
+              marginBottom: '1rem',
+              marginRight: '0.5rem',
+            }}
+          >
+            {copied ? '✓ تم النسخ' : 'انسخ النتايج'}
+          </button>
 
           {previews.map((p) => (
             <div
