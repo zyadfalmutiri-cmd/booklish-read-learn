@@ -2,7 +2,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { supabase } from '@/integrations/supabase/client'
 
-
 interface ChapterRow {
   id: string
   book_slug: string
@@ -21,41 +20,55 @@ interface FixPreview {
   changed: boolean
 }
 
-function normalize(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
-}
+// يشيل أول فقرة لو كانت "HEADING: Title" وبعدها فقرة ثانية = "Title" بس (مكررة)
+function stripLeadingDuplicateParagraphs(heading: string, content: string): string {
+  const paragraphs = content.split(/\n{2,}/)
+  if (paragraphs.length < 2) return content
 
-function stripDuplicateHeading(heading: string, content: string): string {
-  const normHeading = normalize(heading).replace(/\s+/g, ' ')
-  if (!normHeading || normHeading.length < 3) return content
+  const para0 = paragraphs[0].trim()
+  const para1 = paragraphs[1]?.trim() ?? ''
 
-  const searchWindow = content.slice(0, 600)
-  let normalized = ''
-  const indexMap: number[] = []
-
-  for (let i = 0; i < searchWindow.length; i++) {
-    const ch = searchWindow[i]
-    if (/[a-zA-Z0-9]/.test(ch)) {
-      normalized += ch.toLowerCase()
-      indexMap.push(i)
-    } else if (/\s/.test(ch) && normalized.length && normalized[normalized.length - 1] !== ' ') {
-      normalized += ' '
-      indexMap.push(i)
+  // حالة 1: "II: The Raid" ثم "The Raid" (نمط Memoirs)
+  const prefixPattern = new RegExp(`^${heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*:\\s*(.+)$`, 'i')
+  const match = para0.match(prefixPattern)
+  if (match) {
+    const titleAfterColon = match[1].trim()
+    if (para1 && titleAfterColon.toLowerCase() === para1.toLowerCase()) {
+      // شيل أول فقرتين (العنوان المكرر)، خل الباقي
+      return paragraphs.slice(2).join('\n\n').replace(/^\s+/, '')
     }
   }
 
-  const firstIdx = normalized.indexOf(normHeading)
-  if (firstIdx === -1) return content
+  // حالة 2: نفس النص العادي القديم (heading يتكرر داخل أول 600 حرف)
+  const normHeading = heading.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+  if (normHeading.length >= 3) {
+    const searchWindow = content.slice(0, 600)
+    let normalized = ''
+    const indexMap: number[] = []
+    for (let i = 0; i < searchWindow.length; i++) {
+      const ch = searchWindow[i]
+      if (/[a-zA-Z0-9]/.test(ch)) {
+        normalized += ch.toLowerCase()
+        indexMap.push(i)
+      } else if (/\s/.test(ch) && normalized.length && normalized[normalized.length - 1] !== ' ') {
+        normalized += ' '
+        indexMap.push(i)
+      }
+    }
+    const firstIdx = normalized.indexOf(normHeading)
+    if (firstIdx !== -1) {
+      const secondIdx = normalized.indexOf(normHeading, firstIdx + normHeading.length)
+      if (secondIdx !== -1) {
+        const secondEndNormIdx = secondIdx + normHeading.length - 1
+        const cutIndex = indexMap[secondEndNormIdx] + 1
+        let rest = content.slice(cutIndex)
+        rest = rest.replace(/^[\s\n]+/, '')
+        return rest
+      }
+    }
+  }
 
-  const secondIdx = normalized.indexOf(normHeading, firstIdx + normHeading.length)
-  if (secondIdx === -1) return content
-
-  const secondEndNormIdx = secondIdx + normHeading.length - 1
-  const cutIndex = indexMap[secondEndNormIdx] + 1
-
-  let rest = content.slice(cutIndex)
-  rest = rest.replace(/^[\s\n]+/, '')
-  return rest
+  return content
 }
 
 export const Route = createFileRoute('/admin/fix-headings')({
@@ -66,15 +79,23 @@ function FixHeadingsPage() {
   const [previews, setPreviews] = useState<FixPreview[]>([])
   const [loading, setLoading] = useState(false)
   const [applying, setApplying] = useState(false)
+  const [progress, setProgress] = useState('')
   const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [bookFilter, setBookFilter] = useState('')
 
   async function scan() {
     setLoading(true)
-    const { data, error } = await supabase
+    let query = supabase
       .from('library_chapters')
       .select('id, book_slug, chapter_index, heading, content')
       .order('book_slug', { ascending: true })
       .order('chapter_index', { ascending: true })
+
+    if (bookFilter.trim()) {
+      query = query.eq('book_slug', bookFilter.trim())
+    }
+
+    const { data, error } = await query
 
     if (error) {
       alert('خطأ بجلب البيانات: ' + error.message)
@@ -84,7 +105,7 @@ function FixHeadingsPage() {
 
     const rows = (data ?? []) as ChapterRow[]
     const results: FixPreview[] = rows.map((row) => {
-      const fixed = stripDuplicateHeading(row.heading, row.content)
+      const fixed = stripLeadingDuplicateParagraphs(row.heading, row.content)
       return {
         id: row.id,
         book_slug: row.book_slug,
@@ -105,10 +126,13 @@ function FixHeadingsPage() {
     if (!confirm(`راح يتم تعديل ${selected.size} فصل. متأكد؟`)) return
     setApplying(true)
 
+    const ids = Array.from(selected)
+    let done = 0
+
     const { data, error } = await supabase
       .from('library_chapters')
       .select('id, heading, content')
-      .in('id', Array.from(selected))
+      .in('id', ids)
 
     if (error || !data) {
       alert('خطأ: ' + error?.message)
@@ -117,17 +141,22 @@ function FixHeadingsPage() {
     }
 
     for (const row of data as { id: string; heading: string; content: string }[]) {
-      const fixed = stripDuplicateHeading(row.heading, row.content)
+      const fixed = stripLeadingDuplicateParagraphs(row.heading, row.content)
       const { error: updateError } = await supabase
         .from('library_chapters')
         .update({ content: fixed })
         .eq('id', row.id)
+
+      done++
+      setProgress(`${done} / ${data.length}`)
+
       if (updateError) {
         console.error(`فشل تحديث ${row.id}:`, updateError.message)
       }
     }
 
     setApplying(false)
+    setProgress('')
     alert('تم التطبيق')
     setPreviews([])
   }
@@ -146,6 +175,21 @@ function FixHeadingsPage() {
       <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>
         فحص تكرار العناوين بالفصول
       </h1>
+
+      <input
+        type="text"
+        placeholder="book_slug (اختياري، فاضي = كل الكتب)"
+        value={bookFilter}
+        onChange={(e) => setBookFilter(e.target.value)}
+        style={{
+          display: 'block',
+          width: '100%',
+          padding: '0.5rem',
+          marginBottom: '0.75rem',
+          border: '1px solid #ccc',
+          borderRadius: 6,
+        }}
+      />
 
       <button
         onClick={scan}
@@ -202,7 +246,7 @@ function FixHeadingsPage() {
               borderRadius: 8,
             }}
           >
-            {applying ? 'جاري التطبيق...' : `طبّق التعديل (${selected.size})`}
+            {applying ? `جاري التطبيق... ${progress}` : `طبّق التعديل (${selected.size})`}
           </button>
         </>
       )}
