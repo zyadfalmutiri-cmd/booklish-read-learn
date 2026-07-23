@@ -1,7 +1,7 @@
 import { createServerFileRoute } from '@tanstack/react-start/server'
 import { blogPosts } from '../data/blog-posts'
 
-const SITE_URL = 'https://d-learn.vercel.app'
+const SITE_URL = 'https://booklish-read-learn.vercel.app'
 
 const staticRoutes = ['', '/about', '/contact', '/faq', '/blog', '/step']
 
