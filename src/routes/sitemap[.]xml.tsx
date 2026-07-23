@@ -1,19 +1,12 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createServerFileRoute } from '@tanstack/react-start/server'
 import { blogPosts } from '../data/blog-posts'
 
-const SITE_URL = 'https://booklish.app'
+const SITE_URL = 'https://d-learn.vercel.app'
 
-const staticRoutes = [
-  '',
-  '/about',
-  '/contact',
-  '/faq',
-  '/blog',
-  '/step',
-]
+const staticRoutes = ['', '/about', '/contact', '/faq', '/blog', '/step']
 
-export const Route = createFileRoute('/sitemap.xml')({
-  loader: () => {
+export const ServerRoute = createServerFileRoute('/sitemap.xml').methods({
+  GET: () => {
     const staticUrls = staticRoutes
       .map(
         (path) => `
@@ -41,7 +34,7 @@ export const Route = createFileRoute('/sitemap.xml')({
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${staticUrls}${blogUrls}
 </urlset>`
 
-    throw new Response(xml, {
+    return new Response(xml, {
       headers: { 'Content-Type': 'application/xml' },
     })
   },
