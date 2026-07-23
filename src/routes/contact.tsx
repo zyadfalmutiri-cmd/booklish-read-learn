@@ -52,10 +52,10 @@ function ContactPage() {
         عندك سؤال، اقتراح، أو واجهتك مشكلة تقنية؟ راسلنا مباشرة عبر النموذج
         تحت، أو على البريد{' '}
         <a
-          href="mailto:support@booklish.app"
+          href="mailto:booklish.app@gmail.com"
           className="text-[#9D381F] underline"
         >
-          support@booklish.app
+          booklish.app@gmail.com
         </a>
       </p>
 
