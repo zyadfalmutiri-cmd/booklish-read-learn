@@ -1,16 +1,16 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createServerFileRoute } from '@tanstack/react-start/server'
 
-const SITE_URL = 'https://booklish.app'
+const SITE_URL = 'https://booklish-read-learn.vercel.app'
 
-export const Route = createFileRoute('/robots.txt')({
-  loader: () => {
+export const ServerRoute = createServerFileRoute('/robots.txt').methods({
+  GET: () => {
     const body = `User-agent: *
 Allow: /
 Disallow: /admin/
 
 Sitemap: ${SITE_URL}/sitemap.xml`
 
-    throw new Response(body, {
+    return new Response(body, {
       headers: { 'Content-Type': 'text/plain' },
     })
   },
