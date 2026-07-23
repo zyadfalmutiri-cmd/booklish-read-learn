@@ -21,8 +21,10 @@ function ContactPage() {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>(
-    'idle',
-  )
+  'idle',
+)
+const [errorDetail, setErrorDetail] = useState('')
+
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -34,10 +36,11 @@ function ContactPage() {
       .insert({ name, email, message })
 
     if (error) {
-  console.error('Contact form error:', error)
+  setErrorDetail(`${error.message} (code: ${error.code ?? 'unknown'})`)
   setStatus('error')
   return
 }
+
 
 
     setStatus('sent')
@@ -105,10 +108,11 @@ function ContactPage() {
           </div>
 
           {status === 'error' && (
-            <p className="text-red-600 text-sm">
-              صار خطأ أثناء الإرسال، حاول مرة ثانية.
-            </p>
-          )}
+  <p className="text-red-600 text-sm break-words">
+    خطأ: {errorDetail}
+  </p>
+)}
+
 
           <button
             type="submit"
