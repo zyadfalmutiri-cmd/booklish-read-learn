@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { blogPosts } from '~/data/blog-posts'
+import { blogPosts } from '../data/blog-posts'
 
 const SITE_URL = 'https://booklish.app'
 
