@@ -34,9 +34,11 @@ function ContactPage() {
       .insert({ name, email, message })
 
     if (error) {
-      setStatus('error')
-      return
-    }
+  console.error('Contact form error:', error)
+  setStatus('error')
+  return
+}
+
 
     setStatus('sent')
     setName('')
