@@ -20,6 +20,7 @@ import { Toaster } from "../components/ui/sonner";
 import { useCloudSync } from "../lib/sync";
 import { RequireAuth } from "../components/booklish/require-auth";
 import { AchievementToastListener } from "../components/booklish/achievement-toast-listener";
+import { CookieConsent } from "../components/CookieConsent";
 
 function NotFoundComponent() {
  return (
@@ -205,6 +206,7 @@ function RootComponent() {
     <Footer />
     <Toaster />
     <AchievementToastListener />
+    <CookieConsent />
   </QueryClientProvider>
 );
 }
