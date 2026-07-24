@@ -37,4 +37,40 @@
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
+  <url>
+    <loc>https://booklish-read-learn.vercel.app/blog/akthar-1000-kalima-shuyuan</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://booklish-read-learn.vercel.app/blog/farq-bayn-listening-wa-speaking</loc>
+    <lastmod>2026-07-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://booklish-read-learn.vercel.app/blog/akhtaa-shayiaa-fi-alqawaid</loc>
+    <lastmod>2026-07-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://booklish-read-learn.vercel.app/blog/kayfa-tastaidd-liktibar-step</loc>
+    <lastmod>2026-07-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://booklish-read-learn.vercel.app/blog/limatha-alqisas-alqasira-afdal-tariqa</loc>
+    <lastmod>2026-07-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://booklish-read-learn.vercel.app/blog/nasaeh-lihifz-almufradat-tawil-almada</loc>
+    <lastmod>2026-07-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>
