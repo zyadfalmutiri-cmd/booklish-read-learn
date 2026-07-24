@@ -1,6 +1,6 @@
 import { createServerFileRoute } from '@tanstack/react-start/server'
 
-const SITE_URL = 'https://booklish-read-learn.vercel.app'
+const SITE_URL = 'https://d-learn.vercel.app'
 
 export const ServerRoute = createServerFileRoute('/robots.txt').methods({
   GET: () => {
