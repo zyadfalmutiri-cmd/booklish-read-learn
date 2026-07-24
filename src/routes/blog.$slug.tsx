@@ -1,7 +1,6 @@
 import { createFileRoute, notFound, Link } from '@tanstack/react-router'
 import { blogPosts } from '../data/blog-posts'
 
-
 export const Route = createFileRoute('/blog/$slug')({
   loader: ({ params }) => {
     const post = blogPosts.find((p) => p.slug === params.slug)
@@ -20,8 +19,25 @@ export const Route = createFileRoute('/blog/$slug')({
 function BlogPostPage() {
   const post = Route.useLoaderData()
 
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": post.title,
+    "description": post.excerpt,
+    "datePublished": post.date,
+    "author": {
+      "@type": "Organization",
+      "name": "Booklish",
+    },
+  }
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-12" dir="rtl">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+
       <Link to="/blog" className="text-[#9D381F] text-sm mb-6 inline-block">
         ← الرجوع للمدونة
       </Link>
