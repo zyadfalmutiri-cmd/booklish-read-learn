@@ -87,11 +87,11 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
  head: () => ({
-  meta: [
-    { charSet: "utf-8" },
-    { name: "viewport", content: "width=device-width, initial-scale=1" },
-    { name: "google-site-verification", content: "6c9bfamnJNzaN0b9EcyB3tpbQleX6UCZYmzev9B7vrQ" },
-    { title: "Booklish — Learn English by Reading" },
+   meta: [
+     { charSet: "utf-8" },
+     { name: "viewport", content: "width=device-width, initial-scale=1" },
+     { name: "google-site-verification", content: "6c9bfamnJNzaN0b9EcyB3tpbQleX6UCZYmzev9B7vrQ" },
+     { title: "Booklish — Learn English by Reading" },
      {
        name: "description",
        content:
@@ -167,6 +167,32 @@ function RootShell({ children }: { children: ReactNode }) {
              gtag('js', new Date());
              gtag('config', 'G-XQ88T80JG8');
            `,
+         }}
+       />
+
+       {/* Schema.org: Organization */}
+       <script
+         type="application/ld+json"
+         dangerouslySetInnerHTML={{
+           __html: JSON.stringify({
+             "@context": "https://schema.org",
+             "@type": "Organization",
+             "name": "Booklish",
+             "url": "https://booklish-read-learn.vercel.app",
+             "description": "منصة لتعلم اللغة الإنجليزية للناطقين بالعربية عبر القصص والمفردات",
+           }),
+         }}
+       />
+       {/* Schema.org: WebSite */}
+       <script
+         type="application/ld+json"
+         dangerouslySetInnerHTML={{
+           __html: JSON.stringify({
+             "@context": "https://schema.org",
+             "@type": "WebSite",
+             "name": "Booklish",
+             "url": "https://booklish-read-learn.vercel.app",
+           }),
          }}
        />
      </head>
