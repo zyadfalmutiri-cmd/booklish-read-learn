@@ -116,7 +116,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
      { rel: "manifest", href: "/manifest.webmanifest" },
      { rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
    ],
-   scripts: [{ src: "https://cdn.paddle.com/paddle/v2/paddle.js" }],
  }),
 
  shellComponent: RootShell,
@@ -134,10 +133,11 @@ function RootShell({ children }: { children: ReactNode }) {
 
        {/* Google AdSense */}
        <script
-         async
-         src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5277341714713924"
-         crossOrigin="anonymous"
-       />
+  async
+  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5277341714713924"
+  crossOrigin="anonymous"
+/>
+
        {/* Auto Ads: يخلي Google يحدد أماكن الإعلانات تلقائيًا في كل صفحة */}
        <script
          dangerouslySetInnerHTML={{
@@ -212,14 +212,6 @@ function RootComponent() {
    void import("../lib/pwa-register").then((m) => m.registerPWA?.());
  }, []);
 
- useEffect(() => {
-   if (typeof window !== "undefined" && (window as any).Paddle) {
-     (window as any).Paddle.Environment.set("sandbox");
-     (window as any).Paddle.Initialize({
-       token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
-     });
-   }
- }, []);
 
  useCloudSync();
 
