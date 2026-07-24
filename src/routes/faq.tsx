@@ -37,15 +37,33 @@ const faqs = [
   },
   {
     q: 'كيف أتواصل معكم في حال وجود مشكلة؟',
-    a: 'تقدر تراسلنا من صفحة "اتصل بنا" أو عبر البريد booklish.app@gmail.com',
+    a: 'تقدر تراسلنا من صفحة "اتصل بنا" أو عبر البريد support@booklish.app',
   },
 ]
 
 function FAQPage() {
   const [open, setOpen] = useState<number | null>(null)
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map((item) => ({
+      "@type": "Question",
+      "name": item.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.a,
+      },
+    })),
+  }
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-12" dir="rtl">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+
       <h1 className="text-3xl font-semibold text-[#9D381F] mb-8">
         الأسئلة الشائعة
       </h1>
