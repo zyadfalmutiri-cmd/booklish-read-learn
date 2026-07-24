@@ -133,12 +133,10 @@ function RootShell({ children }: { children: ReactNode }) {
 
        {/* Google AdSense */}
        <script
-  async
-  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5277341714713924"
-  crossOrigin="anonymous"
-/>
-
-       {/* Auto Ads: يخلي Google يحدد أماكن الإعلانات تلقائيًا في كل صفحة */}
+         async
+         src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5277341714713924"
+         crossOrigin="anonymous"
+       />
        <script
          dangerouslySetInnerHTML={{
            __html: `
@@ -151,7 +149,7 @@ function RootShell({ children }: { children: ReactNode }) {
        />
 
        {/* Google tag (gtag.js) */}
-<script defer src="https://www.googletagmanager.com/gtag/js?id=G-XQ88T80JG8" />
+       <script defer src="https://www.googletagmanager.com/gtag/js?id=G-XQ88T80JG8" />
        <script
          dangerouslySetInnerHTML={{
            __html: `
@@ -204,7 +202,6 @@ function RootComponent() {
  useEffect(() => {
    void import("../lib/pwa-register").then((m) => m.registerPWA?.());
  }, []);
-
 
  useCloudSync();
 
