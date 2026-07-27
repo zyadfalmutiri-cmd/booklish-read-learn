@@ -11,6 +11,7 @@ import { getPreferredVoice, useVoicePrefs } from "@/lib/voices";
 import { Flame, BookOpen, ArrowRight, Target, Zap, Mic, MicOff, MessageCircle, Loader2 } from "lucide-react";
 import { useT } from "@/lib/i18n";
 import { useState, useRef } from "react";
+import { getSpeakingPartnerReply } from "@/lib/api/speaking-ai.functions";
 
 // 🔓 تحميل مبكر لقائمة الأصوات (بعض المتصفحات تحتاجها قبل أول استخدام)
 if (typeof window !== "undefined" && "speechSynthesis" in window) {
@@ -67,12 +68,6 @@ function PublicLanding({ ar }: { ar: boolean }) {
             className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             {ar ? "ابدأ الآن مجانًا" : "Get started free"}
-          </Link>
-          <Link
-
-            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-          >
-            {ar ? "الأسعار" : "Pricing"}
           </Link>
         </div>
       </section>
@@ -157,14 +152,6 @@ const setGender = (g: "male" | "female") => setVoicePrefs((p) => ({ ...p, gender
     setFeedback("");
 
     try {
-      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-
-      if (!apiKey) {
-        setReply(ar ? "خطأ: مفتاح API غير موجود - VITE_OPENROUTER_API_KEY" : "Error: missing VITE_OPENROUTER_API_KEY");
-        setThinking(false);
-        return;
-      }
-
       const systemPrompt = `You are a friendly, patient English speaking partner for an Arabic-speaking English learner using the Booklish app.
 Your job every turn:
 1. Continue a natural, simple spoken conversation in English. Keep your reply short (1-3 sentences), warm, and ask a small follow-up question to keep the user talking.
@@ -176,32 +163,20 @@ REPLY: <your English conversational reply>
 FEEDBACK: <feedback in Arabic about mistakes in the user's last sentence, be specific and give the corrected sentence. If there were no mistakes, write "ممتاز! ما فيه أخطاء بهذي الجملة.">
 LEVEL: <A1|A2|B1|B2|C1>`;
 
-      const messages = [
+      const messages: { role: "system" | "user" | "assistant"; content: string }[] = [
         { role: "system", content: systemPrompt },
         ...historyRef.current,
         { role: "user", content: text },
       ];
 
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: "poolside/laguna-xs-2.1:free",
-          messages,
-        }),
-      });
-
-      if (!response.ok) {
-        const errText = await response.text();
-        setReply(`${ar ? "خطأ" : "Error"} HTTP ${response.status}: ${errText.slice(0, 200)}`);
+      let message = "";
+      try {
+        const result = await getSpeakingPartnerReply({ data: { messages } });
+        message = result.raw;
+      } catch (err: any) {
+        setReply(`${ar ? "خطأ" : "Error"}: ${err?.message || String(err)}`);
         return;
       }
-
-      const data = await response.json();
-      const message: string = data.choices?.[0]?.message?.content || "";
 
       const replyMatch = message.match(/REPLY:\s*([\s\S]*?)(?=FEEDBACK:|$)/i);
       const feedbackMatch = message.match(/FEEDBACK:\s*([\s\S]*?)(?=LEVEL:|$)/i);
@@ -463,16 +438,6 @@ const { user, loading: authLoading } = useAuth();
   const featured = stories.filter((s) => s.level === "beginner").slice(0, 3);
   const arrowClass = dir === "rtl" ? "h-4 w-4 rotate-180" : "h-4 w-4";
 
-  const openCheckout = (priceId: string) => {
-    if (typeof window !== "undefined" && (window as any).Paddle && user) {
-      (window as any).Paddle.Checkout.open({
-        items: [{ priceId, quantity: 1 }],
-        customer: { email: user.email },
-        customData: { user_id: user.id },
-      });
-    }
-  };
-
   return (
     <main className="mx-auto max-w-5xl px-4 pb-24 pt-8 sm:pt-14">
 
@@ -623,8 +588,6 @@ const { user, loading: authLoading } = useAuth();
           ))}
         </div>
       </section>
-
-
 
     </main>
   );
