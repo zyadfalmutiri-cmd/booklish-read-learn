@@ -18,6 +18,7 @@ import {
 import { stories } from "@/data/stories";
 import { splitSentences } from "@/lib/tokenize";
 import { useT } from "@/lib/i18n";
+import { getPronunciationTip as getPronunciationTipFn } from "@/lib/api/speaking-ai.functions";
 
 interface StoryCompletionProps {
   storySlug: string;
@@ -93,44 +94,6 @@ function scoreAttempt(target: string, spoken: string) {
   return { score, results };
 }
 
-async function getPronunciationTip(
-  target: string,
-  spoken: string,
-  ar: boolean,
-): Promise<string | null> {
-  const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-  if (!apiKey) return null;
-
-  try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "poolside/laguna-xs-2.1:free",
-        messages: [
-          {
-            role: "system",
-            content: `You are a pronunciation coach for Arabic-speaking English learners.
-Compare the target sentence with what the speech recognizer heard the user say, and give ONE short, encouraging tip in Arabic (max 1-2 sentences) about a specific word or sound to improve. If the attempt was very close or perfect, just congratulate them briefly in Arabic. Do not repeat the full sentences back.`,
-          },
-          {
-            role: "user",
-            content: `Target sentence: "${target}"\nWhat the recognizer heard: "${spoken || "(nothing detected)"}"`,
-          },
-        ],
-      }),
-    });
-    if (!response.ok) return null;
-    const data = await response.json();
-    return data.choices?.[0]?.message?.content?.trim() || null;
-  } catch {
-    return null;
-  }
-}
-
 function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }) {
   const sentences = useMemo(() => pickShadowingSentences(storySlug, 5), [storySlug]);
   const [index, setIndex] = useState(0);
@@ -175,8 +138,10 @@ function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }
 
     if (scored.score < 100) {
       setTipLoading(true);
-      const t = await getPronunciationTip(current, spokenText, ar);
-      setTip(t);
+      const { tip } = await getPronunciationTipFn({
+        data: { target: current, spoken: spokenText },
+      });
+      setTip(tip);
       setTipLoading(false);
     } else {
       setTip(ar ? "نطق ممتاز! 👏" : "Perfect pronunciation! 👏");
