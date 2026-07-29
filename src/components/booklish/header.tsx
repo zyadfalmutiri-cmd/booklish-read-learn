@@ -17,6 +17,7 @@ import {
   MapPin,
   User,
   GraduationCap,
+  Settings as SettingsIcon,
 } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useSettings } from "./theme";
@@ -39,6 +40,7 @@ const menuLinks = [
   { to: "/", labelAr: "الرئيسية", labelEn: "Home", icon: Home },
   { to: "/step", labelAr: "التحضير لـ STEP", labelEn: "STEP Prep", icon: GraduationCap },
   { to: "/vocab-games", labelAr: "ألعاب المفردات", labelEn: "Vocabulary Games", icon: Brain },
+  { to: "/settings", labelAr: "الإعدادات", labelEn: "Settings", icon: SettingsIcon },
 ] as const;
 
 export function Header() {
@@ -157,7 +159,7 @@ export function Header() {
         </div>
       </header>
 
-      {/* ☰ menu — extra items (Home + STEP + Vocabulary Games) */}
+      {/* ☰ menu — extra items (Home + STEP + Vocabulary Games + Settings) */}
       {mobileOpen && (
         <div
           className="fixed inset-0 top-14 z-40 bg-background/95 backdrop-blur-sm sm:hidden"
