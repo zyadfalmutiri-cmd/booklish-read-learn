@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Flame, BookOpen, GraduationCap, Sparkles, Clock, Hand, Zap, Sprout } from "lucide-react";
+import { Flame, BookOpen, GraduationCap, Sparkles, Clock, Hand, Zap } from "lucide-react";
 import { stories } from "@/data/stories";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useStreak } from "@/lib/streak";
@@ -20,12 +20,6 @@ function isSameDay(ts: number, ref: Date) {
   const d = new Date(ts);
   return d.getFullYear() === ref.getFullYear() && d.getMonth() === ref.getMonth() && d.getDate() === ref.getDate();
 }
-
-const LEVEL_ICONS = {
-  beginner: Sprout,
-  intermediate: BookOpen,
-  advanced: GraduationCap,
-} as const;
 
 function Dashboard() {
   const [progress] = useLocalStore<ProgressMap>(storeKeys.progress, {});
@@ -75,10 +69,7 @@ function Dashboard() {
       {/* Avatar + level */}
       <div className="mb-6 flex items-center gap-4">
         <div className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
-          {(() => {
-            const LevelIcon = LEVEL_ICONS[level.name] ?? Sprout;
-            return <LevelIcon className="h-7 w-7" aria-hidden="true" />;
-          })()}
+          <level.icon className="h-7 w-7" aria-hidden="true" />
         </div>
         <div>
           <div className="font-serif text-lg">{ar ? level.nameAr : level.nameEn}</div>
