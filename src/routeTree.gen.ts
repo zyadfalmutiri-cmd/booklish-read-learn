@@ -10,14 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VocabGamesRouteImport } from './routes/vocab-games'
-import { Route as VocabRouteImport } from './routes/vocab'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as StepRouteImport } from './routes/step'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefundRouteImport } from './routes/refund'
 import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LibraryRouteImport } from './routes/library'
+import { Route as JourneyRouteImport } from './routes/journey'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
@@ -26,20 +26,21 @@ import { Route as ShadowSlugRouteImport } from './routes/shadow.$slug'
 import { Route as ReadSlugRouteImport } from './routes/read.$slug'
 import { Route as QuizSlugRouteImport } from './routes/quiz.$slug'
 import { Route as ListenSlugRouteImport } from './routes/listen.$slug'
+import { Route as AdminStepSeedRouteImport } from './routes/admin.step-seed'
 
 const VocabGamesRoute = VocabGamesRouteImport.update({
   id: '/vocab-games',
   path: '/vocab-games',
   getParentRoute: () => rootRouteImport,
 } as any)
-const VocabRoute = VocabRouteImport.update({
-  id: '/vocab',
-  path: '/vocab',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StepRoute = StepRouteImport.update({
+  id: '/step',
+  path: '/step',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReviewRoute = ReviewRouteImport.update({
@@ -62,14 +63,14 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PricingRoute = PricingRouteImport.update({
-  id: '/pricing',
-  path: '/pricing',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LibraryRoute = LibraryRouteImport.update({
   id: '/library',
   path: '/library',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JourneyRoute = JourneyRouteImport.update({
+  id: '/journey',
+  path: '/journey',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -112,20 +113,26 @@ const ListenSlugRoute = ListenSlugRouteImport.update({
   path: '/listen/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminStepSeedRoute = AdminStepSeedRouteImport.update({
+  id: '/admin/step-seed',
+  path: '/admin/step-seed',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/journey': typeof JourneyRoute
   '/library': typeof LibraryRoute
-  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/review': typeof ReviewRoute
+  '/step': typeof StepRoute
   '/terms': typeof TermsRoute
-  '/vocab': typeof VocabRoute
   '/vocab-games': typeof VocabGamesRoute
+  '/admin/step-seed': typeof AdminStepSeedRoute
   '/listen/$slug': typeof ListenSlugRoute
   '/quiz/$slug': typeof QuizSlugRoute
   '/read/$slug': typeof ReadSlugRoute
@@ -136,15 +143,16 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/journey': typeof JourneyRoute
   '/library': typeof LibraryRoute
-  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/review': typeof ReviewRoute
+  '/step': typeof StepRoute
   '/terms': typeof TermsRoute
-  '/vocab': typeof VocabRoute
   '/vocab-games': typeof VocabGamesRoute
+  '/admin/step-seed': typeof AdminStepSeedRoute
   '/listen/$slug': typeof ListenSlugRoute
   '/quiz/$slug': typeof QuizSlugRoute
   '/read/$slug': typeof ReadSlugRoute
@@ -156,15 +164,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/journey': typeof JourneyRoute
   '/library': typeof LibraryRoute
-  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/review': typeof ReviewRoute
+  '/step': typeof StepRoute
   '/terms': typeof TermsRoute
-  '/vocab': typeof VocabRoute
   '/vocab-games': typeof VocabGamesRoute
+  '/admin/step-seed': typeof AdminStepSeedRoute
   '/listen/$slug': typeof ListenSlugRoute
   '/quiz/$slug': typeof QuizSlugRoute
   '/read/$slug': typeof ReadSlugRoute
@@ -177,15 +186,16 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/journey'
     | '/library'
-    | '/pricing'
     | '/privacy'
     | '/refund'
     | '/reset-password'
     | '/review'
+    | '/step'
     | '/terms'
-    | '/vocab'
     | '/vocab-games'
+    | '/admin/step-seed'
     | '/listen/$slug'
     | '/quiz/$slug'
     | '/read/$slug'
@@ -196,15 +206,16 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/journey'
     | '/library'
-    | '/pricing'
     | '/privacy'
     | '/refund'
     | '/reset-password'
     | '/review'
+    | '/step'
     | '/terms'
-    | '/vocab'
     | '/vocab-games'
+    | '/admin/step-seed'
     | '/listen/$slug'
     | '/quiz/$slug'
     | '/read/$slug'
@@ -215,15 +226,16 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/journey'
     | '/library'
-    | '/pricing'
     | '/privacy'
     | '/refund'
     | '/reset-password'
     | '/review'
+    | '/step'
     | '/terms'
-    | '/vocab'
     | '/vocab-games'
+    | '/admin/step-seed'
     | '/listen/$slug'
     | '/quiz/$slug'
     | '/read/$slug'
@@ -235,15 +247,16 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
+  JourneyRoute: typeof JourneyRoute
   LibraryRoute: typeof LibraryRoute
-  PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundRoute: typeof RefundRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ReviewRoute: typeof ReviewRoute
+  StepRoute: typeof StepRoute
   TermsRoute: typeof TermsRoute
-  VocabRoute: typeof VocabRoute
   VocabGamesRoute: typeof VocabGamesRoute
+  AdminStepSeedRoute: typeof AdminStepSeedRoute
   ListenSlugRoute: typeof ListenSlugRoute
   QuizSlugRoute: typeof QuizSlugRoute
   ReadSlugRoute: typeof ReadSlugRoute
@@ -260,18 +273,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VocabGamesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/vocab': {
-      id: '/vocab'
-      path: '/vocab'
-      fullPath: '/vocab'
-      preLoaderRoute: typeof VocabRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/terms': {
       id: '/terms'
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/step': {
+      id: '/step'
+      path: '/step'
+      fullPath: '/step'
+      preLoaderRoute: typeof StepRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/review': {
@@ -302,18 +315,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pricing': {
-      id: '/pricing'
-      path: '/pricing'
-      fullPath: '/pricing'
-      preLoaderRoute: typeof PricingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/library': {
       id: '/library'
       path: '/library'
       fullPath: '/library'
       preLoaderRoute: typeof LibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journey': {
+      id: '/journey'
+      path: '/journey'
+      fullPath: '/journey'
+      preLoaderRoute: typeof JourneyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -372,6 +385,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListenSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/step-seed': {
+      id: '/admin/step-seed'
+      path: '/admin/step-seed'
+      fullPath: '/admin/step-seed'
+      preLoaderRoute: typeof AdminStepSeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -379,15 +399,16 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
+  JourneyRoute: JourneyRoute,
   LibraryRoute: LibraryRoute,
-  PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RefundRoute: RefundRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ReviewRoute: ReviewRoute,
+  StepRoute: StepRoute,
   TermsRoute: TermsRoute,
-  VocabRoute: VocabRoute,
   VocabGamesRoute: VocabGamesRoute,
+  AdminStepSeedRoute: AdminStepSeedRoute,
   ListenSlugRoute: ListenSlugRoute,
   QuizSlugRoute: QuizSlugRoute,
   ReadSlugRoute: ReadSlugRoute,
