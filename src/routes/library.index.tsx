@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { Search, TrendingUp, GraduationCap, X } from "lucide-react";
+import { Search, TrendingUp, GraduationCap, X, BookOpen } from "lucide-react";
 import { stories } from "@/data/stories";
 import { StoryCard } from "@/components/booklish/story-card";
 import type { Category, Genre } from "@/lib/types";
@@ -11,7 +11,7 @@ import { PlacementTest } from "@/components/booklish/placement-test";
 import { getLibraryBooks } from "@/lib/library.service";
 import type { LibraryBook } from "@/types/library";
 
-export const Route = createFileRoute("/library/")({
+export const Route = createFileRoute("/library")({
   component: Library,
 });
 
@@ -208,13 +208,13 @@ function FullBooksRow({ title, books }: { title: string; books: LibraryBook[] })
             key={b.slug}
             to="/library/book/$slug"
             params={{ slug: b.slug }}
-            className="w-40 shrink-0 rounded-xl border border-border bg-card p-3 flex flex-col gap-2 hover:bg-muted transition-colors"
+            className="paper-card w-40 shrink-0 p-3 flex flex-col gap-2 hover:bg-muted transition-colors"
           >
             <div className="aspect-[2/3] rounded-lg bg-muted flex items-center justify-center overflow-hidden">
               {b.cover_url ? (
                 <img src={b.cover_url} alt={b.title} className="w-full h-full object-cover" />
               ) : (
-                <span className="text-3xl">📖</span>
+                <BookOpen className="h-8 w-8 text-foreground/30" aria-hidden="true" />
               )}
             </div>
             <div>
