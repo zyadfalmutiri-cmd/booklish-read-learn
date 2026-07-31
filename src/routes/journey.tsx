@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { Lock, CheckCircle2, GraduationCap } from "lucide-react";
+import { Lock, CheckCircle2, GraduationCap, BookOpen } from "lucide-react";
 import { stories } from "@/data/stories";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useUserLevel, CEFR_TO_STORY_LEVEL, STORIES_TO_ADVANCE } from "@/lib/reading-level";
@@ -138,12 +138,12 @@ function Journey() {
                     </span>
 
                     <div
-                      className={`mb-3 grid h-24 w-full place-items-center overflow-hidden rounded-lg bg-gradient-to-br ${s.coverHue} text-3xl`}
+                      className={`mb-3 grid h-24 w-full place-items-center overflow-hidden rounded-lg bg-gradient-to-br ${s.coverHue}`}
                     >
                       {s.coverImage ? (
                         <img src={s.coverImage} alt={s.title} className="h-full w-full object-cover" />
                       ) : (
-                        s.cover
+                        <BookOpen className="h-8 w-8 text-foreground/30" aria-hidden="true" />
                       )}
                     </div>
 
