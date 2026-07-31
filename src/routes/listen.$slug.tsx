@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, Headphones } from "lucide-react";
+import { ArrowLeft, Headphones, BookOpen } from "lucide-react";
 import { getStory } from "@/data/stories";
 import { AudioPlayer } from "@/components/booklish/AudioPlayer";
 import { useT } from "@/lib/i18n";
@@ -48,7 +48,9 @@ function ListenPage() {
     {story.coverImage ? (
       <img src={story.coverImage} alt={story.title} className="h-24 w-24 rounded-xl object-cover" />
     ) : (
-      <span className="text-5xl">{story.cover}</span>
+      <div className="grid h-24 w-24 place-items-center rounded-xl bg-primary/10">
+        <BookOpen className="h-10 w-10 text-primary/50" aria-hidden="true" />
+      </div>
     )}
   </div>
 
