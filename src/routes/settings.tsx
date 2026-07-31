@@ -245,7 +245,7 @@ function SettingsSection({ title, children }: { title: string; children: React.R
       <h2 className="mb-2 px-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
         {title}
       </h2>
-      <div className="overflow-hidden rounded-2xl border border-border bg-card divide-y divide-border">
+      <div className="paper-card overflow-hidden divide-y divide-border">
         {children}
       </div>
     </section>
