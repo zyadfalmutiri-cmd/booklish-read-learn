@@ -144,7 +144,7 @@ function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }
       setTip(tip);
       setTipLoading(false);
     } else {
-      setTip(ar ? "نطق ممتاز! 👏" : "Perfect pronunciation! 👏");
+      setTip(ar ? "نطق ممتاز!" : "Perfect pronunciation!");
     }
   };
 
@@ -273,7 +273,7 @@ function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }
           <button
             type="button"
             onClick={() => speak(current)}
-            className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
+            className="flex items-center gap-2 rounded-md border border-border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
           >
             <Volume2 className="h-4 w-4" />
             {ar ? "استمع" : "Listen"}
@@ -282,7 +282,7 @@ function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }
           <button
             type="button"
             onClick={isRecording ? stopRecording : startRecording}
-            className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
               isRecording
                 ? "bg-red-500 text-white shadow-lg shadow-red-500/20"
                 : "bg-primary text-primary-foreground hover:bg-primary/90"
@@ -333,7 +333,7 @@ function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }
             <button
               type="button"
               onClick={playRecording}
-              className="flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
+              className="flex items-center gap-2 rounded-md border border-primary/30 bg-primary/5 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
             >
               <Play className="h-3.5 w-3.5" />
               {ar ? "تشغيل تسجيلك" : "Play your recording"}
@@ -366,7 +366,7 @@ export function StoryCompletion({
       className="fixed inset-x-0 bottom-0 z-50 px-4 pb-6 pt-2 animate-slide-up"
       dir={ar ? "rtl" : "ltr"}
     >
-      <div className="mx-auto max-w-lg overflow-hidden rounded-2xl border border-border bg-card shadow-2xl max-h-[85vh] overflow-y-auto">
+      <div className="paper-card mx-auto max-w-lg overflow-hidden shadow-2xl max-h-[85vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center gap-3 border-b border-border bg-primary/5 px-5 py-4">
           <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" />
