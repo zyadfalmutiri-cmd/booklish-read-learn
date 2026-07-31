@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Bookmark, BookmarkCheck, Clock, ArrowRight, Lock, CheckCircle2 } from "lucide-react";
+import { Bookmark, BookmarkCheck, Clock, ArrowRight, Lock, CheckCircle2, BookOpen } from "lucide-react";
 import { getStory } from "@/data/stories";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useT } from "@/lib/i18n";
@@ -50,11 +50,11 @@ function StoryDetail() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
-      <div className={`mb-8 flex h-56 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br ${story.coverHue} text-7xl`}>
+      <div className={`mb-8 flex h-56 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br ${story.coverHue}`}>
   {story.coverImage ? (
     <img src={story.coverImage} alt={story.title} className="h-full w-full object-cover" />
   ) : (
-    story.cover
+    <BookOpen className="h-16 w-16 text-foreground/30" aria-hidden="true" />
   )}
 </div>
 
@@ -75,7 +75,7 @@ function StoryDetail() {
           <Link
             to="/read/$slug"
             params={{ slug: story.slug }}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             {pct > 0 ? `${t("story.continue")} (${pct}%)` : t("story.start")} <ArrowRight className={arrowClass} />
           </Link>
@@ -83,7 +83,7 @@ function StoryDetail() {
             <Link
               to="/quiz/$slug"
               params={{ slug: story.slug }}
-              className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm transition-colors hover:bg-muted"
+              className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2.5 text-sm transition-colors hover:bg-muted"
             >
               {t("story.takeQuiz")}
             </Link>
