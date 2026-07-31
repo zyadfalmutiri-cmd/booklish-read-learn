@@ -187,13 +187,13 @@ function ReviewPage() {
       )}
 
       {/* بطاقة الإحصائيات */}
-      <div className="mb-6 rounded-2xl border border-border bg-card p-5">
+      <div className="mb-6 paper-card p-5">
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="rounded-full bg-primary px-3 py-1 text-sm font-semibold text-primary-foreground">
               {knowCount} {isAr ? "أعرفها" : "Know"}
             </span>
-            <span className="rounded-full bg-yellow-500/90 px-3 py-1 text-sm font-semibold text-white">
+            <span className="rounded-full bg-accent px-3 py-1 text-sm font-semibold text-accent-foreground">
               {learnCount} {isAr ? "تعلّم" : "Learn"}
             </span>
           </div>
@@ -202,7 +202,7 @@ function ReviewPage() {
           </span>
         </div>
         <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-muted">
-          <div className="h-full bg-yellow-500" style={{ width: `${100 - knowPct}%` }} />
+          <div className="h-full bg-accent" style={{ width: `${100 - knowPct}%` }} />
           <div className="h-full bg-primary" style={{ width: `${knowPct}%` }} />
         </div>
       </div>
@@ -287,7 +287,7 @@ function ReviewPage() {
                   </div>
                   <button
                     onClick={() => toggleFavorite(v)}
-                    className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${v.favorite ? "text-yellow-500" : "text-muted-foreground hover:bg-muted"}`}
+                    className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${v.favorite ? "text-accent" : "text-muted-foreground hover:bg-muted"}`}
                     aria-label="favorite"
                   >
                     <Star className={`h-4 w-4 ${v.favorite ? "fill-current" : ""}`} />
@@ -491,7 +491,7 @@ function FlashCardsTab({
         </div>
         <h2 className="mb-2 font-serif text-2xl">{isAr ? "خلصت البطاقات!" : "Done!"}</h2>
         {xpEarned > 0 && (
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-yellow-500/10 px-4 py-1.5 text-sm font-medium text-yellow-700 dark:text-yellow-400">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-accent/15 px-4 py-1.5 text-sm font-medium text-accent-foreground">
             <Zap className="h-4 w-4" />
             +{xpEarned} XP
           </div>
@@ -525,7 +525,7 @@ function FlashCardsTab({
 
       <button
         onClick={() => setFlipped((f) => !f)}
-        className="w-full rounded-2xl border border-border bg-card p-10 text-center"
+        className="w-full paper-card p-10 text-center"
       >
         <div className="mb-2 flex items-center justify-center gap-2">
           <span className="font-serif text-4xl" dir="ltr">{current.word}</span>
@@ -711,7 +711,7 @@ function QuizTab({ vocab }: { vocab: SavedWord[] }) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border bg-card p-8 text-center">
+      <div className="paper-card p-8 text-center">
         <p className="mb-1 text-xs text-muted-foreground">
           {isAr ? "وش معنى هذي الكلمة؟" : "What does this word mean?"}
         </p>
