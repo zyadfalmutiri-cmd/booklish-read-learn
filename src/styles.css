@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,680&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -11,47 +12,53 @@
   font-display: swap;
 }
 
+/*
+  هوية بوكلش: "ورقة + حبر + هايلايتر"
+  - الخلفية: لون ورق دافئ (مو الكريمي المعتاد)
+  - Primary: كحلي حبر غامق بدل التراكوتا
+  - Accent: أصفر هايلايتر ذهبي — نفس لون تظليل الكلمة وقت الضغط عليها
+*/
 :root {
-  --background: oklch(0.98 0.005 85);
-  --foreground: oklch(0.18 0.02 60);
-  --card: oklch(0.97 0.005 85);
-  --card-foreground: oklch(0.18 0.02 60);
-  --popover: oklch(0.97 0.005 85);
-  --popover-foreground: oklch(0.18 0.02 60);
-  --primary: oklch(0.48 0.14 35);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.92 0.01 85);
-  --secondary-foreground: oklch(0.25 0.02 60);
-  --muted: oklch(0.93 0.008 85);
-  --muted-foreground: oklch(0.52 0.02 60);
-  --accent: oklch(0.92 0.01 85);
-  --accent-foreground: oklch(0.25 0.02 60);
+  --background: oklch(0.96 0.025 85);
+  --foreground: oklch(0.24 0.045 265);
+  --card: oklch(0.985 0.015 85);
+  --card-foreground: oklch(0.24 0.045 265);
+  --popover: oklch(0.985 0.015 85);
+  --popover-foreground: oklch(0.24 0.045 265);
+  --primary: oklch(0.28 0.06 265);
+  --primary-foreground: oklch(0.98 0.01 85);
+  --secondary: oklch(0.91 0.03 145);
+  --secondary-foreground: oklch(0.24 0.045 265);
+  --muted: oklch(0.92 0.02 85);
+  --muted-foreground: oklch(0.48 0.03 265);
+  --accent: oklch(0.78 0.15 75);
+  --accent-foreground: oklch(0.24 0.06 75);
   --destructive: oklch(0.55 0.22 27);
-  --border: oklch(0.88 0.01 85);
-  --input: oklch(0.88 0.01 85);
-  --ring: oklch(0.48 0.14 35);
-  --radius: 0.5rem;
+  --border: oklch(0.86 0.025 85);
+  --input: oklch(0.86 0.025 85);
+  --ring: oklch(0.78 0.15 75);
+  --radius: 0.65rem;
 }
 
 .dark {
-  --background: oklch(0.15 0.015 60);
-  --foreground: oklch(0.93 0.01 85);
-  --card: oklch(0.18 0.015 60);
-  --card-foreground: oklch(0.93 0.01 85);
-  --popover: oklch(0.18 0.015 60);
-  --popover-foreground: oklch(0.93 0.01 85);
-  --primary: oklch(0.65 0.14 35);
-  --primary-foreground: oklch(0.15 0.015 60);
-  --secondary: oklch(0.25 0.015 60);
-  --secondary-foreground: oklch(0.93 0.01 85);
-  --muted: oklch(0.22 0.015 60);
-  --muted-foreground: oklch(0.62 0.02 60);
-  --accent: oklch(0.25 0.015 60);
-  --accent-foreground: oklch(0.93 0.01 85);
-  --destructive: oklch(0.55 0.22 27);
-  --border: oklch(0.28 0.015 60);
-  --input: oklch(0.28 0.015 60);
-  --ring: oklch(0.65 0.14 35);
+  --background: oklch(0.19 0.035 265);
+  --foreground: oklch(0.93 0.02 85);
+  --card: oklch(0.23 0.04 265);
+  --card-foreground: oklch(0.93 0.02 85);
+  --popover: oklch(0.23 0.04 265);
+  --popover-foreground: oklch(0.93 0.02 85);
+  --primary: oklch(0.78 0.15 75);
+  --primary-foreground: oklch(0.19 0.04 265);
+  --secondary: oklch(0.3 0.03 265);
+  --secondary-foreground: oklch(0.93 0.02 85);
+  --muted: oklch(0.27 0.03 265);
+  --muted-foreground: oklch(0.68 0.03 85);
+  --accent: oklch(0.78 0.15 75);
+  --accent-foreground: oklch(0.19 0.04 265);
+  --destructive: oklch(0.6 0.2 27);
+  --border: oklch(0.32 0.035 265);
+  --input: oklch(0.32 0.035 265);
+  --ring: oklch(0.78 0.15 75);
 }
 
 @theme inline {
@@ -97,14 +104,57 @@ body {
 
 }
 
+/* خط العرض الإنجليزي — Fraunces، سيريف دافئ بشخصية "كتاب"، يُستخدم فقط على العناوين اللاتينية.
+   العربي يبقى على Inter/system-ui زي ما هو مثبت (Thmanyah أزيل سابقًا لمشاكل أداء). */
 .font-serif {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: 'Fraunces', Georgia, "Times New Roman", serif;
+  font-optical-sizing: auto;
 }
 
-/* خط Inter SemiBold — استخدمه بالعناصر اللي تبيها بارزة شوي (عناوين، أزرار) بدون ما تصير ثقيلة زيادة */
 .font-inter-semibold {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-weight: 600;
+}
+
+/* توقيع الهوية: تظليل هايلايتر خلف كلمة — يعكس فعل "اضغط على الكلمة" بالتطبيق نفسه */
+.ink-highlight {
+  position: relative;
+  white-space: nowrap;
+}
+.ink-highlight::before {
+  content: "";
+  position: absolute;
+  left: -0.15em;
+  right: -0.15em;
+  bottom: 0.06em;
+  top: 0.42em;
+  background: var(--accent);
+  opacity: 0.55;
+  transform: rotate(-1deg);
+  border-radius: 0.2em 0.6em 0.2em 0.5em;
+  z-index: -1;
+}
+
+/* بطاقة "ورقة": ظل خفيف من الأسفل بدل shadow-sm العام، وزاوية مطوية بالأعلى */
+.paper-card {
+  position: relative;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background-color: var(--card);
+  box-shadow: 0 1px 2px oklch(0.24 0.045 265 / 0.04), 0 8px 20px -12px oklch(0.24 0.045 265 / 0.18);
+}
+.paper-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 14px 14px 0;
+  border-color: transparent var(--background) transparent transparent;
+  border-top-right-radius: var(--radius-lg);
+  opacity: 0.7;
 }
 
 .reading-column {
@@ -151,4 +201,12 @@ body {
 
 .focus-mode-active .reading-column {
   padding-top: 3rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-slide-up {
+    animation: none;
+  }
 }
