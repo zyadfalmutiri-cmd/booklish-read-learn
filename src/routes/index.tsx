@@ -54,8 +54,14 @@ function PublicLanding({ ar }: { ar: boolean }) {
         <p className="mb-3 text-xs uppercase tracking-[0.2em] text-primary">
           {ar ? "تعلم الإنجليزية بطريقة طبيعية" : "Learn English Naturally"}
         </p>
-        <h1 className="mb-5 mx-auto max-w-2xl font-serif text-3xl leading-[1.1] tracking-tight sm:text-5xl">
-          Booklish
+        <h1 className="mb-5 mx-auto max-w-2xl font-serif font-semibold text-3xl leading-[1.1] tracking-tight sm:text-5xl">
+          {ar ? (
+            <>Booklish</>
+          ) : (
+            <>
+              Read. Tap. <span className="ink-highlight">Understand.</span>
+            </>
+          )}
         </h1>
         <p className="mb-7 mx-auto max-w-xl text-base text-muted-foreground">
           {ar
@@ -65,7 +71,7 @@ function PublicLanding({ ar }: { ar: boolean }) {
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link
             to="/auth"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             {ar ? "ابدأ الآن مجانًا" : "Get started free"}
           </Link>
@@ -73,22 +79,28 @@ function PublicLanding({ ar }: { ar: boolean }) {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-3 mb-10">
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm text-center">
-          <div className="text-2xl mb-2">📚</div>
+        <div className="paper-card p-5 text-center">
+          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+            <BookOpen className="h-5 w-5 text-primary" aria-hidden="true" />
+          </div>
           <h3 className="font-serif text-base mb-1">{ar ? "قصص تفاعلية" : "Interactive Stories"}</h3>
           <p className="text-sm text-muted-foreground">
             {ar ? "اضغط على أي كلمة لمعناها فورًا" : "Tap any word for instant meaning"}
           </p>
         </div>
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm text-center">
-          <div className="text-2xl mb-2">🎙️</div>
+        <div className="paper-card p-5 text-center">
+          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+            <Mic className="h-5 w-5 text-primary" aria-hidden="true" />
+          </div>
           <h3 className="font-serif text-base mb-1">{ar ? "شريك محادثة ذكي" : "AI Conversation Partner"}</h3>
           <p className="text-sm text-muted-foreground">
             {ar ? "تحدث بالإنجليزي واحصل على تصحيح فوري" : "Speak English and get instant feedback"}
           </p>
         </div>
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm text-center">
-          <div className="text-2xl mb-2">🔥</div>
+        <div className="paper-card p-5 text-center">
+          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+            <Flame className="h-5 w-5 text-primary" aria-hidden="true" />
+          </div>
           <h3 className="font-serif text-base mb-1">{ar ? "تتبع تقدمك" : "Track Your Progress"}</h3>
           <p className="text-sm text-muted-foreground">
             {ar ? "نقاط خبرة، مستويات، وسلسلة أيام" : "XP, levels, and daily streaks"}
