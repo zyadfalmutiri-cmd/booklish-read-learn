@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Flame, BookOpen, GraduationCap, Sparkles, Clock, Hand, Zap } from "lucide-react";
+import { Flame, BookOpen, GraduationCap, Sparkles, Clock, Hand, Zap, Sprout } from "lucide-react";
 import { stories } from "@/data/stories";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useStreak } from "@/lib/streak";
@@ -20,6 +20,12 @@ function isSameDay(ts: number, ref: Date) {
   const d = new Date(ts);
   return d.getFullYear() === ref.getFullYear() && d.getMonth() === ref.getMonth() && d.getDate() === ref.getDate();
 }
+
+const LEVEL_ICONS = {
+  beginner: Sprout,
+  intermediate: BookOpen,
+  advanced: GraduationCap,
+} as const;
 
 function Dashboard() {
   const [progress] = useLocalStore<ProgressMap>(storeKeys.progress, {});
@@ -68,8 +74,11 @@ function Dashboard() {
 
       {/* Avatar + level */}
       <div className="mb-6 flex items-center gap-4">
-        <div className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-primary text-2xl text-primary-foreground">
-          {level.icon}
+        <div className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
+          {(() => {
+            const LevelIcon = LEVEL_ICONS[level.name] ?? Sprout;
+            return <LevelIcon className="h-7 w-7" aria-hidden="true" />;
+          })()}
         </div>
         <div>
           <div className="font-serif text-lg">{ar ? level.nameAr : level.nameEn}</div>
@@ -78,7 +87,7 @@ function Dashboard() {
       </div>
 
       {/* Daily goal card */}
-      <section className="mb-4 rounded-xl border border-border bg-card p-5">
+      <section className="mb-4 paper-card p-5">
         <h2 className="mb-4 font-serif text-base">{ar ? "هدفك اليومي" : "Daily Goal"}</h2>
         <div className="mb-4 flex items-center gap-4">
           <div
@@ -114,7 +123,7 @@ function Dashboard() {
       </section>
 
       {/* My Progress */}
-      <section className="mb-4 rounded-xl border border-border bg-card p-5">
+      <section className="mb-4 paper-card p-5">
         <h2 className="mb-4 font-serif text-base">{ar ? "تقدمي" : "My Progress"}</h2>
         <div className="mb-3 flex items-center justify-between">
           <span className="rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-foreground">
@@ -133,7 +142,7 @@ function Dashboard() {
       </section>
 
       {/* Insights */}
-      <section className="mb-6 rounded-xl border border-border bg-card p-5">
+      <section className="mb-6 paper-card p-5">
         <h2 className="mb-4 font-serif text-base">{ar ? "إحصائياتي" : "Insights"}</h2>
         <div className="grid grid-cols-2 gap-4">
           <div className="flex items-center gap-3">
@@ -176,8 +185,8 @@ function Dashboard() {
                     params={{ slug }}
                     className="flex items-center gap-4 rounded-lg border border-border bg-card p-3 transition-colors hover:bg-muted"
                   >
-                    <div className={`grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-md bg-gradient-to-br ${s.coverHue} text-xl`}>
-                      {s.coverImage ? <img src={s.coverImage} alt={s.title} className="h-full w-full object-cover" /> : s.cover}
+                    <div className={`grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-md bg-gradient-to-br ${s.coverHue}`}>
+                      {s.coverImage ? <img src={s.coverImage} alt={s.title} className="h-full w-full object-cover" /> : <BookOpen className="h-5 w-5 text-foreground/40" aria-hidden="true" />}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="truncate font-serif">{s.title}</div>
@@ -197,7 +206,7 @@ function Dashboard() {
       {scoreEntries.length > 0 && (
         <section>
           <h2 className="mb-3 font-serif text-lg">{t("dash.quizHistory")}</h2>
-          <ul className="divide-y divide-border rounded-xl border border-border bg-card">
+          <ul className="paper-card divide-y divide-border">
             {Object.entries(scores)
               .sort((a, b) => b[1].at - a[1].at)
               .map(([slug, s]) => {
@@ -219,7 +228,7 @@ function Dashboard() {
 
 function Stat({ icon, label, value, hint }: { icon: React.ReactNode; label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
+    <div className="paper-card p-4">
       <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
         {icon} {label}
       </div>
