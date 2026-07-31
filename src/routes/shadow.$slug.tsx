@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Mic, Volume2, Check, X, RotateCcw, ArrowLeft, Zap, Square } from "lucide-react";
+import { Mic, Volume2, Check, X, RotateCcw, ArrowLeft, Zap, Square, PartyPopper, ThumbsUp } from "lucide-react";
 import { getStory } from "@/data/stories";
 import { useLocalStore, storeKeys } from "@/lib/store";
 import { useT } from "@/lib/i18n";
@@ -244,7 +244,7 @@ function ShadowPage() {
           </p>
 
           {xpEarned > 0 && (
-            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-yellow-500/10 px-4 py-1.5 text-sm font-medium text-yellow-700 dark:text-yellow-400">
+            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-accent/15 px-4 py-1.5 text-sm font-medium text-accent-foreground">
               <Zap className="h-4 w-4" />
               +{xpEarned} XP
             </div>
@@ -253,13 +253,13 @@ function ShadowPage() {
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             <button
               onClick={restart}
-              className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
+              className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm hover:bg-muted"
             >
               <RotateCcw className="h-4 w-4" /> {t("quiz.tryAgain")}
             </button>
             <Link
               to="/library"
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"
+              className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"
             >
               {t("quiz.backLibrary")}
             </Link>
@@ -286,7 +286,7 @@ function ShadowPage() {
             : "Your browser doesn't support speech recognition. Try Chrome or mobile Safari."}
         </div>
       ) : (
-        <div className="rounded-xl border border-border bg-card p-6">
+        <div className="paper-card p-6">
           <p className="mb-5 text-center font-serif text-xl leading-relaxed" dir="ltr">
             {current}
           </p>
@@ -294,7 +294,7 @@ function ShadowPage() {
           <div className="flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={speak}
-              className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm hover:bg-muted"
+              className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2.5 text-sm hover:bg-muted"
             >
               <Volume2 className="h-4 w-4" />
               {lang === "ar" ? "استمع" : "Listen"}
@@ -303,7 +303,7 @@ function ShadowPage() {
             {state === "listening" ? (
               <button
                 onClick={stopRecording}
-                className="inline-flex items-center gap-2 rounded-full bg-destructive px-4 py-2.5 text-sm font-medium text-destructive-foreground"
+                className="inline-flex items-center gap-2 rounded-md bg-destructive px-4 py-2.5 text-sm font-medium text-destructive-foreground"
               >
                 <Square className="h-4 w-4" />
                 {lang === "ar" ? "إيقاف" : "Stop"}
@@ -311,7 +311,7 @@ function ShadowPage() {
             ) : (
               <button
                 onClick={startRecording}
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
               >
                 <Mic className="h-4 w-4" />
                 {lang === "ar" ? "سجّل صوتك" : "Record"}
@@ -320,8 +320,9 @@ function ShadowPage() {
           </div>
 
           {state === "listening" && (
-            <p className="mt-4 animate-pulse text-center text-sm text-muted-foreground">
-              {lang === "ar" ? "🎙️ جاري الاستماع..." : "🎙️ Listening..."}
+            <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-sm text-muted-foreground">
+              <Mic className="h-4 w-4 animate-pulse text-primary" aria-hidden="true" />
+              {lang === "ar" ? "جاري الاستماع..." : "Listening..."}
             </p>
           )}
 
@@ -343,21 +344,27 @@ function ShadowPage() {
                   </span>
                 ))}
               </p>
-              <p className="text-center font-serif text-lg">
-                {currentAttempt.score}%{" "}
-                {currentAttempt.score >= 90 ? "🎉" : currentAttempt.score >= 70 ? "👍" : "🔁"}
+              <p className="flex items-center justify-center gap-1.5 text-center font-serif text-lg">
+                {currentAttempt.score}%
+                {currentAttempt.score >= 90 ? (
+                  <PartyPopper className="h-5 w-5 text-accent" aria-hidden="true" />
+                ) : currentAttempt.score >= 70 ? (
+                  <ThumbsUp className="h-5 w-5 text-primary" aria-hidden="true" />
+                ) : (
+                  <RotateCcw className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+                )}
               </p>
               <div className="mt-4 flex flex-wrap justify-center gap-3">
                 <button
                   onClick={startRecording}
-                  className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
+                  className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm hover:bg-muted"
                 >
                   <RotateCcw className="h-4 w-4" />
                   {lang === "ar" ? "أعد المحاولة" : "Try again"}
                 </button>
                 <button
                   onClick={goNext}
-                  className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                  className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   {index < sentences.length - 1 ? (lang === "ar" ? "التالي" : "Next") : lang === "ar" ? "إنهاء" : "Finish"}
                   <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
