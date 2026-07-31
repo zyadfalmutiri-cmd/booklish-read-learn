@@ -12,21 +12,38 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VocabGamesRouteImport } from './routes/vocab-games'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as StepRouteImport } from './routes/step'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefundRouteImport } from './routes/refund'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as Oxford3000RouteImport } from './routes/oxford3000'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as JourneyRouteImport } from './routes/journey'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as DailyPhrasesRouteImport } from './routes/daily-phrases'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as BlogRouteImport } from './routes/blog'
+import { Route as AuthConfirmRouteImport } from './routes/auth-confirm'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LibraryIndexRouteImport } from './routes/library.index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as StorySlugRouteImport } from './routes/story.$slug'
 import { Route as ShadowSlugRouteImport } from './routes/shadow.$slug'
 import { Route as ReadSlugRouteImport } from './routes/read.$slug'
 import { Route as QuizSlugRouteImport } from './routes/quiz.$slug'
 import { Route as ListenSlugRouteImport } from './routes/listen.$slug'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminStepSeedRouteImport } from './routes/admin.step-seed'
+import { Route as AdminGenerateCoversRouteImport } from './routes/admin.generate-covers'
+import { Route as LibraryBookSlugRouteImport } from './routes/library.book.$slug'
+import { Route as LibraryBookSlugIndexRouteImport } from './routes/library.book.$slug.index'
+import { Route as LibraryBookSlugChapterChapterIndexRouteImport } from './routes/library.book.$slug.chapter.$chapterIndex'
+import { Route as LibraryBookSlugChapterChapterIndexIndexRouteImport } from './routes/library.book.$slug.chapter.$chapterIndex.index'
+import { Route as LibraryBookSlugChapterChapterIndexQuizRouteImport } from './routes/library.book.$slug.chapter.$chapterIndex.quiz'
 
 const VocabGamesRoute = VocabGamesRouteImport.update({
   id: '/vocab-games',
@@ -41,6 +58,11 @@ const TermsRoute = TermsRouteImport.update({
 const StepRoute = StepRouteImport.update({
   id: '/step',
   path: '/step',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReviewRoute = ReviewRouteImport.update({
@@ -63,6 +85,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Oxford3000Route = Oxford3000RouteImport.update({
+  id: '/oxford3000',
+  path: '/oxford3000',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LibraryRoute = LibraryRouteImport.update({
   id: '/library',
   path: '/library',
@@ -73,9 +100,34 @@ const JourneyRoute = JourneyRouteImport.update({
   path: '/journey',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DailyPhrasesRoute = DailyPhrasesRouteImport.update({
+  id: '/daily-phrases',
+  path: '/daily-phrases',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthConfirmRoute = AuthConfirmRouteImport.update({
+  id: '/auth-confirm',
+  path: '/auth-confirm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -83,10 +135,25 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryIndexRoute = LibraryIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LibraryRoute,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => BlogRoute,
 } as any)
 const StorySlugRoute = StorySlugRouteImport.update({
   id: '/story/$slug',
@@ -113,149 +180,290 @@ const ListenSlugRoute = ListenSlugRouteImport.update({
   path: '/listen/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => BlogRoute,
+} as any)
 const AdminStepSeedRoute = AdminStepSeedRouteImport.update({
   id: '/admin/step-seed',
   path: '/admin/step-seed',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminGenerateCoversRoute = AdminGenerateCoversRouteImport.update({
+  id: '/admin/generate-covers',
+  path: '/admin/generate-covers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryBookSlugRoute = LibraryBookSlugRouteImport.update({
+  id: '/book/$slug',
+  path: '/book/$slug',
+  getParentRoute: () => LibraryRoute,
+} as any)
+const LibraryBookSlugIndexRoute = LibraryBookSlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LibraryBookSlugRoute,
+} as any)
+const LibraryBookSlugChapterChapterIndexRoute =
+  LibraryBookSlugChapterChapterIndexRouteImport.update({
+    id: '/chapter/$chapterIndex',
+    path: '/chapter/$chapterIndex',
+    getParentRoute: () => LibraryBookSlugRoute,
+  } as any)
+const LibraryBookSlugChapterChapterIndexIndexRoute =
+  LibraryBookSlugChapterChapterIndexIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => LibraryBookSlugChapterChapterIndexRoute,
+  } as any)
+const LibraryBookSlugChapterChapterIndexQuizRoute =
+  LibraryBookSlugChapterChapterIndexQuizRouteImport.update({
+    id: '/quiz',
+    path: '/quiz',
+    getParentRoute: () => LibraryBookSlugChapterChapterIndexRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/auth-confirm': typeof AuthConfirmRoute
+  '/blog': typeof BlogRouteWithChildren
+  '/contact': typeof ContactRoute
+  '/daily-phrases': typeof DailyPhrasesRoute
   '/dashboard': typeof DashboardRoute
+  '/faq': typeof FaqRoute
   '/journey': typeof JourneyRoute
-  '/library': typeof LibraryRoute
+  '/library': typeof LibraryRouteWithChildren
+  '/oxford3000': typeof Oxford3000Route
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/review': typeof ReviewRoute
+  '/settings': typeof SettingsRoute
   '/step': typeof StepRoute
   '/terms': typeof TermsRoute
   '/vocab-games': typeof VocabGamesRoute
+  '/admin/generate-covers': typeof AdminGenerateCoversRoute
   '/admin/step-seed': typeof AdminStepSeedRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/listen/$slug': typeof ListenSlugRoute
   '/quiz/$slug': typeof QuizSlugRoute
   '/read/$slug': typeof ReadSlugRoute
   '/shadow/$slug': typeof ShadowSlugRoute
   '/story/$slug': typeof StorySlugRoute
+  '/blog/': typeof BlogIndexRoute
+  '/library/': typeof LibraryIndexRoute
+  '/library/book/$slug': typeof LibraryBookSlugRouteWithChildren
+  '/library/book/$slug/': typeof LibraryBookSlugIndexRoute
+  '/library/book/$slug/chapter/$chapterIndex': typeof LibraryBookSlugChapterChapterIndexRouteWithChildren
+  '/library/book/$slug/chapter/$chapterIndex/quiz': typeof LibraryBookSlugChapterChapterIndexQuizRoute
+  '/library/book/$slug/chapter/$chapterIndex/': typeof LibraryBookSlugChapterChapterIndexIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/auth-confirm': typeof AuthConfirmRoute
+  '/contact': typeof ContactRoute
+  '/daily-phrases': typeof DailyPhrasesRoute
   '/dashboard': typeof DashboardRoute
+  '/faq': typeof FaqRoute
   '/journey': typeof JourneyRoute
-  '/library': typeof LibraryRoute
+  '/oxford3000': typeof Oxford3000Route
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/review': typeof ReviewRoute
+  '/settings': typeof SettingsRoute
   '/step': typeof StepRoute
   '/terms': typeof TermsRoute
   '/vocab-games': typeof VocabGamesRoute
+  '/admin/generate-covers': typeof AdminGenerateCoversRoute
   '/admin/step-seed': typeof AdminStepSeedRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/listen/$slug': typeof ListenSlugRoute
   '/quiz/$slug': typeof QuizSlugRoute
   '/read/$slug': typeof ReadSlugRoute
   '/shadow/$slug': typeof ShadowSlugRoute
   '/story/$slug': typeof StorySlugRoute
+  '/blog': typeof BlogIndexRoute
+  '/library': typeof LibraryIndexRoute
+  '/library/book/$slug': typeof LibraryBookSlugIndexRoute
+  '/library/book/$slug/chapter/$chapterIndex/quiz': typeof LibraryBookSlugChapterChapterIndexQuizRoute
+  '/library/book/$slug/chapter/$chapterIndex': typeof LibraryBookSlugChapterChapterIndexIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/auth-confirm': typeof AuthConfirmRoute
+  '/blog': typeof BlogRouteWithChildren
+  '/contact': typeof ContactRoute
+  '/daily-phrases': typeof DailyPhrasesRoute
   '/dashboard': typeof DashboardRoute
+  '/faq': typeof FaqRoute
   '/journey': typeof JourneyRoute
-  '/library': typeof LibraryRoute
+  '/library': typeof LibraryRouteWithChildren
+  '/oxford3000': typeof Oxford3000Route
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
   '/review': typeof ReviewRoute
+  '/settings': typeof SettingsRoute
   '/step': typeof StepRoute
   '/terms': typeof TermsRoute
   '/vocab-games': typeof VocabGamesRoute
+  '/admin/generate-covers': typeof AdminGenerateCoversRoute
   '/admin/step-seed': typeof AdminStepSeedRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/listen/$slug': typeof ListenSlugRoute
   '/quiz/$slug': typeof QuizSlugRoute
   '/read/$slug': typeof ReadSlugRoute
   '/shadow/$slug': typeof ShadowSlugRoute
   '/story/$slug': typeof StorySlugRoute
+  '/blog/': typeof BlogIndexRoute
+  '/library/': typeof LibraryIndexRoute
+  '/library/book/$slug': typeof LibraryBookSlugRouteWithChildren
+  '/library/book/$slug/': typeof LibraryBookSlugIndexRoute
+  '/library/book/$slug/chapter/$chapterIndex': typeof LibraryBookSlugChapterChapterIndexRouteWithChildren
+  '/library/book/$slug/chapter/$chapterIndex/quiz': typeof LibraryBookSlugChapterChapterIndexQuizRoute
+  '/library/book/$slug/chapter/$chapterIndex/': typeof LibraryBookSlugChapterChapterIndexIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/auth'
+    | '/auth-confirm'
+    | '/blog'
+    | '/contact'
+    | '/daily-phrases'
     | '/dashboard'
+    | '/faq'
     | '/journey'
     | '/library'
+    | '/oxford3000'
     | '/privacy'
     | '/refund'
     | '/reset-password'
     | '/review'
+    | '/settings'
     | '/step'
     | '/terms'
     | '/vocab-games'
+    | '/admin/generate-covers'
     | '/admin/step-seed'
+    | '/blog/$slug'
     | '/listen/$slug'
     | '/quiz/$slug'
     | '/read/$slug'
     | '/shadow/$slug'
     | '/story/$slug'
+    | '/blog/'
+    | '/library/'
+    | '/library/book/$slug'
+    | '/library/book/$slug/'
+    | '/library/book/$slug/chapter/$chapterIndex'
+    | '/library/book/$slug/chapter/$chapterIndex/quiz'
+    | '/library/book/$slug/chapter/$chapterIndex/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/auth'
+    | '/auth-confirm'
+    | '/contact'
+    | '/daily-phrases'
     | '/dashboard'
+    | '/faq'
     | '/journey'
-    | '/library'
+    | '/oxford3000'
     | '/privacy'
     | '/refund'
     | '/reset-password'
     | '/review'
+    | '/settings'
     | '/step'
     | '/terms'
     | '/vocab-games'
+    | '/admin/generate-covers'
     | '/admin/step-seed'
+    | '/blog/$slug'
     | '/listen/$slug'
     | '/quiz/$slug'
     | '/read/$slug'
     | '/shadow/$slug'
     | '/story/$slug'
+    | '/blog'
+    | '/library'
+    | '/library/book/$slug'
+    | '/library/book/$slug/chapter/$chapterIndex/quiz'
+    | '/library/book/$slug/chapter/$chapterIndex'
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/auth'
+    | '/auth-confirm'
+    | '/blog'
+    | '/contact'
+    | '/daily-phrases'
     | '/dashboard'
+    | '/faq'
     | '/journey'
     | '/library'
+    | '/oxford3000'
     | '/privacy'
     | '/refund'
     | '/reset-password'
     | '/review'
+    | '/settings'
     | '/step'
     | '/terms'
     | '/vocab-games'
+    | '/admin/generate-covers'
     | '/admin/step-seed'
+    | '/blog/$slug'
     | '/listen/$slug'
     | '/quiz/$slug'
     | '/read/$slug'
     | '/shadow/$slug'
     | '/story/$slug'
+    | '/blog/'
+    | '/library/'
+    | '/library/book/$slug'
+    | '/library/book/$slug/'
+    | '/library/book/$slug/chapter/$chapterIndex'
+    | '/library/book/$slug/chapter/$chapterIndex/quiz'
+    | '/library/book/$slug/chapter/$chapterIndex/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
+  AuthConfirmRoute: typeof AuthConfirmRoute
+  BlogRoute: typeof BlogRouteWithChildren
+  ContactRoute: typeof ContactRoute
+  DailyPhrasesRoute: typeof DailyPhrasesRoute
   DashboardRoute: typeof DashboardRoute
+  FaqRoute: typeof FaqRoute
   JourneyRoute: typeof JourneyRoute
-  LibraryRoute: typeof LibraryRoute
+  LibraryRoute: typeof LibraryRouteWithChildren
+  Oxford3000Route: typeof Oxford3000Route
   PrivacyRoute: typeof PrivacyRoute
   RefundRoute: typeof RefundRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ReviewRoute: typeof ReviewRoute
+  SettingsRoute: typeof SettingsRoute
   StepRoute: typeof StepRoute
   TermsRoute: typeof TermsRoute
   VocabGamesRoute: typeof VocabGamesRoute
+  AdminGenerateCoversRoute: typeof AdminGenerateCoversRoute
   AdminStepSeedRoute: typeof AdminStepSeedRoute
   ListenSlugRoute: typeof ListenSlugRoute
   QuizSlugRoute: typeof QuizSlugRoute
@@ -287,6 +495,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StepRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/review': {
       id: '/review'
       path: '/review'
@@ -315,6 +530,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/oxford3000': {
+      id: '/oxford3000'
+      path: '/oxford3000'
+      fullPath: '/oxford3000'
+      preLoaderRoute: typeof Oxford3000RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/library': {
       id: '/library'
       path: '/library'
@@ -329,11 +551,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JourneyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/daily-phrases': {
+      id: '/daily-phrases'
+      path: '/daily-phrases'
+      fullPath: '/daily-phrases'
+      preLoaderRoute: typeof DailyPhrasesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth-confirm': {
+      id: '/auth-confirm'
+      path: '/auth-confirm'
+      fullPath: '/auth-confirm'
+      preLoaderRoute: typeof AuthConfirmRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -343,12 +600,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/library/': {
+      id: '/library/'
+      path: '/'
+      fullPath: '/library/'
+      preLoaderRoute: typeof LibraryIndexRouteImport
+      parentRoute: typeof LibraryRoute
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof BlogRoute
     }
     '/story/$slug': {
       id: '/story/$slug'
@@ -385,6 +663,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListenSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof BlogRoute
+    }
     '/admin/step-seed': {
       id: '/admin/step-seed'
       path: '/admin/step-seed'
@@ -392,22 +677,131 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminStepSeedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/generate-covers': {
+      id: '/admin/generate-covers'
+      path: '/admin/generate-covers'
+      fullPath: '/admin/generate-covers'
+      preLoaderRoute: typeof AdminGenerateCoversRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/book/$slug': {
+      id: '/library/book/$slug'
+      path: '/book/$slug'
+      fullPath: '/library/book/$slug'
+      preLoaderRoute: typeof LibraryBookSlugRouteImport
+      parentRoute: typeof LibraryRoute
+    }
+    '/library/book/$slug/': {
+      id: '/library/book/$slug/'
+      path: '/'
+      fullPath: '/library/book/$slug/'
+      preLoaderRoute: typeof LibraryBookSlugIndexRouteImport
+      parentRoute: typeof LibraryBookSlugRoute
+    }
+    '/library/book/$slug/chapter/$chapterIndex': {
+      id: '/library/book/$slug/chapter/$chapterIndex'
+      path: '/chapter/$chapterIndex'
+      fullPath: '/library/book/$slug/chapter/$chapterIndex'
+      preLoaderRoute: typeof LibraryBookSlugChapterChapterIndexRouteImport
+      parentRoute: typeof LibraryBookSlugRoute
+    }
+    '/library/book/$slug/chapter/$chapterIndex/': {
+      id: '/library/book/$slug/chapter/$chapterIndex/'
+      path: '/'
+      fullPath: '/library/book/$slug/chapter/$chapterIndex/'
+      preLoaderRoute: typeof LibraryBookSlugChapterChapterIndexIndexRouteImport
+      parentRoute: typeof LibraryBookSlugChapterChapterIndexRoute
+    }
+    '/library/book/$slug/chapter/$chapterIndex/quiz': {
+      id: '/library/book/$slug/chapter/$chapterIndex/quiz'
+      path: '/quiz'
+      fullPath: '/library/book/$slug/chapter/$chapterIndex/quiz'
+      preLoaderRoute: typeof LibraryBookSlugChapterChapterIndexQuizRouteImport
+      parentRoute: typeof LibraryBookSlugChapterChapterIndexRoute
+    }
   }
 }
 
+interface BlogRouteChildren {
+  BlogSlugRoute: typeof BlogSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogSlugRoute: BlogSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
+
+interface LibraryBookSlugChapterChapterIndexRouteChildren {
+  LibraryBookSlugChapterChapterIndexQuizRoute: typeof LibraryBookSlugChapterChapterIndexQuizRoute
+  LibraryBookSlugChapterChapterIndexIndexRoute: typeof LibraryBookSlugChapterChapterIndexIndexRoute
+}
+
+const LibraryBookSlugChapterChapterIndexRouteChildren: LibraryBookSlugChapterChapterIndexRouteChildren =
+  {
+    LibraryBookSlugChapterChapterIndexQuizRoute:
+      LibraryBookSlugChapterChapterIndexQuizRoute,
+    LibraryBookSlugChapterChapterIndexIndexRoute:
+      LibraryBookSlugChapterChapterIndexIndexRoute,
+  }
+
+const LibraryBookSlugChapterChapterIndexRouteWithChildren =
+  LibraryBookSlugChapterChapterIndexRoute._addFileChildren(
+    LibraryBookSlugChapterChapterIndexRouteChildren,
+  )
+
+interface LibraryBookSlugRouteChildren {
+  LibraryBookSlugIndexRoute: typeof LibraryBookSlugIndexRoute
+  LibraryBookSlugChapterChapterIndexRoute: typeof LibraryBookSlugChapterChapterIndexRouteWithChildren
+}
+
+const LibraryBookSlugRouteChildren: LibraryBookSlugRouteChildren = {
+  LibraryBookSlugIndexRoute: LibraryBookSlugIndexRoute,
+  LibraryBookSlugChapterChapterIndexRoute:
+    LibraryBookSlugChapterChapterIndexRouteWithChildren,
+}
+
+const LibraryBookSlugRouteWithChildren = LibraryBookSlugRoute._addFileChildren(
+  LibraryBookSlugRouteChildren,
+)
+
+interface LibraryRouteChildren {
+  LibraryIndexRoute: typeof LibraryIndexRoute
+  LibraryBookSlugRoute: typeof LibraryBookSlugRouteWithChildren
+}
+
+const LibraryRouteChildren: LibraryRouteChildren = {
+  LibraryIndexRoute: LibraryIndexRoute,
+  LibraryBookSlugRoute: LibraryBookSlugRouteWithChildren,
+}
+
+const LibraryRouteWithChildren =
+  LibraryRoute._addFileChildren(LibraryRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
+  AuthConfirmRoute: AuthConfirmRoute,
+  BlogRoute: BlogRouteWithChildren,
+  ContactRoute: ContactRoute,
+  DailyPhrasesRoute: DailyPhrasesRoute,
   DashboardRoute: DashboardRoute,
+  FaqRoute: FaqRoute,
   JourneyRoute: JourneyRoute,
-  LibraryRoute: LibraryRoute,
+  LibraryRoute: LibraryRouteWithChildren,
+  Oxford3000Route: Oxford3000Route,
   PrivacyRoute: PrivacyRoute,
   RefundRoute: RefundRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ReviewRoute: ReviewRoute,
+  SettingsRoute: SettingsRoute,
   StepRoute: StepRoute,
   TermsRoute: TermsRoute,
   VocabGamesRoute: VocabGamesRoute,
+  AdminGenerateCoversRoute: AdminGenerateCoversRoute,
   AdminStepSeedRoute: AdminStepSeedRoute,
   ListenSlugRoute: ListenSlugRoute,
   QuizSlugRoute: QuizSlugRoute,

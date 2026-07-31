@@ -11,7 +11,7 @@ import { PlacementTest } from "@/components/booklish/placement-test";
 import { getLibraryBooks } from "@/lib/library.service";
 import type { LibraryBook } from "@/types/library";
 
-export const Route = createFileRoute("/library")({
+export const Route = createFileRoute("/library/")({
   component: Library,
 });
 

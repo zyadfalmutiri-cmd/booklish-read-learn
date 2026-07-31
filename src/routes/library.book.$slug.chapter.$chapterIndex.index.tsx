@@ -14,7 +14,7 @@ import { ReadingSettingsSheet } from "@/components/booklish/reading-settings-she
 import { useSpeaking } from "@/lib/tts";
 import type { Story } from "@/lib/types";
 
-export const Route = createFileRoute("/library/book/$slug/chapter/$chapterIndex")({
+export const Route = createFileRoute("/library/book/$slug/chapter/$chapterIndex/")({
   component: ChapterReaderPage,
 });
 

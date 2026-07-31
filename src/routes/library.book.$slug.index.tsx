@@ -10,7 +10,7 @@ import {
 import type { LibraryBook } from "@/types/library";
 import { useAuth } from "@/hooks/use-auth";
 
-export const Route = createFileRoute("/library/book/$slug")({
+export const Route = createFileRoute("/library/book/$slug/")({
   component: BookDetailPage,
 });
 

@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useT } from "@/lib/i18n";
 import type { StepVocabItem } from "@/types/step-vocab";
 
-export const Route = createFileRoute("/step/daily-phrases")({
+export const Route = createFileRoute("/daily-phrases")({
   component: DailyPhrasesPage,
 });
 
