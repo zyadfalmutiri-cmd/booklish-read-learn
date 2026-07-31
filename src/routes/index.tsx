@@ -493,7 +493,12 @@ const { user, loading: authLoading } = useAuth();
         <StatCard
           icon={<Zap className="h-4 w-4 text-yellow-500" />}
           value={`${xp} XP`}
-          label={`${level.icon} ${ar ? level.nameAr : level.nameEn}`}
+          label={
+            <span className="inline-flex items-center gap-1">
+              <level.icon className="h-3.5 w-3.5" aria-hidden="true" />
+              {ar ? level.nameAr : level.nameEn}
+            </span>
+          }
         />
         <StatCard
           icon={<Target className="h-4 w-4 text-emerald-500" />}
@@ -514,11 +519,11 @@ const { user, loading: authLoading } = useAuth();
             params={{ slug: continueStory.slug }}
             className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4 transition-all hover:shadow-md hover:-translate-y-0.5"
           >
-<div className={`grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-gradient-to-br ${continueStory.coverHue} text-2xl shadow-sm`}>
+<div className={`grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-gradient-to-br ${continueStory.coverHue} shadow-sm`}>
   {continueStory.coverImage ? (
     <img src={continueStory.coverImage} alt={continueStory.title} className="h-full w-full object-cover" />
   ) : (
-    continueStory.cover
+    <BookOpen className="h-6 w-6 text-foreground/40" aria-hidden="true" />
   )}
 </div>
 
@@ -561,7 +566,10 @@ const { user, loading: authLoading } = useAuth();
       <section className="mb-8 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
         <div className="border-b border-border px-4 py-3">
           <div className="flex items-center justify-between text-sm">
-            <span className="font-medium">{level.icon} {ar ? level.nameAr : level.nameEn}</span>
+            <span className="flex items-center gap-1.5 font-medium">
+              <level.icon className="h-4 w-4" aria-hidden="true" />
+              {ar ? level.nameAr : level.nameEn}
+            </span>
             {xpToNext > 0 && (
               <span className="text-xs text-muted-foreground">
                 {ar ? `${xpToNext} XP للمستوى التالي` : `${xpToNext} XP to next level`}
@@ -579,7 +587,7 @@ const { user, loading: authLoading } = useAuth();
           <div className="mt-3 flex justify-between text-[11px] text-muted-foreground">
             {LEVELS.map((l) => (
               <span key={l.name} className={xp >= l.minXp ? "text-primary font-medium" : ""}>
-                {l.icon}
+                <l.icon className="h-4 w-4" aria-hidden="true" />
               </span>
             ))}
           </div>
@@ -605,7 +613,7 @@ const { user, loading: authLoading } = useAuth();
   );
 }
 
-function StatCard({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
+function StatCard({ icon, value, label }: { icon: React.ReactNode; value: string; label: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
       <div className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
