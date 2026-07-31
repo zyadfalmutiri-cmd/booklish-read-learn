@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Headphones } from "lucide-react";
+import { Headphones, BookOpen } from "lucide-react";
 import type { Story } from "@/lib/types";
 import { useT } from "@/lib/i18n";
 
@@ -44,7 +44,7 @@ const levelStyles: Record<string, string> = {
   return (
 
     <Link to="/story/$slug" params={{ slug: story.slug }}>
-      <div className="group relative block overflow-hidden rounded-xl border border-border bg-card transition-all hover:shadow-md hover:-translate-y-0.5">
+      <div className="paper-card group relative block overflow-hidden transition-all hover:shadow-md hover:-translate-y-0.5">
         <div className={`relative flex h-40 items-center justify-center overflow-hidden bg-gradient-to-br ${story.coverHue}`}>
           <span
             className={`absolute right-2 top-2 z-10 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider shadow-sm ${levelStyles[story.level] ?? "bg-muted text-muted-foreground"}`}
@@ -65,7 +65,7 @@ const levelStyles: Record<string, string> = {
               style={{ lineHeight: 0 }}
             />
           ) : (
-            <span className="text-5xl drop-shadow-sm">{story.cover}</span>
+            <BookOpen className="h-10 w-10 text-foreground/30" aria-hidden="true" />
           )}
         </div>
         <div className="space-y-2 p-4">
