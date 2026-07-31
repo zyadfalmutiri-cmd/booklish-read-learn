@@ -1,4 +1,5 @@
 import { useLocalStore, storeKeys } from "./store";
+import { Sprout, BookOpen, GraduationCap, type LucideIcon } from "lucide-react";
 
 export interface XpData {
   total: number;
@@ -21,13 +22,13 @@ export interface Level {
   nameEn: string;
   minXp: number;
   maxXp: number;
-  icon: string;
+  icon: LucideIcon;
 }
 
 export const LEVELS: Level[] = [
-  { name: "beginner",     nameAr: "مبتدئ",  nameEn: "Beginner",     minXp: 0,    maxXp: 299,  icon: "🌱" },
-  { name: "intermediate", nameAr: "متوسط",  nameEn: "Intermediate", minXp: 300,  maxXp: 799,  icon: "📖" },
-  { name: "advanced",     nameAr: "متقدم",  nameEn: "Advanced",     minXp: 800,  maxXp: Infinity, icon: "🎓" },
+  { name: "beginner",     nameAr: "مبتدئ",  nameEn: "Beginner",     minXp: 0,    maxXp: 299,  icon: Sprout },
+  { name: "intermediate", nameAr: "متوسط",  nameEn: "Intermediate", minXp: 300,  maxXp: 799,  icon: BookOpen },
+  { name: "advanced",     nameAr: "متقدم",  nameEn: "Advanced",     minXp: 800,  maxXp: Infinity, icon: GraduationCap },
 ];
 
 export function getLevel(xp: number): Level {
