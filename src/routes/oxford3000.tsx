@@ -321,7 +321,7 @@ function QuizView({
         </p>
         <button
           onClick={startQuiz}
-          className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
         >
           <RotateCcw className="h-4 w-4" />
           {isAr ? "اختبار جديد" : "New quiz"}
@@ -412,7 +412,7 @@ function QuizView({
       {selected !== null && (
         <button
           onClick={handleNext}
-          className="mt-4 w-full rounded-full bg-primary py-2.5 text-sm font-medium text-primary-foreground"
+          className="mt-4 w-full rounded-md bg-primary py-2.5 text-sm font-medium text-primary-foreground"
         >
           {qIndex + 1 >= questions.length
             ? isAr
