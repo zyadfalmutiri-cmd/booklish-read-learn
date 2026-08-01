@@ -71,8 +71,8 @@ function QuizPage() {
         const info = LEVEL_INFO[result.newLevel as keyof typeof LEVEL_INFO];
         toast.success(
           ar
-            ? `🎉 ترقيت للمستوى ${result.newLevel} — ${info.nameAr}!`
-            : `🎉 You leveled up to ${result.newLevel} — ${info.nameEn}!`
+            ? `ترقيت للمستوى ${result.newLevel} — ${info.nameAr}!`
+            : `You leveled up to ${result.newLevel} — ${info.nameEn}!`
         );
       }
     }
@@ -107,7 +107,7 @@ function QuizPage() {
         <p className="mb-2 text-xs uppercase tracking-wider text-muted-foreground">{t("quiz.kicker")}</p>
         <h1 className="mb-6 font-serif text-3xl">{story.title}</h1>
 
-        <div className="rounded-xl border border-border bg-card p-6 text-center">
+        <div className="paper-card p-6 text-center">
           <p className="text-sm text-muted-foreground">لقد أكملت هذا الاختبار من قبل</p>
           <p className="mt-2 font-serif text-2xl">
             {t("quiz.youScored")} {priorResult.score} / {priorResult.total}
@@ -132,13 +132,13 @@ function QuizPage() {
                 setXpEarned(0);
                 setRetaking(true);
               }}
-              className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
+              className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm hover:bg-muted"
             >
               <RotateCcw className="h-4 w-4" /> {t("quiz.tryAgain")}
             </button>
             <Link
               to="/library"
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"
+              className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"
             >
               {t("quiz.backLibrary")}
             </Link>
@@ -155,7 +155,7 @@ function QuizPage() {
 
       <ol className="space-y-6">
         {story.quiz.map((q, i) => (
-          <li key={i} className="rounded-xl border border-border bg-card p-5">
+          <li key={i} className="paper-card p-5">
             <div className="mb-3 flex items-baseline justify-between gap-3">
               <p className="font-serif text-lg">{i + 1}. {q.q}</p>
               <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
@@ -201,18 +201,18 @@ function QuizPage() {
         <button
           onClick={submit}
           disabled={!allAnswered}
-          className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-opacity hover:bg-primary/90 disabled:opacity-50 sm:w-auto"
+          className="mt-8 inline-flex w-full items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-opacity hover:bg-primary/90 disabled:opacity-50 sm:w-auto"
         >
           {t("quiz.submit")}
         </button>
       ) : (
-        <div className="mt-8 rounded-xl border border-border bg-card p-6 text-center">
+        <div className="mt-8 paper-card p-6 text-center">
           <p className="font-serif text-2xl">{t("quiz.youScored")} {score} / {story.quiz.length}</p>
           <p className="mt-1 text-sm text-muted-foreground">
             {score === story.quiz.length ? t("quiz.perfect") : score >= story.quiz.length / 2 ? t("quiz.nice") : t("quiz.reread")}
           </p>
           {xpEarned > 0 && (
-            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-yellow-500/10 px-4 py-1.5 text-sm font-medium text-yellow-700 dark:text-yellow-400">
+            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-accent/15 px-4 py-1.5 text-sm font-medium text-accent-foreground">
               <Zap className="h-4 w-4" />
               +{xpEarned} XP {t("quiz.xpEarned")}
             </div>
@@ -229,19 +229,19 @@ function QuizPage() {
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             <button
               onClick={saveMissedVocab}
-              className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
+              className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm hover:bg-muted"
             >
               <BookmarkPlus className="h-4 w-4" /> {t("quiz.saveMissed")}
             </button>
             <button
               onClick={() => { setAnswers(story.quiz.map(() => null)); setSubmitted(false); setXpEarned(0); }}
-              className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
+              className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm hover:bg-muted"
             >
               <RotateCcw className="h-4 w-4" /> {t("quiz.tryAgain")}
             </button>
             <Link
               to={promotion.promoted ? "/journey" : "/library"}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"
+              className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"
             >
               {promotion.promoted ? (ar ? "شوف رحلتك الجديدة" : "See your new journey") : t("quiz.backLibrary")}
             </Link>
