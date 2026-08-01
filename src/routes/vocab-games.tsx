@@ -105,7 +105,7 @@ function GameMenu({ level, wordCount, onSelect }: { level: string; wordCount: nu
           <button
             key={g.id}
             onClick={() => onSelect(g.id)}
-            className="flex flex-col items-start gap-2 rounded-xl border border-border bg-card p-4 text-right transition-all hover:border-primary hover:bg-primary/5 active:scale-95"
+            className="flex flex-col items-start gap-2 paper-card p-4 text-right transition-all hover:border-primary hover:bg-primary/5 active:scale-95"
           >
             <g.icon className="h-6 w-6 text-primary" />
             <div>
@@ -133,10 +133,10 @@ function GameHeader({ title, score, total, onBack }: { title: string; score: num
 
 function ScoreScreen({ score, total, onRestart, onBack }: { score: number; total: number; onRestart: () => void; onBack: () => void }) {
   const pct = Math.round((score / total) * 100);
-  const msg = pct >= 80 ? "ممتاز! 🎉" : pct >= 60 ? "جيد جداً 👍" : "حاول مرة أخرى 💪";
+  const msg = pct >= 80 ? "ممتاز!" : pct >= 60 ? "جيد جداً" : "حاول مرة أخرى";
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center px-4">
-      <Trophy className="h-12 w-12 text-yellow-500" />
+      <Trophy className="h-12 w-12 text-accent" />
       <h2 className="font-serif text-2xl font-semibold">{msg}</h2>
       <p className="text-4xl font-bold text-primary">{score}<span className="text-lg text-muted-foreground">/{total}</span></p>
       <p className="text-sm text-muted-foreground">{pct}% إجابات صحيحة</p>
@@ -299,7 +299,7 @@ function AnagramGame({ words, onBack }: { words: VocabWord[]; onBack: () => void
   return (
     <div className="mx-auto max-w-lg px-4 pt-6 pb-24">
       <GameHeader title="رتب الحروف" score={score} total={TOTAL} onBack={onBack} />
-      <div className="mb-6 rounded-xl border border-border bg-card p-4 text-center">
+      <div className="mb-6 paper-card p-4 text-center">
         <p className="text-xs text-muted-foreground mb-1">المعنى:</p>
         <p className="text-lg font-semibold">{current.ar}</p>
         {current.example && <p className="mt-2 text-xs text-muted-foreground italic">{current.example.replace(current.word, '_____')}</p>}
@@ -381,7 +381,7 @@ function FillGame({ words, onBack }: { words: VocabWord[]; onBack: () => void })
   return (
     <div className="mx-auto max-w-lg px-4 pt-6 pb-24">
       <GameHeader title="أكمل الكلمة" score={score} total={TOTAL} onBack={onBack} />
-      <div className="mb-4 rounded-xl border border-border bg-card p-5">
+      <div className="mb-4 paper-card p-5">
         <p className="text-xs text-muted-foreground mb-2">المعنى: <span className="font-medium text-foreground">{current.ar}</span></p>
         <p className="font-serif text-lg leading-relaxed">{getPrompt(current)}</p>
       </div>
@@ -402,10 +402,14 @@ function FillGame({ words, onBack }: { words: VocabWord[]; onBack: () => void })
         )}
       />
       {status !== "playing" && (
-        <p className={cn("mb-3 text-center text-sm font-medium",
+        <p className={cn("mb-3 flex items-center justify-center gap-1.5 text-center text-sm font-medium",
           status === "correct" ? "text-emerald-600" : "text-red-500"
         )}>
-          {status === "correct" ? "✓ صحيح!" : `✗ الإجابة: ${current.word}`}
+          {status === "correct" ? (
+            <><CheckCircle2 className="h-4 w-4" aria-hidden="true" /> صحيح!</>
+          ) : (
+            <><XCircle className="h-4 w-4" aria-hidden="true" /> الإجابة: {current.word}</>
+          )}
         </p>
       )}
       <button onClick={check} disabled={!input.trim() || status !== "playing"}
@@ -460,17 +464,21 @@ function TrueFalseGame({ words, onBack }: { words: VocabWord[]; onBack: () => vo
   return (
     <div className="mx-auto max-w-lg px-4 pt-6 pb-24">
       <GameHeader title="صح أو خطأ" score={score} total={TOTAL} onBack={onBack} />
-      <div className="mb-8 rounded-xl border border-border bg-card p-6 text-center">
+      <div className="mb-8 paper-card p-6 text-center">
         <p className="text-xs text-muted-foreground mb-2">هل هذا المعنى صحيح؟</p>
         <p className="font-serif text-2xl font-semibold mb-3">{current.word}</p>
         <div className="inline-block rounded-lg bg-muted px-4 py-2">
           <p className="text-base">{current.shown}</p>
         </div>
         {status !== "playing" && (
-          <p className={cn("mt-3 text-sm font-medium",
+          <p className={cn("mt-3 flex items-center justify-center gap-1.5 text-sm font-medium",
             status === "correct" ? "text-emerald-600" : "text-red-500"
           )}>
-            {status === "correct" ? "✓ صحيح!" : `✗ المعنى الصحيح: ${words.find(w => w.word === current.word)?.ar}`}
+            {status === "correct" ? (
+              <><CheckCircle2 className="h-4 w-4" aria-hidden="true" /> صحيح!</>
+            ) : (
+              <><XCircle className="h-4 w-4" aria-hidden="true" /> المعنى الصحيح: {words.find(w => w.word === current.word)?.ar}</>
+            )}
           </p>
         )}
       </div>
@@ -553,8 +561,8 @@ function MemoryGame({ words, onBack }: { words: VocabWord[]; onBack: () => void 
 
   if (done) return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center px-4">
-      <Trophy className="h-12 w-12 text-yellow-500" />
-      <h2 className="font-serif text-2xl">أحسنت! 🎉</h2>
+      <Trophy className="h-12 w-12 text-accent" />
+      <h2 className="font-serif text-2xl">أحسنت!</h2>
       <p className="text-muted-foreground text-sm">وجدت كل الأزواج في <strong>{moves}</strong> محاولة</p>
       <div className="flex gap-3">
         <button onClick={restart} className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground">
@@ -629,7 +637,7 @@ function ChoiceGame({ words, onBack }: { words: VocabWord[]; onBack: () => void 
   return (
     <div className="mx-auto max-w-lg px-4 pt-6 pb-24">
       <GameHeader title="اختر الصحيح" score={score} total={TOTAL} onBack={onBack} />
-      <div className="mb-6 rounded-xl border border-border bg-card p-6 text-center">
+      <div className="mb-6 paper-card p-6 text-center">
         <p className="text-xs text-muted-foreground mb-2">ما معنى هذه الكلمة؟</p>
         <p className="font-serif text-3xl font-semibold">{current.word}</p>
         {current.example && (
