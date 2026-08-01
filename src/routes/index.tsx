@@ -293,7 +293,7 @@ LEVEL: <A1|A2|B1|B2|C1>`;
   };
 
   return (
-    <section className="mb-8 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+    <section className="mb-8 paper-card overflow-hidden">
       <div className="px-5 py-4 border-b border-border flex items-center gap-3">
         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 shrink-0">
           <MessageCircle className="h-4 w-4 text-primary" />
@@ -463,7 +463,7 @@ const { user, loading: authLoading } = useAuth();
         <div className="flex flex-wrap items-center gap-3">
           <Link
             to="/library"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             <BookOpen className="h-4 w-4" />
             {t("home.browse")}
@@ -471,7 +471,7 @@ const { user, loading: authLoading } = useAuth();
           </Link>
           <Link
             to="/review"
-            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+            className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
           >
             {ar ? "راجع كلماتك" : "Review words"}
           </Link>
@@ -517,7 +517,7 @@ const { user, loading: authLoading } = useAuth();
           <Link
             to="/read/$slug"
             params={{ slug: continueStory.slug }}
-            className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4 transition-all hover:shadow-md hover:-translate-y-0.5"
+            className="flex items-center gap-4 paper-card p-4 transition-all hover:shadow-md hover:-translate-y-0.5"
           >
 <div className={`grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-gradient-to-br ${continueStory.coverHue} shadow-sm`}>
   {continueStory.coverImage ? (
@@ -542,7 +542,7 @@ const { user, loading: authLoading } = useAuth();
       )}
 
       {/* Daily Goal */}
-      <section className="mb-8 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+      <section className="mb-8 paper-card overflow-hidden">
         <div className="border-b border-border px-4 py-3">
           <h2 className="text-sm font-medium">{ar ? "هدف اليوم" : "Daily goal"}</h2>
         </div>
@@ -563,7 +563,7 @@ const { user, loading: authLoading } = useAuth();
       </section>
 
       {/* XP Progress */}
-      <section className="mb-8 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+      <section className="mb-8 paper-card overflow-hidden">
         <div className="border-b border-border px-4 py-3">
           <div className="flex items-center justify-between text-sm">
             <span className="flex items-center gap-1.5 font-medium">
@@ -615,7 +615,7 @@ const { user, loading: authLoading } = useAuth();
 
 function StatCard({ icon, value, label }: { icon: React.ReactNode; value: string; label: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+    <div className="paper-card p-4">
       <div className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
         {icon} {label}
       </div>
