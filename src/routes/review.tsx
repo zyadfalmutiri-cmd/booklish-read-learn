@@ -253,7 +253,7 @@ function ReviewPage() {
       {/* زر إضافة كلمات جديدة */}
       <Link
         to="/library"
-        className="mb-5 flex items-center justify-center gap-2 rounded-xl border border-border bg-card py-3.5 text-sm font-medium hover:bg-muted"
+        className="mb-5 flex items-center justify-center gap-2 paper-card py-3.5 text-sm font-medium hover:bg-muted"
       >
         <Plus className="h-4 w-4 text-primary" />
         {isAr ? "أضف كلمات جديدة" : "Add new words"}
@@ -276,7 +276,7 @@ function ReviewPage() {
             const expanded = expandedIds.has(id);
             const story = stories.find((s) => s.slug === v.slug);
             return (
-              <li key={id} className="overflow-hidden rounded-xl border border-border bg-card">
+              <li key={id} className="paper-card overflow-hidden">
                 <div className="flex items-center gap-3 p-4">
                   <SpeakIconButton word={v.word} idPrefix="vocab" />
                   <div className="min-w-0 flex-1">
@@ -513,7 +513,7 @@ function FlashCardsTab({
         <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
           <span>{idx} / {total}</span>
           {xpEarned > 0 && (
-            <span className="inline-flex items-center gap-1 font-medium text-yellow-600 dark:text-yellow-400">
+            <span className="inline-flex items-center gap-1 font-medium text-accent">
               <Zap className="h-3.5 w-3.5" />+{xpEarned}
             </span>
           )}
@@ -656,7 +656,7 @@ function QuizTab({ vocab }: { vocab: SavedWord[] }) {
 
   if (!started) {
     return (
-      <div className="rounded-xl border border-border bg-card p-8 text-center">
+      <div className="paper-card p-8 text-center">
         <ListChecks className="mx-auto mb-3 h-8 w-8 text-primary" />
         <p className="mb-5 text-sm text-muted-foreground">
           {isAr
@@ -665,7 +665,7 @@ function QuizTab({ vocab }: { vocab: SavedWord[] }) {
         </p>
         <button
           onClick={start}
-          className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
         >
           {isAr ? "ابدأ الاختبار" : "Start quiz"}
         </button>
@@ -688,7 +688,7 @@ function QuizTab({ vocab }: { vocab: SavedWord[] }) {
         </p>
         <button
           onClick={start}
-          className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
+          className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm hover:bg-muted"
         >
           <RotateCcw className="h-4 w-4" /> {isAr ? "أعد الاختبار" : "Retry"}
         </button>
@@ -747,7 +747,7 @@ function QuizTab({ vocab }: { vocab: SavedWord[] }) {
       {selected && (
         <button
           onClick={next}
-          className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
         >
           {isAr ? "التالي" : "Next"}
         </button>
