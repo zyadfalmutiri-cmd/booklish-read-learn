@@ -33,7 +33,7 @@ export function ShareQuizResult({
       </div>
       <button
         onClick={handleShare}
-        className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
+        className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm hover:bg-muted"
       >
         <Share2 className="h-4 w-4" /> مشاركة النتيجة
       </button>
