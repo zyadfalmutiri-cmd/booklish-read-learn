@@ -225,14 +225,14 @@ function ShadowPage() {
         </p>
         <h1 className="mb-6 font-serif text-3xl">{story.title}</h1>
 
-        <div className="rounded-xl border border-border bg-card p-6 text-center">
+        <div className="paper-card p-6 text-center">
           <p className="font-serif text-2xl">
             {lang === "ar" ? "متوسط دقة النطق" : "Average pronunciation score"}: {avgScore}%
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
             {avgScore >= 90
               ? lang === "ar"
-                ? "نطق ممتاز! 🎉"
+                ? "نطق ممتاز!"
                 : "Excellent pronunciation!"
               : avgScore >= 70
               ? lang === "ar"
