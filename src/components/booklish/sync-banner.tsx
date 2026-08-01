@@ -14,7 +14,7 @@ export function SyncBanner() {
   if (loading || user || dismissed) return null;
 
   return (
-    <div className="mx-auto mt-4 flex max-w-3xl items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-sm shadow-sm animate-fade-in">
+    <div className="paper-card mx-auto mt-4 flex max-w-3xl items-center gap-3 px-4 py-3 text-sm animate-fade-in">
       <Cloud className="h-4 w-4 shrink-0 text-primary" />
       <p className="flex-1 text-muted-foreground">
         أنشئ حساباً لحفظ تقدمك على جميع أجهزتك.{" "}
