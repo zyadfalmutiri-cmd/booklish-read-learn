@@ -121,7 +121,7 @@ function Library() {
               </div>
             </div>
           )}
-          {isMaxLevel && <p className="mt-2 text-xs font-medium opacity-80">🎓 وصلت للمستوى الأعلى!</p>}
+          {isMaxLevel && <p className="mt-2 text-xs font-medium opacity-80">وصلت للمستوى الأعلى!</p>}
         </div>
       )}
 
