@@ -217,7 +217,7 @@ function ReadPage() {
         {!isFocusMode && (
           <div className="reading-column px-4 pb-16">
             {hasChapters ? (
-              <div className="mt-8 rounded-xl border border-border bg-card p-5 text-center font-sans">
+              <div className="mt-8 paper-card p-5 text-center font-sans">
                 {nextChapterIndex !== null ? (
                   <>
                     <p className="text-sm text-muted-foreground">
@@ -228,7 +228,7 @@ function ReadPage() {
                         to="/read/$slug"
                         params={{ slug: story.slug }}
                         search={{ chapter: nextChapterIndex }}
-                        className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                        className="mt-3 inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                       >
                         الفصل التالي
                       </Link>
@@ -236,7 +236,7 @@ function ReadPage() {
                       <Link
                         to="/story/$slug"
                         params={{ slug: story.slug }}
-                        className="mt-3 inline-flex items-center gap-2 rounded-full border border-border px-5 py-2 text-sm font-medium hover:bg-muted"
+                        className="mt-3 inline-flex items-center gap-2 rounded-md border border-border px-5 py-2 text-sm font-medium hover:bg-muted"
                       >
                         رجوع لصفحة القصة
                       </Link>
@@ -248,7 +248,7 @@ function ReadPage() {
                     <Link
                       to="/quiz/$slug"
                       params={{ slug: story.slug }}
-                      className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                      className="mt-3 inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                     >
                       {t("read.takeQuiz")}
                     </Link>
@@ -256,12 +256,12 @@ function ReadPage() {
                 )}
               </div>
             ) : (
-              <div className="mt-8 rounded-xl border border-border bg-card p-5 text-center font-sans">
+              <div className="mt-8 paper-card p-5 text-center font-sans">
                 <p className="text-sm text-muted-foreground">{t("read.finishedQ")}</p>
                 <Link
                   to="/quiz/$slug"
                   params={{ slug: story.slug }}
-                  className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                  className="mt-3 inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   {t("read.takeQuiz")}
                 </Link>
