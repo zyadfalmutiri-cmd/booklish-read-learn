@@ -37,7 +37,7 @@ function ListenPage() {
 
       <div className="reading-column px-4 py-8">
         {!story.audio ? (
-          <div className="rounded-xl border border-border bg-card p-6 text-center font-sans">
+          <div className="paper-card p-6 text-center font-sans">
             <Headphones className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">الصوت غير متاح لهذه القصة حاليًا</p>
           </div>
@@ -60,12 +60,12 @@ function ListenPage() {
 
             <AudioPlayer audioUrl={story.audio.url} duration={story.audio.duration} />
 
-            <div className="mt-8 rounded-xl border border-border bg-card p-5 text-center font-sans">
+            <div className="mt-8 paper-card p-5 text-center font-sans">
               <p className="text-sm text-muted-foreground">{t("read.finishedQ")}</p>
               <Link
                 to="/quiz/$slug"
                 params={{ slug: story.slug }}
-                className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                className="mt-3 inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
               >
                 {t("read.takeQuiz")}
               </Link>
