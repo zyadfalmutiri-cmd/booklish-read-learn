@@ -199,9 +199,40 @@ body {
   animation: slide-up 0.25s ease-out both;
 }
 
+/* أغلفة طباعية: 5 تلوينات محدودة ومقصودة مبنية على نفس عائلة ألوان الهوية،
+   بدل التدرجات العشوائية (rainbow coverHue) القديمة */
+.cover-tint-ink {
+  background: oklch(0.3 0.055 265);
+  color: oklch(0.94 0.02 85);
+}
+.cover-tint-rose {
+  background: oklch(0.4 0.09 25);
+  color: oklch(0.95 0.015 85);
+}
+.cover-tint-sage {
+  background: oklch(0.48 0.06 155);
+  color: oklch(0.95 0.015 85);
+}
+.cover-tint-gold {
+  background: oklch(0.58 0.1 75);
+  color: oklch(0.22 0.04 75);
+}
+.cover-tint-paper {
+  background: oklch(0.86 0.02 85);
+  color: oklch(0.28 0.045 265);
+}
+
+.cover-rule {
+  width: 2rem;
+  height: 2px;
+  opacity: 0.55;
+  background: currentColor;
+}
+
 .focus-mode-active .reading-column {
   padding-top: 3rem;
 }
+
 
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,
