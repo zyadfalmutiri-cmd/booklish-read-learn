@@ -1,10 +1,19 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Headphones, BookOpen } from "lucide-react";
+import { Headphones } from "lucide-react";
 import type { Story } from "@/lib/types";
 import { useT } from "@/lib/i18n";
 
 const COVER_IMAGES: Record<string, string> = {
   "ronaldo-from-poverty-to-glory": "/covers/glory-of-ronaldo.PNG",
+};
+
+const GENRE_TINTS: Record<string, string> = {
+  mystery: "cover-tint-ink",
+  drama: "cover-tint-ink",
+  romance: "cover-tint-rose",
+  "sci-fi": "cover-tint-sage",
+  adventure: "cover-tint-gold",
+  "non-fiction": "cover-tint-paper",
 };
 
 
@@ -45,7 +54,7 @@ const levelStyles: Record<string, string> = {
 
     <Link to="/story/$slug" params={{ slug: story.slug }}>
       <div className="paper-card group relative block overflow-hidden transition-all hover:shadow-md hover:-translate-y-0.5">
-        <div className={`relative flex h-40 items-center justify-center overflow-hidden bg-gradient-to-br ${story.coverHue}`}>
+        <div className={`relative flex h-40 items-center justify-center overflow-hidden ${!image && !svg ? GENRE_TINTS[story.genre] ?? "cover-tint-ink" : ""}`}>
           <span
             className={`absolute right-2 top-2 z-10 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider shadow-sm ${levelStyles[story.level] ?? "bg-muted text-muted-foreground"}`}
           >
@@ -65,7 +74,11 @@ const levelStyles: Record<string, string> = {
               style={{ lineHeight: 0 }}
             />
           ) : (
-            <BookOpen className="h-10 w-10 text-foreground/30" aria-hidden="true" />
+            <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-4 text-center">
+              <span className="cover-rule" />
+              <p className="font-serif text-base font-semibold leading-snug line-clamp-3">{story.title}</p>
+              <span className="text-[10px] uppercase tracking-widest opacity-70">{t(`genre.${story.genre}`)}</span>
+            </div>
           )}
         </div>
         <div className="space-y-2 p-4">
