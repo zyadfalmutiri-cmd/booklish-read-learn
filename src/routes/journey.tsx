@@ -46,7 +46,7 @@ function Journey() {
           </p>
           <Link
             to="/library"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
             {ar ? "ابدأ الاختبار" : "Start test"}
           </Link>
@@ -81,7 +81,7 @@ function Journey() {
           </>
         ) : (
           <p className="text-xs font-medium opacity-80">
-            {ar ? "🎓 وصلت لأعلى مستوى!" : "🎓 You reached the top level!"}
+            {ar ? "وصلت لأعلى مستوى!" : "You reached the top level!"}
           </p>
         )}
       </section>
@@ -156,7 +156,7 @@ function Journey() {
                           <Link
                             to="/read/$slug"
                             params={{ slug: s.slug }}
-                            className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90"
                           >
                             {p?.pct ? (ar ? "أكمل القراءة" : "Continue reading") : ar ? "ابدأ القراءة" : "Start reading"}
                           </Link>
@@ -164,7 +164,7 @@ function Journey() {
                           <Link
                             to="/quiz/$slug"
                             params={{ slug: s.slug }}
-                            className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90"
                           >
                             {ar ? "ابدأ الاختبار" : "Take the quiz"}
                           </Link>
@@ -172,7 +172,7 @@ function Journey() {
                           <Link
                             to="/read/$slug"
                             params={{ slug: s.slug }}
-                            className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-xs font-medium hover:bg-muted"
+                            className="inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-xs font-medium hover:bg-muted"
                           >
                             {ar ? "إعادة القراءة" : "Re-read"}
                           </Link>
