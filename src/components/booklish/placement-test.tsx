@@ -404,7 +404,7 @@ export function PlacementTest({ onComplete }: Props) {
           <p className="mb-2 text-sm text-muted-foreground">{info.nameAr}</p>
           <p className="mb-8 text-sm text-muted-foreground">{info.descAr}</p>
 
-          <div className="mb-6 rounded-xl border border-border bg-card p-4 text-right">
+          <div className="mb-6 paper-card p-4 text-right">
             <p className="mb-1 text-xs text-muted-foreground">نتيجة الاختبار</p>
             <p className="text-sm">
               أجبت بشكل صحيح على{" "}
@@ -461,7 +461,7 @@ export function PlacementTest({ onComplete }: Props) {
         </p>
 
         {/* Passage */}
-        <div className="mb-6 rounded-xl border border-border bg-card p-5">
+        <div className="mb-6 paper-card p-5">
           {currentLevel.passage.split("\n").map((line, i) =>
             line.trim() === "" ? (
               <br key={i} />
@@ -508,7 +508,7 @@ export function PlacementTest({ onComplete }: Props) {
       </div>
 
       {/* Question */}
-      <div className="mb-6 rounded-xl border border-border bg-card p-5">
+      <div className="mb-6 paper-card p-5">
         <p className="mb-4 text-base font-medium leading-relaxed">
           {currentQ.text}
         </p>
