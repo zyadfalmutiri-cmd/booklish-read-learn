@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Trophy } from 'lucide-react';
 
 type UnlockedAchievement = {
   newly_unlocked_code: string;
@@ -35,10 +36,15 @@ export function AchievementToastListener() {
   return (
     <div
       dir="rtl"
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-5 py-3 rounded-xl shadow-lg animate-in slide-in-from-bottom-4 fade-in"
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-xl bg-primary text-primary-foreground px-5 py-3 shadow-lg animate-in slide-in-from-bottom-4 fade-in"
     >
-      <p className="font-bold text-sm">🎉 إنجاز جديد!</p>
-      <p className="text-xs opacity-90">{current.newly_unlocked_title}</p>
+      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent/20">
+        <Trophy className="h-5 w-5 text-accent" aria-hidden="true" />
+      </div>
+      <div>
+        <p className="font-bold text-sm">إنجاز جديد!</p>
+        <p className="text-xs opacity-90">{current.newly_unlocked_title}</p>
+      </div>
     </div>
   );
 }
