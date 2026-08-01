@@ -103,7 +103,7 @@ function ChapterQuizPage() {
 
       <ol className="space-y-6">
         {questions.map((q, i) => (
-          <li key={i} className="rounded-xl border border-border bg-card p-5">
+          <li key={i} className="paper-card p-5">
             <p className="mb-3 font-serif text-lg">
               {i + 1}. {q.q}
             </p>
@@ -148,12 +148,12 @@ function ChapterQuizPage() {
         <button
           onClick={() => setSubmitted(true)}
           disabled={!allAnswered}
-          className="mt-8 w-full rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground disabled:opacity-50"
+          className="mt-8 w-full rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground disabled:opacity-50"
         >
           تأكيد الإجابات
         </button>
       ) : (
-        <div className="mt-8 rounded-xl border border-border bg-card p-6 text-center">
+        <div className="mt-8 paper-card p-6 text-center">
           <p className="font-serif text-2xl">
             نتيجتك: {score} / {questions.length}
           </p>
@@ -163,13 +163,13 @@ function ChapterQuizPage() {
                 setAnswers(questions.map(() => null));
                 setSubmitted(false);
               }}
-              className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
+              className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm hover:bg-muted"
             >
               <RotateCcw className="h-4 w-4" /> إعادة المحاولة
             </button>
             <button
               onClick={handleContinue}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"
+              className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground"
             >
               {isLast ? "إنهاء الكتاب" : "الفصل التالي"}
             </button>
