@@ -90,7 +90,7 @@ export async function generateAIStoryCover(
  * لما نضيف العنوان بعدين عبر Canvas يكون فوق خلفية واضحة ومقروءة.
  */
 const BASE_FLAT_COVER_STYLE =
-  "flat 2D vector illustration, children's book illustration style, simple clean shapes, minimal flat shading, no gradients on characters, not photorealistic, not 3D rendered, not glass, not glossy, absolutely no text, no words, no letters, no numbers, no watermark, no logo, a single clear symbolic focal subject (a person, an animal, or an object representing the story's theme) placed in the lower two-thirds of the image, the upper third of the image is a simple plain sky or plain background area with no objects in it, kept clear and open for a text overlay to be added later";
+  "flat design vector illustration, sticker-style illustration, modern children's book cover art, solid flat colors only, no gradients anywhere, no soft shadows, no drop shadows, no blur, no glass, no glossy or shiny surfaces, not photorealistic, not 3D rendered, thick clean bold outlines around every shape, simple geometric shapes, high contrast between shapes, crisp hard edges, absolutely no text, no words, no letters, no numbers, no watermark, no logo, a single clear symbolic focal subject (a person, an animal, or an object representing the story's theme) with clearly defined edges placed in the lower two-thirds of the image, the upper third of the image is a simple plain solid-color background with no objects in it, kept clear and open for a text overlay to be added later";
 
 /**
  * تلميحات لوحة ألوان/مزاج هادئة (Pastel/Muted) حسب نوع القصة (Genre)
