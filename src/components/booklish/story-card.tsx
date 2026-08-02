@@ -2,6 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Headphones } from "lucide-react";
 import type { Story } from "@/lib/types";
 import { useT } from "@/lib/i18n";
+import { STORY_COVER_ICONS } from "@/lib/story-cover-icons";
 
 const COVER_IMAGES: Record<string, string> = {
   "ronaldo-from-poverty-to-glory": "/covers/glory-of-ronaldo.PNG",
@@ -75,8 +76,12 @@ const levelStyles: Record<string, string> = {
             />
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-4 text-center">
+              {(() => {
+                const Icon = STORY_COVER_ICONS[story.slug];
+                return Icon ? <Icon className="h-8 w-8" strokeWidth={1.5} aria-hidden="true" /> : null;
+              })()}
               <span className="cover-rule" />
-              <p className="font-serif text-base font-semibold leading-snug line-clamp-3">{story.title}</p>
+              <p className="font-serif text-base font-semibold leading-snug line-clamp-2">{story.title}</p>
               <span className="text-[10px] uppercase tracking-widest opacity-70">{t(`genre.${story.genre}`)}</span>
             </div>
           )}
