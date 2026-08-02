@@ -38,9 +38,21 @@ function readCachedSession(): Session | null {
 export function useAuth(): AuthState {
   const [state, setState] = useState<AuthState>(() => {
     const cached = readCachedSession();
-    return cached
-      ? { user: cached.user, session: cached, loading: false }
-      : { user: null, session: null, loading: true };
+    if (cached) {
+      return { user: cached.user, session: cached, loading: false };
+    }
+    // على السيرفر (SSR) ما فيه وصول لـ localStorage، فما نقدر نعرف حالة
+    // الجلسة قبل ما يوصل المتصفح. سابقًا كنا نرجّع loading:true هنا،
+    // اللي يخلي index.tsx يرجّع null ويطلع HTML فاضي تمامًا من السيرفر
+    // (نفس الشي اللي يشوفه Googlebot / مراجع AdSense). عشان نتجنب هذا،
+    // على السيرفر نفترض "زائر غير مسجل" (loading:false) عشان تُعرض
+    // PublicLanding مباشرة بالمحتوى الحقيقي. على المتصفح لو ما لقينا
+    // كاش، نخليها loading:true عشان نتجنب وميض الصفحة العامة للمستخدم
+    // المسجّل دخول قبل ما يتأكد useEffect من جلسته.
+    if (typeof window === "undefined") {
+      return { user: null, session: null, loading: false };
+    }
+    return { user: null, session: null, loading: true };
   });
 
   useEffect(() => {
