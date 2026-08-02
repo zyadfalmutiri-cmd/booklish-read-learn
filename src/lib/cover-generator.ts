@@ -6,6 +6,11 @@ import type { Story } from "@/lib/types";
  * ملاحظة: هذي خدمة مجانية غير رسمية، الاستقرار والجودة غير مضمونة 100%،
  * وقت الاستجابة ممكن يختلف. للمشاريع التجارية الجادة يفضل لاحقًا
  * الانتقال لخدمة مدفوعة أكثر ثباتًا.
+ *
+ * ⚠️ مهم: ما نطلب من الذكاء الاصطناعي يرسم عنوان القصة كنص داخل الصورة —
+ * جربنا هذا وطلعت النتيجة صور مجردة بدون أي نص واضح (نماذج التوليد المجانية
+ * زي Flux ضعيفة جدًا في رسم نص مقروء، خصوصًا مع برومبت طويل). العنوان الآن
+ * يُضاف بخط حقيقي عبر Canvas بعد التوليد — شوف cover-compose.ts.
  */
 
 export interface GenerateAICoverOptions {
@@ -21,8 +26,7 @@ function sleep(ms: number): Promise<void> {
 export async function generateAIStoryCover(
   options: GenerateAICoverOptions
 ): Promise<Blob> {
-  // ✅ أبعاد بورتريت (2:3) تطابق شكل غلاف كتاب حقيقي، بدل اللاندسكيب القديم،
-  // عشان العنوان النصي والرسمة ما ينقصّون لما الصورة تتقصّ داخل بطاقة القصة
+  // ✅ أبعاد بورتريت (2:3) تطابق شكل غلاف كتاب حقيقي
   const { prompt, width = 800, height = 1200 } = options;
 
   const encodedPrompt = encodeURIComponent(prompt);
@@ -34,7 +38,7 @@ export async function generateAIStoryCover(
     try {
       // seed عشوائي عشان كل توليد يطلع مختلف شوي حتى لو نفس البرومبت
       const seed = Math.floor(Math.random() * 1_000_000);
-      const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&nologo=true&seed=${seed}`;
+      const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&model=flux&seed=${seed}`;
 
       const response = await fetch(url);
 
@@ -81,66 +85,52 @@ export async function generateAIStoryCover(
 }
 
 /**
- * الأسلوب الفني الثابت لكل الأغلفة — غلاف كتاب فلات فيكتور (Flat Vector
- * Book Cover) بعنوان نصي بارز أعلى الغلاف، بنفس روح أغلفة "Died Standing"
- * و"Great Glory Across 300 Years" و"The Da Vinci Code":
- * توضيح مسطّح (Flat Illustration) بألوان محدودة هادئة، شخصية أو رمز واحد
- * واضح بمنتصف/أسفل الغلاف، وعنوان القصة مكتوب بخط بارز وواضح بالأعلى.
- * هذا الأسلوب ثابت لكل القصص بغض النظر عن نوعها، عشان هوية بصرية موحدة.
+ * الأسلوب الفني الثابت — رسمة فلات فيكتور بسيطة (بدون أي نص داخلها).
+ * نطلب صراحة إن الثلث العلوي يبقى فاتح/بسيط (سماء أو خلفية صافية) عشان
+ * لما نضيف العنوان بعدين عبر Canvas يكون فوق خلفية واضحة ومقروءة.
  */
 const BASE_FLAT_COVER_STYLE =
-  "professional flat vector illustration book cover design, 2D flat illustration style, NOT a photograph, not photorealistic, not 3D rendered, simple clean geometric shapes with minimal shading, limited muted flat color palette, soft solid or gently gradiented background in one dominant color, a single clear symbolic focal subject in flat vector illustration style placed in the lower two-thirds of the composition representing the story's main theme (this could be a person, an animal, an object, or an iconic symbol depending on what best fits the story), the focal subject is the clear center of the composition, clean modern minimalist book cover composition, bold impactful book-title typography prominently displayed across the upper portion of the cover in a clean bold sans-serif or serif font, well-kerned and legible, the title text is the same color as or contrasts cleanly against the background";
+  "flat 2D vector illustration, children's book illustration style, simple clean shapes, minimal flat shading, no gradients on characters, not photorealistic, not 3D rendered, not glass, not glossy, absolutely no text, no words, no letters, no numbers, no watermark, no logo, a single clear symbolic focal subject (a person, an animal, or an object representing the story's theme) placed in the lower two-thirds of the image, the upper third of the image is a simple plain sky or plain background area with no objects in it, kept clear and open for a text overlay to be added later";
 
 /**
- * تلميحات لوحة ألوان/مزاج هادئة (Pastel/Muted) حسب نوع القصة (Genre)،
- * تطابق روح الأمثلة (أزرق سماوي فاتح، رملي دافئ، وردي فاتح...)
+ * تلميحات لوحة ألوان/مزاج هادئة (Pastel/Muted) حسب نوع القصة (Genre)
  */
 const GENRE_MOOD_MAP: Record<string, string> = {
-  "non-fiction": "warm sandy pastel palette, desert tan and soft amber tones with a pale blue sky gradient background",
-  mystery: "muted deep teal or navy pastel palette, soft flat shadows, subdued moody tone",
-  romance: "soft pastel pink and cream palette, gentle warm glow",
-  "sci-fi": "pastel lavender and soft powder-blue palette, minimal futuristic flat shapes",
-  adventure: "sky-blue pastel gradient background, sunlit sandy or grassy flat ground tones",
-  drama: "muted dusty-rose or soft amber pastel palette, gentle contrast",
+  "non-fiction": "warm sandy pastel palette, desert tan and soft amber tones, pale blue sky",
+  mystery: "muted deep teal or navy pastel palette, subdued moody tone",
+  romance: "soft pastel pink and cream palette",
+  "sci-fi": "pastel lavender and soft powder-blue palette",
+  adventure: "sky-blue pastel palette, sunlit sandy or grassy ground tones",
+  drama: "muted dusty-rose or soft amber pastel palette",
 };
 
 /**
  * تلميحات إضافية حسب التصنيف (Tags) لو موجودة
  */
 const TAG_HINT_MAP: Record<string, string> = {
-  sports: "flat vector illustrated athlete figure in a team jersey with a visible number, standing on a pitch, curved stadium silhouette in the background, subtle dynamic pose",
+  sports: "an athlete figure in a team jersey with a visible number, standing on a pitch, curved stadium silhouette in the background",
 };
 
 /**
- * يبني برومبت تلقائي معبّر عن القصة إذا ما كان فيه coverPrompt مخصص
- * الأسلوب الفني ثابت دائمًا (flat vector + عنوان نصي)، والمزاج فقط يختلف حسب النوع
+ * يبني برومبت مختصر ومركّز — بدون أي طلب لرسم نص، فقط الرسمة والمزاج واللون
  */
 export function buildCoverPrompt(story: Story): string {
-  const titleText = story.title.toUpperCase();
-  const titleInstruction = `the title text at the top of the cover must read exactly: "${titleText}"`;
-
-  if (story.coverPrompt && story.coverPrompt.trim().length > 0) {
-    // حتى لو فيه coverPrompt مخصص، نضيف الأسلوب الفني الثابت له
-    // عشان يبقى متسق مع باقي المكتبة
-    return `${BASE_FLAT_COVER_STYLE}, ${titleInstruction}, ${story.coverPrompt.trim()}, no watermark, no logo, no signature, no extra text besides the title`;
-  }
-
-  const mood =
-    GENRE_MOOD_MAP[story.genre] || "warm muted pastel palette";
+  const mood = GENRE_MOOD_MAP[story.genre] || "warm muted pastel palette";
 
   const tagHint = story.tags
     ?.map((tag) => TAG_HINT_MAP[tag])
     .filter(Boolean)
     .join(", ");
 
+  if (story.coverPrompt && story.coverPrompt.trim().length > 0) {
+    return `${BASE_FLAT_COVER_STYLE}, ${mood}, ${story.coverPrompt.trim()}`;
+  }
+
   const parts = [
     BASE_FLAT_COVER_STYLE,
-    titleInstruction,
     mood,
     tagHint,
-    `depicting the theme of "${story.title}"`,
     story.blurb,
-    "no watermark, no logo, no signature, no extra text besides the title",
   ].filter(Boolean);
 
   return parts.join(", ");
