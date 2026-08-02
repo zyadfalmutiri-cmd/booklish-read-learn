@@ -71,11 +71,12 @@ function GenerateCoversPage() {
       }
 
       try {
-        // 1) توليد الصورة الفوتوغرافية عبر Pollinations.ai
+        // 1) توليد صورة الغلاف (فلات فيكتور + عنوان نصي) عبر Pollinations.ai
+        //    ✅ أبعاد بورتريت (2:3) تطابق شكل غلاف كتاب حقيقي
         const blob = await generateAIStoryCover({
           prompt,
-          width: 1200,
-          height: 800,
+          width: 800,
+          height: 1200,
         });
 
         // 2) رفعها إلى Supabase Storage
@@ -126,10 +127,10 @@ function GenerateCoversPage() {
 
   return (
     <div style={{ padding: 20, fontFamily: "sans-serif" }}>
-      <h1>توليد أغلفة القصص (AI فوتوغرافي)</h1>
+      <h1>توليد أغلفة القصص (Flat Vector + عنوان)</h1>
       <p style={{ fontSize: 13, color: "#666" }}>
-        يستخدم Pollinations.ai (خدمة مجانية طرف ثالث) لتوليد صور فوتوغرافية
-        واقعية بناءً على وصف كل قصة.
+        يستخدم Pollinations.ai (خدمة مجانية طرف ثالث) لتوليد غلاف فلات
+        فيكتور بعنوان نصي بارز، بنفس أسلوب "Died Standing".
       </p>
       <p style={{ fontSize: 13, color: "#999" }}>
         سيتم توليد الأغلفة لـ {targetStories.length} قصة فقط
@@ -199,7 +200,7 @@ function GenerateCoversPage() {
                 <img
                   src={r.url}
                   alt={r.slug}
-                  style={{ width: 200, borderRadius: 8 }}
+                  style={{ width: 160, borderRadius: 8 }}
                 />
                 <div style={{ fontSize: 12, wordBreak: "break-all", marginTop: 4 }}>
                   {r.url}
