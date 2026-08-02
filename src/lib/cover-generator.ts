@@ -1,7 +1,7 @@
 import type { Story } from "@/lib/types";
 
 /**
- * توليد صورة غلاف فوتوغرافية واقعية عبر Pollinations.ai
+ * توليد صورة غلاف عبر Pollinations.ai
  * خدمة مجانية طرف ثالث، بدون حاجة لـ API key.
  * ملاحظة: هذي خدمة مجانية غير رسمية، الاستقرار والجودة غير مضمونة 100%،
  * وقت الاستجابة ممكن يختلف. للمشاريع التجارية الجادة يفضل لاحقًا
@@ -21,7 +21,9 @@ function sleep(ms: number): Promise<void> {
 export async function generateAIStoryCover(
   options: GenerateAICoverOptions
 ): Promise<Blob> {
-  const { prompt, width = 1200, height = 800 } = options;
+  // ✅ أبعاد بورتريت (2:3) تطابق شكل غلاف كتاب حقيقي، بدل اللاندسكيب القديم،
+  // عشان العنوان النصي والرسمة ما ينقصّون لما الصورة تتقصّ داخل بطاقة القصة
+  const { prompt, width = 800, height = 1200 } = options;
 
   const encodedPrompt = encodeURIComponent(prompt);
   const maxRetries = 4;
@@ -79,47 +81,52 @@ export async function generateAIStoryCover(
 }
 
 /**
- * الأسلوب الفني الثابت لكل الأغلفة — رسم توضيحي ملوّن (Stylized Illustration)
- * بنفس روح أغلفة "London Calling" و"Paris Awaits" وسلسلة هاري بوتر بالمكتبة:
- * أشكال مبسّطة وملونة بغنى، إضاءة دافئة، لكن بشكل صريح غير فوتوغرافي وغير واقعي.
+ * الأسلوب الفني الثابت لكل الأغلفة — غلاف كتاب فلات فيكتور (Flat Vector
+ * Book Cover) بعنوان نصي بارز أعلى الغلاف، بنفس روح أغلفة "Died Standing"
+ * و"Great Glory Across 300 Years" و"The Da Vinci Code":
+ * توضيح مسطّح (Flat Illustration) بألوان محدودة هادئة، شخصية أو رمز واحد
+ * واضح بمنتصف/أسفل الغلاف، وعنوان القصة مكتوب بخط بارز وواضح بالأعلى.
  * هذا الأسلوب ثابت لكل القصص بغض النظر عن نوعها، عشان هوية بصرية موحدة.
  */
-const BASE_ILLUSTRATION_STYLE =
-"vibrant stylized digital illustration book cover art, illustrated poster art style, NOT a photograph, not photorealistic, not realistic, simplified and stylized shapes and characters, bold saturated colors, warm atmospheric lighting with soft color gradients, clean modern illustration aesthetic similar to young-adult book cover art, richly colored illustrated scene, professional book cover design, high detail illustration, always include one clear symbolic focal subject prominently in the foreground that represents the story’s main theme or subject (this could be a person, an animal, an object, or an iconic symbol depending on what best fits the story), the focal subject is the clear center of the composition, with a fitting background setting behind it that matches the story’s theme"
+const BASE_FLAT_COVER_STYLE =
+  "professional flat vector illustration book cover design, 2D flat illustration style, NOT a photograph, not photorealistic, not 3D rendered, simple clean geometric shapes with minimal shading, limited muted flat color palette, soft solid or gently gradiented background in one dominant color, a single clear symbolic focal subject in flat vector illustration style placed in the lower two-thirds of the composition representing the story's main theme (this could be a person, an animal, an object, or an iconic symbol depending on what best fits the story), the focal subject is the clear center of the composition, clean modern minimalist book cover composition, bold impactful book-title typography prominently displayed across the upper portion of the cover in a clean bold sans-serif or serif font, well-kerned and legible, the title text is the same color as or contrasts cleanly against the background";
 
 /**
- * تلميحات لوحة ألوان/مزاج حسب نوع القصة (Genre) — تعديل بسيط على لوحة
- * الألوان فقط، مع الحفاظ على نفس الأسلوب الغني الثابت أعلاه
+ * تلميحات لوحة ألوان/مزاج هادئة (Pastel/Muted) حسب نوع القصة (Genre)،
+ * تطابق روح الأمثلة (أزرق سماوي فاتح، رملي دافئ، وردي فاتح...)
  */
 const GENRE_MOOD_MAP: Record<string, string> = {
-  "non-fiction": "warm inviting color palette, golden hour tones with deep greens and ambers",
-  mystery: "dark moody color palette, deep purples and navy blues with dramatic shadows",
-  romance: "soft warm color palette, pinks and warm oranges with gentle glow",
-  "sci-fi": "cool futuristic color palette, blues and purples with glowing bright accents",
-  adventure: "vibrant energetic color palette, bright blues and oranges with sunlit atmosphere",
-  drama: "bold contrast color palette, deep reds and dark tones with dramatic lighting",
+  "non-fiction": "warm sandy pastel palette, desert tan and soft amber tones with a pale blue sky gradient background",
+  mystery: "muted deep teal or navy pastel palette, soft flat shadows, subdued moody tone",
+  romance: "soft pastel pink and cream palette, gentle warm glow",
+  "sci-fi": "pastel lavender and soft powder-blue palette, minimal futuristic flat shapes",
+  adventure: "sky-blue pastel gradient background, sunlit sandy or grassy flat ground tones",
+  drama: "muted dusty-rose or soft amber pastel palette, gentle contrast",
 };
 
 /**
  * تلميحات إضافية حسب التصنيف (Tags) لو موجودة
  */
 const TAG_HINT_MAP: Record<string, string> = {
-  sports: "athlete figure, sports stadium setting, dynamic action pose",
+  sports: "flat vector illustrated athlete figure in a team jersey with a visible number, standing on a pitch, curved stadium silhouette in the background, subtle dynamic pose",
 };
 
 /**
  * يبني برومبت تلقائي معبّر عن القصة إذا ما كان فيه coverPrompt مخصص
- * الأسلوب الفني ثابت دائمًا (illustration)، والمزاج فقط يختلف حسب النوع
+ * الأسلوب الفني ثابت دائمًا (flat vector + عنوان نصي)، والمزاج فقط يختلف حسب النوع
  */
 export function buildCoverPrompt(story: Story): string {
+  const titleText = story.title.toUpperCase();
+  const titleInstruction = `the title text at the top of the cover must read exactly: "${titleText}"`;
+
   if (story.coverPrompt && story.coverPrompt.trim().length > 0) {
     // حتى لو فيه coverPrompt مخصص، نضيف الأسلوب الفني الثابت له
     // عشان يبقى متسق مع باقي المكتبة
-    return `${BASE_ILLUSTRATION_STYLE}, ${story.coverPrompt.trim()}, no text, no watermark`;
+    return `${BASE_FLAT_COVER_STYLE}, ${titleInstruction}, ${story.coverPrompt.trim()}, no watermark, no logo, no signature, no extra text besides the title`;
   }
 
   const mood =
-    GENRE_MOOD_MAP[story.genre] || "emotional cinematic mood";
+    GENRE_MOOD_MAP[story.genre] || "warm muted pastel palette";
 
   const tagHint = story.tags
     ?.map((tag) => TAG_HINT_MAP[tag])
@@ -127,12 +134,13 @@ export function buildCoverPrompt(story: Story): string {
     .join(", ");
 
   const parts = [
-    BASE_ILLUSTRATION_STYLE,
+    BASE_FLAT_COVER_STYLE,
+    titleInstruction,
     mood,
     tagHint,
     `depicting the theme of "${story.title}"`,
     story.blurb,
-    "no text, no watermark, no logo, high detail",
+    "no watermark, no logo, no signature, no extra text besides the title",
   ].filter(Boolean);
 
   return parts.join(", ");
