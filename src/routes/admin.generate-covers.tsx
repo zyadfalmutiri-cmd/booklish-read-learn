@@ -4,6 +4,7 @@ import {
   generateAIStoryCover,
   buildCoverPrompt,
 } from "@/lib/cover-generator";
+import { composeCoverWithTitle } from "@/lib/cover-compose";
 import { stories } from "@/data/stories";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -71,26 +72,34 @@ function GenerateCoversPage() {
       }
 
       try {
-        // 1) توليد صورة الغلاف (فلات فيكتور + عنوان نصي) عبر Pollinations.ai
-        //    ✅ أبعاد بورتريت (2:3) تطابق شكل غلاف كتاب حقيقي
-        const blob = await generateAIStoryCover({
+        // 1) توليد الرسمة فقط (بدون أي نص) عبر Pollinations.ai
+        const rawBlob = await generateAIStoryCover({
           prompt,
           width: 800,
           height: 1200,
         });
 
-        // 2) رفعها إلى Supabase Storage
+        // 2) نضيف عنوان القصة كنص حقيقي واضح فوق الرسمة عبر Canvas
+        //    (الذكاء الاصطناعي ما نعتمد عليه لرسم النص، لأنه غير موثوق)
+        const finalBlob = await composeCoverWithTitle({
+          imageBlob: rawBlob,
+          title: story.title,
+          width: 800,
+          height: 1200,
+        });
+
+        // 3) رفعها إلى Supabase Storage
         const filePath = `${story.slug}.png`;
         const { error: uploadError } = await supabase.storage
           .from("story-covers")
-          .upload(filePath, blob, {
+          .upload(filePath, finalBlob, {
             contentType: "image/png",
             upsert: true,
           });
 
         if (uploadError) throw uploadError;
 
-        // 3) جلب الرابط العام
+        // 4) جلب الرابط العام
         const { data: publicUrlData } = supabase.storage
           .from("story-covers")
           .getPublicUrl(filePath);
@@ -127,10 +136,10 @@ function GenerateCoversPage() {
 
   return (
     <div style={{ padding: 20, fontFamily: "sans-serif" }}>
-      <h1>توليد أغلفة القصص (Flat Vector + عنوان)</h1>
+      <h1>توليد أغلفة القصص (Flat Vector + عنوان مركّب)</h1>
       <p style={{ fontSize: 13, color: "#666" }}>
-        يستخدم Pollinations.ai (خدمة مجانية طرف ثالث) لتوليد غلاف فلات
-        فيكتور بعنوان نصي بارز، بنفس أسلوب "Died Standing".
+        يولّد Pollinations.ai الرسمة فقط (بدون نص)، وبعدين نضيف عنوان القصة
+        كنص حقيقي واضح فوقها عبر Canvas.
       </p>
       <p style={{ fontSize: 13, color: "#999" }}>
         سيتم توليد الأغلفة لـ {targetStories.length} قصة فقط
