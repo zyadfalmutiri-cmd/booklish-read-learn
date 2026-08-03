@@ -83,5 +83,8 @@ export const storyCoverUrls: Record<string, string> = {
   "shadows-of-empire": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-covers/shadows-of-empire.svg?v=1785795526054",
   "the-consciousness-question": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-covers/the-consciousness-question.svg?v=1785795526716",
   "a-fragile-peace": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-covers/a-fragile-peace.svg?v=1785795527488",
+"the-last-train-home": "https://hjukomykhyzzhweojlga.supabase.co/storage/v1/object/public/story-covers/the-last-train-home.svg",
+
 };
+
 
