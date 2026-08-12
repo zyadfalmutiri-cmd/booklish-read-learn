@@ -13,54 +13,188 @@
 }
 
 /*
-  هوية بوكلش: "ورقة + حبر + هايلايتر"
-  - الخلفية: لون ورق دافئ (مو الكريمي المعتاد)
-  - Primary: كحلي حبر غامق بدل التراكوتا
-  - Accent: أصفر هايلايتر ذهبي — نفس لون تظليل الكلمة وقت الضغط عليها
+  Booklish — Warm Peach Pastels
+  الهوية: Warm Peach Pastels
+  مستوحاة من لوحات الألوان السينمائية:
+  
+  Dusty Rose    #E9A095
+  Terracotta    #D46C5B
+  Peach Cream   #F0DED0
+  Burnt Sienna  #A74339
+  Warm Ivory    #F4E9DC
 */
 
 :root {
-  --background: oklch(0.96 0.025 85);
-  --foreground: oklch(0.24 0.045 265);
-  --card: oklch(0.985 0.015 85);
-  --card-foreground: oklch(0.24 0.045 265);
-  --popover: oklch(0.985 0.015 85);
-  --popover-foreground: oklch(0.24 0.045 265);
-  --primary: oklch(0.28 0.06 265);
-  --primary-foreground: oklch(0.98 0.01 85);
-  --secondary: oklch(0.91 0.03 145);
-  --secondary-foreground: oklch(0.24 0.045 265);
-  --muted: oklch(0.92 0.02 85);
-  --muted-foreground: oklch(0.48 0.03 265);
-  --accent: oklch(0.78 0.15 75);
-  --accent-foreground: oklch(0.24 0.06 75);
-  --destructive: oklch(0.55 0.22 27);
-  --border: oklch(0.86 0.025 85);
-  --input: oklch(0.86 0.025 85);
-  --ring: oklch(0.78 0.15 75);
+  /* ─────────────────────────────
+     Base
+     ───────────────────────────── */
+
+  --background: #F4E9DC;
+  --foreground: #6B302A;
+
+  /* ─────────────────────────────
+     Cards
+     ───────────────────────────── */
+
+  --card: #FFF8F2;
+  --card-foreground: #6B302A;
+
+  --popover: #FFF8F2;
+  --popover-foreground: #6B302A;
+
+  /* ─────────────────────────────
+     Primary
+     Burnt Sienna
+     ───────────────────────────── */
+
+  --primary: #A74339;
+  --primary-foreground: #FFF8F2;
+
+  /* ─────────────────────────────
+     Secondary
+     Dusty Rose
+     ───────────────────────────── */
+
+  --secondary: #E9A095;
+  --secondary-foreground: #6B302A;
+
+  /* ─────────────────────────────
+     Muted
+     Peach Cream
+     ───────────────────────────── */
+
+  --muted: #F0DED0;
+  --muted-foreground: #8C5A52;
+
+  /* ─────────────────────────────
+     Accent
+     Terracotta
+     ───────────────────────────── */
+
+  --accent: #D46C5B;
+  --accent-foreground: #FFF8F2;
+
+  /* ─────────────────────────────
+     Destructive
+     ───────────────────────────── */
+
+  --destructive: #A74339;
+
+  /* ─────────────────────────────
+     Borders / Inputs
+     ───────────────────────────── */
+
+  --border: #E5C9BD;
+  --input: #E5C9BD;
+
+  /* ─────────────────────────────
+     Focus Ring
+     ───────────────────────────── */
+
+  --ring: #D46C5B;
+
+  /* ─────────────────────────────
+     Radius
+     ───────────────────────────── */
+
   --radius: 0.65rem;
+
+  /* ─────────────────────────────
+     Booklish Palette
+     ───────────────────────────── */
+
+  --palette-dusty-rose: #E9A095;
+  --palette-terracotta: #D46C5B;
+  --palette-peach-cream: #F0DED0;
+  --palette-burnt-sienna: #A74339;
+  --palette-warm-ivory: #F4E9DC;
 }
 
 .dark {
-  --background: oklch(0.19 0.035 265);
-  --foreground: oklch(0.93 0.02 85);
-  --card: oklch(0.23 0.04 265);
-  --card-foreground: oklch(0.93 0.02 85);
-  --popover: oklch(0.23 0.04 265);
-  --popover-foreground: oklch(0.93 0.02 85);
-  --primary: oklch(0.78 0.15 75);
-  --primary-foreground: oklch(0.19 0.04 265);
-  --secondary: oklch(0.3 0.03 265);
-  --secondary-foreground: oklch(0.93 0.02 85);
-  --muted: oklch(0.27 0.03 265);
-  --muted-foreground: oklch(0.68 0.03 85);
-  --accent: oklch(0.78 0.15 75);
-  --accent-foreground: oklch(0.19 0.04 265);
-  --destructive: oklch(0.6 0.2 27);
-  --border: oklch(0.32 0.035 265);
-  --input: oklch(0.32 0.035 265);
-  --ring: oklch(0.78 0.15 75);
+  /* ─────────────────────────────
+     Base
+     ───────────────────────────── */
+
+  --background: #2A1715;
+  --foreground: #F4E9DC;
+
+  /* ─────────────────────────────
+     Cards
+     ───────────────────────────── */
+
+  --card: #351E1B;
+  --card-foreground: #F4E9DC;
+
+  --popover: #351E1B;
+  --popover-foreground: #F4E9DC;
+
+  /* ─────────────────────────────
+     Primary
+     Burnt Sienna / Terracotta
+     ───────────────────────────── */
+
+  --primary: #D46C5B;
+  --primary-foreground: #2A1715;
+
+  /* ─────────────────────────────
+     Secondary
+     Darkened Dusty Rose
+     ───────────────────────────── */
+
+  --secondary: #6E3933;
+  --secondary-foreground: #F4E9DC;
+
+  /* ─────────────────────────────
+     Muted
+     ───────────────────────────── */
+
+  --muted: #4A2925;
+  --muted-foreground: #D8AAA0;
+
+  /* ─────────────────────────────
+     Accent
+     Dusty Rose
+     ───────────────────────────── */
+
+  --accent: #E9A095;
+  --accent-foreground: #2A1715;
+
+  /* ─────────────────────────────
+     Destructive
+     ───────────────────────────── */
+
+  --destructive: #D46C5B;
+
+  /* ─────────────────────────────
+     Borders / Inputs
+     ───────────────────────────── */
+
+  --border: #633832;
+  --input: #633832;
+
+  /* ─────────────────────────────
+     Focus Ring
+     ───────────────────────────── */
+
+  --ring: #E9A095;
+
+  /* ─────────────────────────────
+     Radius
+     ───────────────────────────── */
+
+  --radius: 0.65rem;
+
+  /* ─────────────────────────────
+     Booklish Palette
+     ───────────────────────────── */
+
+  --palette-dusty-rose: #E9A095;
+  --palette-terracotta: #D46C5B;
+  --palette-peach-cream: #F0DED0;
+  --palette-burnt-sienna: #A74339;
+  --palette-warm-ivory: #F4E9DC;
 }
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
