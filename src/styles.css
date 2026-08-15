@@ -96,7 +96,7 @@
      Radius
      ───────────────────────────── */
 
-  --radius: 0.65rem;
+  --radius: 0.85rem;
 
   /* ─────────────────────────────
      Booklish Palette
@@ -107,6 +107,13 @@
   --palette-copper: #8A6D3B;
   --palette-olive: #6B7A5E;
   --palette-clay: #B5502F;
+
+  /* ─────────────────────────────
+     تجربة ناعمة — منحنى وزمن انتقال أهدأ يُطبَّق تلقائيًا
+     على كل استخدامات transition-* في المشروع بدون لمس أي مكوّن
+     ───────────────────────────── */
+  --default-transition-duration: 320ms;
+  --default-transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .dark {
@@ -223,6 +230,21 @@
   border-color: var(--border);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+::selection {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
 body {
 
   background-color: var(--background);
@@ -274,7 +296,9 @@ body {
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   background-color: var(--card);
-  box-shadow: 0 1px 2px oklch(0.24 0.045 265 / 0.04), 0 8px 20px -12px oklch(0.24 0.045 265 / 0.18);
+  box-shadow: 0 1px 2px oklch(0.24 0.045 265 / 0.03), 0 14px 32px -16px oklch(0.24 0.045 265 / 0.14);
+  transition: box-shadow var(--default-transition-duration, 320ms) var(--default-transition-timing-function, ease),
+    transform var(--default-transition-duration, 320ms) var(--default-transition-timing-function, ease);
 }
 .paper-card::after {
   content: "";
@@ -378,7 +402,7 @@ body {
   50% { transform: translateY(-6px); }
 }
 .breathe-card {
-  animation: breathe 7s ease-in-out infinite;
+  animation: breathe 7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 
 @keyframes ping-soft {
@@ -461,7 +485,9 @@ body {
   font: inherit;
   color: inherit;
   border-bottom: 2px dotted var(--accent);
-  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+  transition: background-color 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .word-token-demo:hover,
 .word-token-demo-active {
@@ -497,7 +523,7 @@ body {
 .reveal {
   opacity: 0;
   transform: translateY(18px);
-  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+  transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .reveal-visible {
   opacity: 1;
