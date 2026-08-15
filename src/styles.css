@@ -368,10 +368,156 @@ body {
 }
 
 
+/* ─────────────────────────────────────────────
+   الصفحة الرئيسية العامة — نمط "هادئ حي"
+   حركة سفلية بطيئة ومستمرة بدل نبضات صاخبة،
+   تنقل إحساس صفحة كتاب تتنفس بهدوء
+   ───────────────────────────────────────────── */
+
+@keyframes breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.breathe-card {
+  animation: breathe 7s ease-in-out infinite;
+}
+
+@keyframes ping-soft {
+  0% { transform: scale(1); opacity: 0.6; }
+  70%, 100% { transform: scale(2.4); opacity: 0; }
+}
+.animate-ping-soft {
+  animation: ping-soft 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes progress-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+.progress-breathe {
+  animation: progress-breathe 3.5s ease-in-out infinite;
+}
+
+/* أشكال دافئة تطفو ببطء خلف قسم البطل — إحساس "حي" بلا ضجيج */
+.ambient-shape {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(48px);
+  opacity: 0.35;
+}
+.ambient-shape-a {
+  top: -10%;
+  right: -6%;
+  width: 22rem;
+  height: 22rem;
+  background: var(--secondary);
+  animation: drift-a 22s ease-in-out infinite;
+}
+.ambient-shape-b {
+  bottom: -14%;
+  left: -8%;
+  width: 18rem;
+  height: 18rem;
+  background: var(--accent);
+  opacity: 0.22;
+  animation: drift-b 26s ease-in-out infinite;
+}
+.ambient-shape-c {
+  top: 30%;
+  left: 40%;
+  width: 12rem;
+  height: 12rem;
+  background: var(--palette-dusty-rose);
+  opacity: 0.18;
+  animation: drift-a 19s ease-in-out infinite reverse;
+}
+@keyframes drift-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-18px, 22px) scale(1.06); }
+}
+@keyframes drift-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(20px, -16px) scale(1.08); }
+}
+
+/* حبيبات ورق خفيفة جدًا فوق الخلفية — ملمس هادئ بلا تشتيت */
+.grain-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.25;
+  background-image: radial-gradient(currentColor 0.6px, transparent 0.6px);
+  background-size: 16px 16px;
+  color: var(--foreground);
+  mix-blend-mode: multiply;
+}
+
+/* كلمة قابلة للضغط داخل عرض تفاعلي في البطل — تعكس فعل المنتج نفسه */
+.word-token-demo {
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0 2px;
+  border-radius: 3px;
+  font: inherit;
+  color: inherit;
+  border-bottom: 2px dotted var(--accent);
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+.word-token-demo:hover,
+.word-token-demo-active {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border-bottom-color: transparent;
+}
+.word-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.75rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 10;
+}
+.word-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--primary);
+}
+
+/* كشف تدريجي عند التمرير — بديل هادئ للظهور الفجائي */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,
   .animate-scale-in,
-  .animate-slide-up {
+  .animate-slide-up,
+  .breathe-card,
+  .animate-ping-soft,
+  .progress-breathe,
+  .ambient-shape {
     animation: none;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
