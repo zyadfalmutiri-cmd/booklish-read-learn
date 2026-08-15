@@ -45,10 +45,12 @@ export function StoryCard({ story }: { story: Story }) {
   const svg = COVERS[story.slug];
   const image = COVER_IMAGES[story.slug] || story.coverImage;
 
-const levelStyles: Record<string, string> = {
-    beginner: "bg-emerald-500 text-white",
-    intermediate: "bg-yellow-500 text-white",
-    advanced: "bg-red-500 text-white",
+  // 🎨 شارات المستوى — بنفس عائلة الهوية الترابية (نحاسي/زيتوني/طيني)
+  // بدل أخضر/أصفر/أحمر القياسية اللي ما لها علاقة بالتصميم
+  const levelStyles: Record<string, string> = {
+    beginner: "bg-secondary text-secondary-foreground",
+    intermediate: "bg-primary text-primary-foreground",
+    advanced: "bg-accent text-accent-foreground",
   };
 
   return (
