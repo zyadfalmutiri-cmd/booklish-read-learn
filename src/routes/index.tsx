@@ -8,9 +8,9 @@ import { useXp, LEVELS } from "@/lib/xp";
 import { useStats } from "@/lib/stats";
 import type { SavedWord } from "@/lib/types";
 import { getPreferredVoice, useVoicePrefs } from "@/lib/voices";
-import { Flame, BookOpen, ArrowRight, Target, Zap, Mic, MicOff, MessageCircle, Loader2 } from "lucide-react";
+import { Flame, BookOpen, ArrowRight, Target, Zap, Mic, MicOff, MessageCircle, Loader2, Volume2 } from "lucide-react";
 import { useT } from "@/lib/i18n";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, Fragment } from "react";
 import { getSpeakingPartnerReply } from "@/lib/api/speaking-ai.functions";
 
 // 🔓 تحميل مبكر لقائمة الأصوات (بعض المتصفحات تحتاجها قبل أول استخدام)
@@ -47,70 +47,324 @@ const LEVEL_LABELS_AR: Record<LevelCode, string> = {
   C1: "متقدم",
 };
 
+/* ─────────────────────────────────────────────
+   Reveal — كشف تدريجي عند الوصول للعنصر أثناء التمرير
+   حركة هادئة، محترمة لـ prefers-reduced-motion عبر CSS
+   ───────────────────────────────────────────── */
+function Reveal({
+  children,
+  delay = 0,
+  className = "",
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className={`reveal ${visible ? "reveal-visible" : ""} ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   AmbientField — إحساس "حي" هادئ في الخلفية: أشكال دافئة
+   تتنفس ببطء خلف المحتوى، بدل الرسوم المتحركة الصاخبة
+   ───────────────────────────────────────────── */
+function AmbientField() {
+  return (
+    <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+      <span className="ambient-shape ambient-shape-a" />
+      <span className="ambient-shape ambient-shape-b" />
+      <span className="ambient-shape ambient-shape-c" />
+      <div className="grain-overlay" />
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   TapWordDemo — التوقيع البصري للموقع: نفس فعل "اضغط على
+   الكلمة" اللي هو جوهر المنتج، لكن هنا كتجربة حية في البطل
+   ───────────────────────────────────────────── */
+type DemoToken = { text: string; meaning?: string };
+
+const DEMO_TOKENS: DemoToken[] = [
+  { text: "The" },
+  { text: "old", meaning: "قديمة" },
+  { text: "lighthouse", meaning: "منارة" },
+  { text: "still" },
+  { text: "guides", meaning: "ترشد" },
+  { text: "ships", meaning: "السفن" },
+  { text: "safely", meaning: "بأمان" },
+  { text: "home." },
+];
+
+function TapWordDemo({ ar }: { ar: boolean }) {
+  const [active, setActive] = useState<number | null>(1);
+
+  useEffect(() => {
+    const t = setTimeout(() => setActive(null), 2200);
+    return () => clearTimeout(t);
+  }, []);
+
+  return (
+    <div className="relative breathe-card paper-card p-6 sm:p-8">
+      <div className="mb-5 flex items-center gap-2 text-xs text-muted-foreground">
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping-soft rounded-full bg-emerald-500 opacity-60" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+        </span>
+        {ar ? "جرّب بنفسك — اضغط على أي كلمة" : "Try it — tap any word"}
+      </div>
+
+      <p className="font-serif text-xl leading-relaxed sm:text-[1.7rem]" dir="ltr">
+        {DEMO_TOKENS.map((tok, i) => (
+          <Fragment key={i}>
+            {i > 0 && " "}
+            {tok.meaning ? (
+              <span className="relative inline-block">
+                <button
+                  type="button"
+                  onClick={() => setActive(active === i ? null : i)}
+                  className={`word-token-demo ${active === i ? "word-token-demo-active" : ""}`}
+                >
+                  {tok.text}
+                </button>
+                {active === i && (
+                  <span className="word-tooltip animate-scale-in" dir="rtl">
+                    {tok.meaning}
+                  </span>
+                )}
+              </span>
+            ) : (
+              tok.text
+            )}
+          </Fragment>
+        ))}
+      </p>
+
+      <div className="mt-5 flex items-center gap-2 border-t border-border pt-4 text-xs text-muted-foreground">
+        <Volume2 className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+        {ar ? "استمع للنطق الصحيح لكل كلمة" : "Hear the correct pronunciation of every word"}
+      </div>
+    </div>
+  );
+}
+
 function PublicLanding({ ar }: { ar: boolean }) {
   return (
-    <main className="mx-auto max-w-5xl px-4 pb-24 pt-8 sm:pt-14" dir={ar ? "rtl" : "ltr"}>
-      <section className="mb-10 sm:mb-14 text-center">
-        <p className="mb-3 text-xs uppercase tracking-[0.2em] text-primary">
-          {ar ? "تعلم الإنجليزية بطريقة طبيعية" : "Learn English Naturally"}
-        </p>
-        <h1 className="mb-5 mx-auto max-w-2xl font-serif font-semibold text-3xl leading-[1.1] tracking-tight sm:text-5xl">
-          {ar ? (
-            <>Booklish</>
-          ) : (
-            <>
-              Read. Tap. <span className="ink-highlight">Understand.</span>
-            </>
-          )}
-        </h1>
-        <p className="mb-7 mx-auto max-w-xl text-base text-muted-foreground">
-          {ar
-            ? "اقرأ قصصًا قصيرة، اضغط على أي كلمة لمعناها، ومارس النطق والمحادثة بالذكاء الاصطناعي."
-            : "Read short stories, tap any word for its meaning, and practice speaking with AI."}
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <Link
-            to="/auth"
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-          >
-            {ar ? "ابدأ الآن مجانًا" : "Get started free"}
-          </Link>
+    <main dir={ar ? "rtl" : "ltr"}>
+      {/* Hero */}
+      <section className="relative overflow-hidden px-4 pb-16 pt-12 sm:pb-24 sm:pt-20">
+        <AmbientField />
+        <div className="mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+          <div className="text-center lg:text-start">
+            <p className="mb-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-primary">
+              <span className="cover-rule" />
+              {ar ? "طريقة أهدأ لتعلم الإنجليزية" : "A calmer way to learn English"}
+            </p>
+            <h1 className="mx-auto mb-5 max-w-2xl font-serif font-semibold text-4xl leading-[1.1] tracking-tight sm:text-6xl lg:mx-0">
+              {ar ? (
+                <>
+                  اقرأ. اضغط.
+                  <br />
+                  <span className="ink-highlight">افهم.</span>
+                </>
+              ) : (
+                <>
+                  Read. Tap. <span className="ink-highlight">Understand.</span>
+                </>
+              )}
+            </h1>
+            <p className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg lg:mx-0">
+              {ar
+                ? "اقرأ قصصًا قصيرة بلا ضغط، اضغط على أي كلمة لمعناها فورًا، ومارس المحادثة مع شريك ذكاء اصطناعي يستمع لك بصبر."
+                : "Read short stories at your own pace, tap any word for its meaning, and practice speaking with a patient AI partner."}
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+              <Link
+                to="/auth"
+                className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                {ar ? "ابدأ الآن مجانًا" : "Get started free"}
+              </Link>
+              <span className="text-xs text-muted-foreground">
+                {ar ? "بلا بطاقة ائتمان" : "No credit card needed"}
+              </span>
+            </div>
+          </div>
+
+          <Reveal delay={100} className="mx-auto w-full max-w-md lg:mx-0">
+            <TapWordDemo ar={ar} />
+          </Reveal>
         </div>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-3 mb-10">
-        <div className="paper-card p-5 text-center">
-          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-            <BookOpen className="h-5 w-5 text-primary" aria-hidden="true" />
-          </div>
-          <h3 className="font-serif text-base mb-1">{ar ? "قصص تفاعلية" : "Interactive Stories"}</h3>
-          <p className="text-sm text-muted-foreground">
-            {ar ? "اضغط على أي كلمة لمعناها فورًا" : "Tap any word for instant meaning"}
-          </p>
+      {/* Flow — تسلسل حقيقي لخطوات الاستخدام، ليس ديكورًا */}
+      <section className="mx-auto max-w-5xl px-4 pb-16 sm:pb-20">
+        <Reveal>
+          <h2 className="mb-8 text-center font-serif text-2xl sm:text-3xl">
+            {ar ? "ثلاث خطوات، ولا شيء يُثقل" : "Three steps, nothing heavier"}
+          </h2>
+        </Reveal>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {[
+            {
+              n: "01",
+              icon: BookOpen,
+              title: ar ? "اقرأ" : "Read",
+              body: ar
+                ? "قصص قصيرة مصنّفة حسب مستواك، من المبتدئ حتى المتقدم."
+                : "Short stories leveled from beginner to advanced.",
+            },
+            {
+              n: "02",
+              icon: Zap,
+              title: ar ? "اضغط" : "Tap",
+              body: ar
+                ? "اضغط أي كلمة غامضة، ويظهر معناها ونطقها فورًا."
+                : "Tap any unfamiliar word for instant meaning and pronunciation.",
+            },
+            {
+              n: "03",
+              icon: Mic,
+              title: ar ? "تحدّث" : "Speak",
+              body: ar
+                ? "مارس المحادثة صوتيًا مع شريك ذكاء اصطناعي يصحح أخطاءك بلطف."
+                : "Practice speaking aloud with an AI partner that corrects you gently.",
+            },
+          ].map((step, i) => (
+            <Reveal key={step.n} delay={i * 90}>
+              <div className="paper-card h-full p-5">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                    <step.icon className="h-5 w-5 text-primary" aria-hidden="true" />
+                  </div>
+                  <span className="font-serif text-2xl text-muted-foreground/40">{step.n}</span>
+                </div>
+                <h3 className="mb-1 font-serif text-lg">{step.title}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">{step.body}</p>
+              </div>
+            </Reveal>
+          ))}
         </div>
-        <div className="paper-card p-5 text-center">
-          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-            <Mic className="h-5 w-5 text-primary" aria-hidden="true" />
-          </div>
-          <h3 className="font-serif text-base mb-1">{ar ? "شريك محادثة ذكي" : "AI Conversation Partner"}</h3>
-          <p className="text-sm text-muted-foreground">
-            {ar ? "تحدث بالإنجليزي واحصل على تصحيح فوري" : "Speak English and get instant feedback"}
-          </p>
+      </section>
+
+      {/* Progress — تتبع هادئ، بلا ضغط أرقام صاخبة */}
+      <section className="relative overflow-hidden px-4 py-16 sm:py-20">
+        <div className="absolute inset-0 -z-10 bg-muted/40" aria-hidden="true" />
+        <div className="mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-2">
+          <Reveal>
+            <p className="mb-3 text-xs uppercase tracking-[0.2em] text-primary">
+              {ar ? "بدون سباق" : "No race"}
+            </p>
+            <h2 className="mb-4 max-w-md font-serif text-2xl leading-tight sm:text-3xl">
+              {ar ? "تقدّمك يُحفظ بهدوء، خطوة بعد خطوة" : "Your progress is kept quietly, step by step"}
+            </h2>
+            <p className="max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">
+              {ar
+                ? "سلسلة أيام، نقاط خبرة، وكلمات محفوظة — كلها تُبنى تلقائيًا بينما تقرأ، بلا إشعارات مزعجة أو تذكيرات ملحّة."
+                : "Streaks, XP, and saved words build automatically as you read — no pushy notifications, no pressure."}
+            </p>
+          </Reveal>
+          <Reveal delay={120}>
+            <div className="paper-card p-6">
+              <div className="mb-5 grid grid-cols-3 gap-3 text-center">
+                <div>
+                  <Flame className="mx-auto mb-1.5 h-5 w-5 text-orange-500" aria-hidden="true" />
+                  <div className="font-serif text-xl">7</div>
+                  <div className="text-[11px] text-muted-foreground">{ar ? "أيام" : "days"}</div>
+                </div>
+                <div>
+                  <BookOpen className="mx-auto mb-1.5 h-5 w-5 text-primary" aria-hidden="true" />
+                  <div className="font-serif text-xl">12</div>
+                  <div className="text-[11px] text-muted-foreground">{ar ? "قصص" : "stories"}</div>
+                </div>
+                <div>
+                  <Target className="mx-auto mb-1.5 h-5 w-5 text-emerald-500" aria-hidden="true" />
+                  <div className="font-serif text-xl">86</div>
+                  <div className="text-[11px] text-muted-foreground">{ar ? "كلمة" : "words"}</div>
+                </div>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                <div className="progress-breathe h-full w-2/3 rounded-full bg-gradient-to-r from-primary to-primary/70" />
+              </div>
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                {ar ? "مثال توضيحي لتقدم أحد المتعلمين" : "Illustrative example of a learner's progress"}
+              </p>
+            </div>
+          </Reveal>
         </div>
-        <div className="paper-card p-5 text-center">
-          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-            <Flame className="h-5 w-5 text-primary" aria-hidden="true" />
+      </section>
+
+      {/* Speaking partner teaser */}
+      <section className="mx-auto max-w-5xl px-4 py-16 sm:py-20">
+        <Reveal className="mx-auto max-w-2xl text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+            <MessageCircle className="h-6 w-6 text-primary" aria-hidden="true" />
           </div>
-          <h3 className="font-serif text-base mb-1">{ar ? "تتبع تقدمك" : "Track Your Progress"}</h3>
-          <p className="text-sm text-muted-foreground">
-            {ar ? "نقاط خبرة، مستويات، وسلسلة أيام" : "XP, levels, and daily streaks"}
+          <h2 className="mb-3 font-serif text-2xl sm:text-3xl">
+            {ar ? "شريك محادثة يستمع بصبر" : "A conversation partner that listens patiently"}
+          </h2>
+          <p className="mb-8 text-sm leading-relaxed text-muted-foreground sm:text-base">
+            {ar
+              ? "تحدث بالإنجليزي بصوتك، واحصل على تصحيح فوري ومهذّب، وتقييم لمستواك حسب معايير CEFR."
+              : "Speak English out loud, get gentle instant corrections, and a CEFR-based level estimate."}
           </p>
-        </div>
+          <Link
+            to="/auth"
+            className="inline-flex items-center gap-2 rounded-md border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          >
+            {ar ? "جرّب شريك المحادثة" : "Try the speaking partner"}
+            <ArrowRight className={ar ? "h-4 w-4 rotate-180" : "h-4 w-4"} aria-hidden="true" />
+          </Link>
+        </Reveal>
+      </section>
+
+      {/* Final CTA */}
+      <section className="relative overflow-hidden px-4 py-16 sm:py-24">
+        <div className="absolute inset-0 -z-10 bg-primary/[0.06]" aria-hidden="true" />
+        <Reveal className="mx-auto max-w-xl text-center">
+          <h2 className="mb-4 font-serif text-2xl leading-tight sm:text-3xl">
+            {ar ? "ابدأ بقصة واحدة اليوم" : "Start with one story today"}
+          </h2>
+          <p className="mb-7 text-sm text-muted-foreground sm:text-base">
+            {ar ? "خمس دقائق تكفي لتلاحظ الفرق." : "Five minutes is enough to notice the difference."}
+          </p>
+          <Link
+            to="/auth"
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:bg-primary/90"
+          >
+            {ar ? "ابدأ الآن مجانًا" : "Get started free"}
+          </Link>
+        </Reveal>
       </section>
     </main>
   );
 }
-
 function SpeakingPartner({ ar }: { ar: boolean }) {
   const [listening, setListening] = useState(false);
   const [thinking, setThinking] = useState(false);
