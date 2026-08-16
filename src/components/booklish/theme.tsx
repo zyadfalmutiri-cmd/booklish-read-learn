@@ -20,11 +20,17 @@ export interface Settings {
   readerLineHeight: number; // 1.3 .. 2.2
 }
 
+// 🎨 ألوان شاشة القراءة نفسها — أهم شاشة بالتطبيق (فيها يقضي المستخدم أغلب وقته)
+// كانت تستخدم "light" = أبيض ناصع #ffffff كافتراضي، منفصل تمامًا عن هوية
+// "المكتبة القديمة" المطبّقة بباقي الموقع. الآن الأربع خيارات كلها من نفس
+// عائلة الورق/الحبر الدافئة، والافتراضي صار "cream" (يطابق --card بالضبط)
+// بدل الأبيض الجامد. باقي الخيارات (فاتح جدًا/داكن/بني) محفوظة كتفضيلات
+// قراءة مشروعة، فقط أُعيد توليفها على نفس العائلة اللونية.
 export const READER_THEME_STYLES: Record<ReaderTheme, { background: string; color: string; label: string; labelEn: string }> = {
-  light: { background: "#ffffff", color: "#1a1a1a", label: "فاتح", labelEn: "Light" },
-  dark: { background: "#000000", color: "#e8e8e8", label: "داكن", labelEn: "Dark" },
-  sepia: { background: "#f2e8d5", color: "#3f2f1e", label: "بني", labelEn: "Sepia" },
-  cream: { background: "#faf6ec", color: "#2b2620", label: "كريمي", labelEn: "Cream" },
+  light: { background: "#FBF8F2", color: "#2B2119", label: "فاتح", labelEn: "Light" },
+  dark: { background: "#17110B", color: "#EDE6D6", label: "داكن", labelEn: "Dark" },
+  sepia: { background: "#F0E2C8", color: "#43301D", label: "بني", labelEn: "Sepia" },
+  cream: { background: "#FAF6EC", color: "#2B2620", label: "كريمي", labelEn: "Cream" },
 };
 
 export const READER_FONT_FAMILY_MAP: Record<ReaderFontFamily, { css: string; label: string }> = {
@@ -40,7 +46,7 @@ const DEFAULTS: Settings = {
   translateMode: "off",
   uiLanguage: "ar",
   focusMode: false,
-  readerTheme: "light",
+  readerTheme: "cream",
   readerFontFamily: "serif",
   readerLineHeight: 1.7,
 };
