@@ -18,10 +18,11 @@ export const Route = createFileRoute("/library")({
 const GENRES: Genre[] = ["mystery", "romance", "sci-fi", "adventure", "drama", "non-fiction"];
 const CATEGORIES: Category[] = ["short", "fiction", "non-fiction", "sports"];
 
+// 🎨 نفس عائلة الهوية الترابية (نحاسي/طيني) بدل الأزرق والبرتقالي القياسيين
 const LEVEL_COLORS: Record<string, string> = {
-  B2: "bg-blue-500/90 text-white",
-  C1: "bg-[oklch(0.48_0.14_35)] text-white",
-  C2: "bg-[oklch(0.48_0.14_35)] text-white",
+  B2: "bg-primary/90 text-primary-foreground",
+  C1: "bg-accent/90 text-accent-foreground",
+  C2: "bg-accent text-accent-foreground",
 };
 
 function Library() {
