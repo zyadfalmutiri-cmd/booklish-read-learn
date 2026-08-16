@@ -24,6 +24,11 @@ export interface LevelInfo {
   color: string;
 }
 
+// 🎨 تدرّج "الحبر يتعمّق" — بدل ألوان قوس قزح عشوائية (أخضر/أزرق/بنفسجي)،
+// كل مستوى أعمق يميل أكثر نحو النحاسي/الطيني الدافئ بدل التلوين العشوائي.
+// ملاحظة: النص المستخدم فوق هذا التدرّج في journey.tsx/library.index.tsx/
+// placement-test.tsx هو دائمًا نص داكن افتراضي (بدون override)، فالتدرّج
+// يبقى ضمن مدى فاتح-متوسط فقط (لا يقترب من الأسود) عشان يضل مقروء.
 export const LEVEL_INFO: Record<CefrLevel, LevelInfo> = {
   A1: {
     label: "A1",
@@ -31,7 +36,7 @@ export const LEVEL_INFO: Record<CefrLevel, LevelInfo> = {
     nameEn: "Beginner",
     descAr: "أفهم الجمل البسيطة جداً والكلمات الشائعة.",
     descEn: "I understand very simple sentences and common words.",
-    color: "from-emerald-200 to-emerald-400",
+    color: "from-[#F3E9D2] to-[#E9D7B0]",
   },
   A2: {
     label: "A2",
@@ -39,7 +44,7 @@ export const LEVEL_INFO: Record<CefrLevel, LevelInfo> = {
     nameEn: "Elementary",
     descAr: "أفهم التعبيرات الشائعة في مواضيع مألوفة.",
     descEn: "I understand common expressions on familiar topics.",
-    color: "from-teal-200 to-teal-400",
+    color: "from-[#E3CA98] to-[#D8B57C]",
   },
   B1: {
     label: "B1",
@@ -47,7 +52,7 @@ export const LEVEL_INFO: Record<CefrLevel, LevelInfo> = {
     nameEn: "Intermediate",
     descAr: "أفهم النقاط الرئيسية في نصوص واضحة حول مواضيع مألوفة.",
     descEn: "I understand main points in clear texts on familiar topics.",
-    color: "from-blue-200 to-blue-400",
+    color: "from-[#CFA467] to-[#C29354]",
   },
   B2: {
     label: "B2",
@@ -55,7 +60,7 @@ export const LEVEL_INFO: Record<CefrLevel, LevelInfo> = {
     nameEn: "Upper-Intermediate",
     descAr: "أفهم النصوص المعقدة وأتعامل مع المواضيع المتخصصة.",
     descEn: "I understand complex texts and handle specialised topics.",
-    color: "from-violet-200 to-violet-400",
+    color: "from-[#B98B4A] to-[#AD7D3F]",
   },
   C1: {
     label: "C1",
@@ -63,7 +68,7 @@ export const LEVEL_INFO: Record<CefrLevel, LevelInfo> = {
     nameEn: "Advanced",
     descAr: "أفهم نصوصاً طويلة ومعقدة وأدرك المعاني الضمنية.",
     descEn: "I understand long, complex texts and implicit meanings.",
-    color: "from-orange-200 to-orange-400",
+    color: "from-[#A9793F] to-[#9C6D38]",
   },
   C2: {
     label: "C2",
@@ -71,7 +76,7 @@ export const LEVEL_INFO: Record<CefrLevel, LevelInfo> = {
     nameEn: "Mastery",
     descAr: "أفهم كل ما أقرأه بسهولة وبدقة عالية.",
     descEn: "I understand virtually everything I read with ease.",
-    color: "from-rose-200 to-rose-400",
+    color: "from-[#96692F] to-[#8A5D2A]",
   },
 };
 
