@@ -10,6 +10,7 @@ import {
   InflationRisingPrices,
   ChildAggressionUnderstanding,
 } from "./stories/stories.knowledge";
+
 import {
   aNewMoonMission,
   aRobotTaxiInTheSky,
@@ -36,6 +37,18 @@ import {
   aMuseumCelebrates250Years,
 } from "@/data/stories/stories.news-a2";
 
+import {
+  whenAiLearnsToTalkBack,
+  aHealthEmergencyInCentralAfrica,
+  lockingTheWorldOutOfAi,
+  gravesMovedForAGolfResort,
+  womensRightsOnAGlobalStage,
+  dronesCrossABorder,
+  aSmokeCloudOverACity,
+  theCostOfFlyingTaxis,
+  aSacredStatueGoesMissing,
+  coralReefsUnderPressure,
+} from "@/data/stories/stories.news-b1";
 
 import { storyCoverUrls } from "@/data/story-covers-map";
 import { storyAudio } from "@/data/story-audio";
@@ -263,7 +276,17 @@ export const stories: Story[] = [
   aCityRebuildsAfterAnEarthquake,
   newRulesForOnlinePrivacy,
   aMuseumCelebrates250Years,
-
+  // Real-world news stories — B1 batch (10)
+  whenAiLearnsToTalkBack,
+  aHealthEmergencyInCentralAfrica,
+  lockingTheWorldOutOfAi,
+  gravesMovedForAGolfResort,
+  womensRightsOnAGlobalStage,
+  dronesCrossABorder,
+  aSmokeCloudOverACity,
+  theCostOfFlyingTaxis,
+  aSacredStatueGoesMissing,
+  coralReefsUnderPressure,
 ].map(withDefaults);
 
 
