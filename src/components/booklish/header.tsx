@@ -91,13 +91,16 @@ export function Header() {
     <>
       {/* Top bar */}
       <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur-md">
+        <div className="h-px w-full bg-gradient-to-r from-transparent via-accent/40 to-transparent" aria-hidden="true" />
         <div className="mx-auto flex h-14 max-w-5xl items-center gap-2 px-4">
           <Link
             to="/"
             className="flex items-center gap-2 font-serif text-lg font-semibold tracking-tight"
             onClick={() => setMobileOpen(false)}
           >
-            <BookOpen className="h-5 w-5 text-primary" />
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary/10">
+              <BookOpen className="h-4 w-4 text-primary" />
+            </span>
             <span>{t("brand.name")}</span>
           </Link>
 
