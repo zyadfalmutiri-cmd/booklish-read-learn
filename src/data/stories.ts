@@ -10,6 +10,18 @@ import {
   InflationRisingPrices,
   ChildAggressionUnderstanding,
 } from "./stories/stories.knowledge";
+import {
+  aNewMoonMission,
+  aRobotTaxiInTheSky,
+  theWorldCupInThreeCountries,
+  iceAndSnowInItaly,
+  aWomanWinsTheDerby,
+  aBigBirthdayForAmerica,
+  theSunDisappears,
+  aNewBabyPanda,
+  millionsWalkToMecca,
+  aFastTrainOpens,
+} from "@/data/stories/stories.news-a1";
 
 import { storyCoverUrls } from "@/data/story-covers-map";
 import { storyAudio } from "@/data/story-audio";
@@ -215,6 +227,17 @@ export const stories: Story[] = [
   UnderstandingEmotions,
   InflationRisingPrices,
   ChildAggressionUnderstanding,
+  // Real-world news stories — A1 batch (10)
+  aNewMoonMission,
+  aRobotTaxiInTheSky,
+  theWorldCupInThreeCountries,
+  iceAndSnowInItaly,
+  aWomanWinsTheDerby,
+  aBigBirthdayForAmerica,
+  theSunDisappears,
+  aNewBabyPanda,
+  millionsWalkToMecca,
+  aFastTrainOpens,
 ].map(withDefaults);
 
 
