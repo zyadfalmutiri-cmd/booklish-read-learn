@@ -134,8 +134,8 @@ function TapWordDemo({ ar }: { ar: boolean }) {
     <div className="relative breathe-card paper-card p-6 sm:p-8">
       <div className="mb-5 flex items-center gap-2 text-xs text-muted-foreground">
         <span className="relative flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping-soft rounded-full bg-emerald-500 opacity-60" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+          <span className="absolute inline-flex h-full w-full animate-ping-soft rounded-full bg-secondary opacity-60" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-secondary" />
         </span>
         {ar ? "جرّب بنفسك — اضغط على أي كلمة" : "Try it — tap any word"}
       </div>
@@ -294,7 +294,7 @@ function PublicLanding({ ar }: { ar: boolean }) {
             <div className="paper-card p-6">
               <div className="mb-5 grid grid-cols-3 gap-3 text-center">
                 <div>
-                  <Flame className="mx-auto mb-1.5 h-5 w-5 text-orange-500" aria-hidden="true" />
+                  <Flame className="mx-auto mb-1.5 h-5 w-5 text-accent" aria-hidden="true" />
                   <div className="font-serif text-xl">7</div>
                   <div className="text-[11px] text-muted-foreground">{ar ? "أيام" : "days"}</div>
                 </div>
@@ -304,7 +304,7 @@ function PublicLanding({ ar }: { ar: boolean }) {
                   <div className="text-[11px] text-muted-foreground">{ar ? "قصص" : "stories"}</div>
                 </div>
                 <div>
-                  <Target className="mx-auto mb-1.5 h-5 w-5 text-emerald-500" aria-hidden="true" />
+                  <Target className="mx-auto mb-1.5 h-5 w-5 text-secondary" aria-hidden="true" />
                   <div className="font-serif text-xl">86</div>
                   <div className="text-[11px] text-muted-foreground">{ar ? "كلمة" : "words"}</div>
                 </div>
@@ -594,12 +594,12 @@ LEVEL: <A1|A2|B1|B2|C1>`;
             disabled={thinking}
             className={`relative flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all ${
               listening
-                ? "bg-red-500 text-white shadow-lg shadow-red-500/20"
+                ? "bg-destructive text-primary-foreground shadow-lg shadow-destructive/20"
                 : "bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90"
             } disabled:opacity-50`}
           >
             {listening && (
-              <span className="absolute inset-0 rounded-full animate-ping bg-red-400 opacity-20 pointer-events-none" />
+              <span className="absolute inset-0 rounded-full animate-ping bg-destructive opacity-20 pointer-events-none" />
             )}
             {listening ? (
               <MicOff className="h-4 w-4 relative z-10" />
@@ -656,10 +656,10 @@ LEVEL: <A1|A2|B1|B2|C1>`;
 
         {feedback && !thinking && (
           <div className="flex gap-2 items-start">
-            <span className="mt-1 text-[10px] font-bold text-emerald-600 uppercase tracking-wide shrink-0 w-10 text-center">
+            <span className="mt-1 text-[10px] font-bold text-secondary uppercase tracking-wide shrink-0 w-10 text-center">
               {ar ? "تصحيح" : "Fix"}
             </span>
-            <p className="text-sm bg-emerald-500/5 border border-emerald-500/15 rounded-xl px-3 py-2.5 flex-1 leading-relaxed">
+            <p className="text-sm bg-secondary/5 border border-secondary/15 rounded-xl px-3 py-2.5 flex-1 leading-relaxed">
               {feedback}
             </p>
           </div>
@@ -732,10 +732,10 @@ const { user, loading: authLoading } = useAuth();
         </div>
       </section>
 
-      {/* Stats Row */}
+      {/* Stats Row — نفس عائلة الهوية بدل الألوان القياسية (برتقالي/أصفر/أخضر) */}
       <section className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard
-          icon={<Flame className="h-4 w-4 text-orange-500" />}
+          icon={<Flame className="h-4 w-4 text-accent" />}
           value={String(streak.current)}
           label={ar ? "أيام متتالية" : "Day streak"}
         />
@@ -745,7 +745,7 @@ const { user, loading: authLoading } = useAuth();
           label={ar ? "قصص مكتملة" : "Stories done"}
         />
         <StatCard
-          icon={<Zap className="h-4 w-4 text-yellow-500" />}
+          icon={<Zap className="h-4 w-4 text-primary" />}
           value={`${xp} XP`}
           label={
             <span className="inline-flex items-center gap-1">
@@ -755,7 +755,7 @@ const { user, loading: authLoading } = useAuth();
           }
         />
         <StatCard
-          icon={<Target className="h-4 w-4 text-emerald-500" />}
+          icon={<Target className="h-4 w-4 text-secondary" />}
           value={`${todayWords}/${DAILY_WORD_GOAL}`}
           label={ar ? "كلمات اليوم" : "Words today"}
         />
@@ -811,7 +811,7 @@ const { user, loading: authLoading } = useAuth();
             label={ar ? `احفظ ${DAILY_WORD_GOAL} كلمات` : `Save ${DAILY_WORD_GOAL} words`}
             current={Math.min(todayWords, DAILY_WORD_GOAL)}
             max={DAILY_WORD_GOAL}
-            color="bg-emerald-500"
+            color="bg-secondary"
           />
         </div>
       </section>
