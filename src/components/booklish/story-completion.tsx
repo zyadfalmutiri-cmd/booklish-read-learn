@@ -220,14 +220,16 @@ function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }
   const goNext = () => setIndex((i) => Math.min(sentences.length - 1, i + 1));
   const goPrev = () => setIndex((i) => Math.max(0, i - 1));
 
+  // 🎨 نفس عائلة الهوية بدل الأخضر/الأصفر/الأحمر القياسي:
+  // زيتوني = ممتاز، نحاسي = مقبول، طيني (destructive) = يحتاج تحسين
   const scoreColor =
     result == null
       ? ""
       : result.score >= 80
-        ? "text-emerald-600 bg-emerald-500/10"
+        ? "text-secondary bg-secondary/10"
         : result.score >= 50
-          ? "text-yellow-600 bg-yellow-500/10"
-          : "text-red-500 bg-red-500/10";
+          ? "text-primary bg-primary/10"
+          : "text-destructive bg-destructive/10";
 
   return (
     <div className="border-t border-border p-4">
@@ -251,7 +253,7 @@ function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }
             ? result.results.map((r, i) => (
                 <span
                   key={i}
-                  className={r.ok ? "text-emerald-600" : "text-red-500 underline decoration-dotted"}
+                  className={r.ok ? "text-secondary" : "text-destructive underline decoration-dotted"}
                 >
                   {r.word}{" "}
                 </span>
@@ -284,7 +286,7 @@ function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }
             onClick={isRecording ? stopRecording : startRecording}
             className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
               isRecording
-                ? "bg-red-500 text-white shadow-lg shadow-red-500/20"
+                ? "bg-destructive text-primary-foreground shadow-lg shadow-destructive/20"
                 : "bg-primary text-primary-foreground hover:bg-primary/90"
             }`}
           >
@@ -303,7 +305,7 @@ function ShadowingPractice({ storySlug, ar }: { storySlug: string; ar: boolean }
           </button>
         </div>
 
-        {micError && <p className="mt-3 text-center text-xs text-red-500">{micError}</p>}
+        {micError && <p className="mt-3 text-center text-xs text-destructive">{micError}</p>}
 
         {result && (
           <div className="mt-4 space-y-2">
@@ -398,7 +400,7 @@ export function StoryCompletion({
             label={ar ? "كلمات جديدة" : "New words"}
           />
           <StatItem
-            icon={<Zap className="h-4 w-4 text-yellow-500" />}
+            icon={<Zap className="h-4 w-4 text-primary" />}
             value={`+${xpEarned}`}
             label="XP"
           />
