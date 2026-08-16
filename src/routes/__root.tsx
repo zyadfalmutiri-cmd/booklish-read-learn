@@ -208,6 +208,8 @@ function RootComponent() {
  return (
   <QueryClientProvider client={queryClient}>
     <ThemeSync />
+    {/* نسيج ورق خفيف على كل صفحات التطبيق — نفس لمسة صفحة الهبوط، مو بس فيها */}
+    <div className="app-grain-overlay" aria-hidden="true" />
     <Header />
     <RequireAuth>
       <Outlet />
