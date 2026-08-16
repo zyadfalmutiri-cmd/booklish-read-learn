@@ -23,6 +23,20 @@ import {
   aFastTrainOpens,
 } from "@/data/stories/stories.news-a1";
 
+import {
+  mosquitoesWithAMission,
+  theUaeLeavesAnOldClub,
+  aStarBiggerThanOurSolarSystem,
+  buildingVertiports,
+  theOlympicTorchTravels,
+  aSequelAfter20Years,
+  farmersFaceADryYear,
+  aCityRebuildsAfterAnEarthquake,
+  newRulesForOnlinePrivacy,
+  aMuseumCelebrates250Years,
+} from "@/data/stories/stories.news-a2";
+
+
 import { storyCoverUrls } from "@/data/story-covers-map";
 import { storyAudio } from "@/data/story-audio";
 import type { Story, Category } from "@/lib/types";
@@ -238,6 +252,18 @@ export const stories: Story[] = [
   aNewBabyPanda,
   millionsWalkToMecca,
   aFastTrainOpens,
+  // Real-world news stories — A2 batch (10)
+  mosquitoesWithAMission,
+  theUaeLeavesAnOldClub,
+  aStarBiggerThanOurSolarSystem,
+  buildingVertiports,
+  theOlympicTorchTravels,
+  aSequelAfter20Years,
+  farmersFaceADryYear,
+  aCityRebuildsAfterAnEarthquake,
+  newRulesForOnlinePrivacy,
+  aMuseumCelebrates250Years,
+
 ].map(withDefaults);
 
 
