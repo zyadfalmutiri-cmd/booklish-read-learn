@@ -143,10 +143,10 @@ function Library() {
 
       <div className="mb-8 flex flex-col gap-4">
         <h1 className="font-serif text-3xl">{t("library.title")}</h1>
-        <div className="relative">
+        <div className="relative search-shell">
           <Search className={`pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground ${isRtl ? "right-3" : "left-3"}`} />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("common.searchPlaceholder")}
-            className={`w-full rounded-lg border border-border bg-card py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring/50 ${isRtl ? "pr-9 pl-3 text-right" : "pl-9 pr-3"}`} />
+            className={`w-full bg-transparent py-2.5 text-sm outline-none ${isRtl ? "pr-9 pl-3 text-right" : "pl-9 pr-3"}`} />
         </div>
         <div className="flex flex-wrap gap-2">
           <Chip active={genre === "all"} onClick={() => setGenre("all")}>{t("common.allCategories")}</Chip>
