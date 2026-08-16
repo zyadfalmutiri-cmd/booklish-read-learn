@@ -109,10 +109,10 @@ function Journey() {
 
             return (
               <li key={s.slug}>
+                {/* بطاقة "ورقة" موحّدة مع باقي التطبيق (ظل ناعم + زاوية مطوية)
+                    بدل الحدود المسطّحة القديمة. البطاقات المقفلة تفتّ شفافيتها فقط */}
                 <div
-                  className={`flex items-start gap-4 rounded-xl border p-4 ${
-                    locked ? "border-border bg-muted/40 opacity-60" : "border-border bg-card"
-                  }`}
+                  className={`paper-card flex items-start gap-4 p-4 ${locked ? "opacity-60" : ""}`}
                 >
                   <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-border bg-background">
                     {done ? (
