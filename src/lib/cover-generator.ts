@@ -49,26 +49,25 @@ export async function generateAIStoryCover(
 
   return blob;
 }
-
 /**
- * الأسلوب الفني الثابت — رسمة توضيحية ملوّنة بإضاءة دافئة (بدون أي نص داخلها).
- * نطلب صراحة إن الثلث العلوي يبقى فاتح/بسيط (سماء أو خلفية صافية) عشان
- * لما نضيف العنوان بعدين عبر Canvas يكون فوق خلفية واضحة ومقروءة.
+ * الأسلوب الفني الثابت — Flat Vector Travel-Poster Style
+ * (يطابق ستايل "Paris Awaits" / "London Calling")
  */
 const BASE_FLAT_COVER_STYLE =
-  "vibrant stylized digital illustration book cover art, illustrated poster art style, portrait orientation book cover, NOT a photograph, not photorealistic, not realistic, not 3D rendered, not glass, not glossy, simplified and stylized shapes and characters, bold saturated colors, warm atmospheric lighting with soft color gradients, clean modern illustration aesthetic similar to young-adult book cover art, richly colored illustrated scene, professional book cover design, high detail illustration, absolutely no text, no words, no letters, no numbers, no watermark, no logo, always include one clear symbolic focal subject (a person, an animal, or an object representing the story's theme) prominently in the foreground in the lower two-thirds of the image, the upper third of the image is a simple, relatively plain sky or background area with no objects in it, kept clear and open for a text overlay to be added later";
+  "flat vector illustration book cover, poster style, portrait orientation, NOT a photograph, not photorealistic, not 3D rendered, not glossy, minimal geometric shapes, bold flat design, warm golden-hour lighting with a deep navy or teal sky, limited color palette of 2-3 colors, no gradients, high contrast, travel-poster aesthetic, professional book cover design, absolutely no text, no words, no letters, no numbers, no watermark, no logo, always include one clear symbolic focal subject prominently in the lower two-thirds of the image, the upper third of the image is a simple plain sky or background area with no objects, kept clear and open for a text overlay to be added later";
 
 /**
- * تلميحات لوحة ألوان/مزاج هادئة (Pastel/Muted) حسب نوع القصة (Genre)
+ * لوحة ألوان حسب نوع القصة — معدّلة لتناسب navy/amber/teal الثابتة
  */
 const GENRE_MOOD_MAP: Record<string, string> = {
-  "non-fiction": "warm sandy pastel palette, desert tan and soft amber tones, pale blue sky",
-  mystery: "muted deep teal or navy pastel palette, subdued moody tone",
-  romance: "soft pastel pink and cream palette",
-  "sci-fi": "pastel lavender and soft powder-blue palette",
-  adventure: "sky-blue pastel palette, sunlit sandy or grassy ground tones",
-  drama: "muted dusty-rose or soft amber pastel palette",
+  "non-fiction": "warm amber and copper tones, deep teal sky",
+  mystery: "deep navy and muted indigo palette, subdued moody tone",
+  romance: "warm terracotta and soft rose accents on navy",
+  "sci-fi": "deep navy with electric teal accents",
+  adventure: "navy sky with sunlit amber ground tones",
+  drama: "deep navy with dusty amber accents",
 };
+
 
 /**
  * تلميحات إضافية حسب التصنيف (Tags) لو موجودة
