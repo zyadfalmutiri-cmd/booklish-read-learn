@@ -1,3 +1,4 @@
+// src/lib/cover-svg-generator.ts
 import type { Story } from "@/lib/types";
 
 /**
@@ -189,6 +190,38 @@ const SLUG_ICON_MAP: Record<string, string> = {
   "understanding-emotions": "face-emotion",
   "inflation-rising-prices": "growth-chart",
   "child-aggression-understanding": "friendship",
+
+  // ── قصص الأخبار الجديدة (news-a1 / news-a2 / news-b1) ──
+  "a-new-moon-mission": "satellite",
+  "a-robot-taxi-in-the-sky": "bus",
+  "the-world-cup-in-three-countries": "soccer",
+  "ice-and-snow-in-italy": "mountain",
+  "a-woman-wins-the-derby": "runner",
+  "a-big-birthday-for-america": "cake",
+  "the-sun-disappears": "moon-stars",
+  "a-new-baby-panda": "cat",
+  "millions-walk-to-mecca": "compass",
+  "a-fast-train-opens": "bus",
+  "mosquitoes-with-a-mission": "bee",
+  "the-uae-leaves-an-old-club": "briefcase",
+  "a-star-bigger-than-our-solar-system": "satellite",
+  "building-vertiports": "city-skyline",
+  "the-olympic-torch-travels": "sun",
+  "a-sequel-after-20-years": "photo-frame",
+  "farmers-face-a-dry-year": "garden",
+  "a-city-rebuilds-after-an-earthquake": "broken-window",
+  "new-rules-for-online-privacy": "justice-scale",
+  "a-museum-celebrates-250-years": "ancient-column",
+  "when-ai-learns-to-talk-back": "brain-ai",
+  "a-health-emergency-in-central-africa": "virus",
+  "locking-the-world-out-of-ai": "globe",
+  "graves-moved-for-a-golf-resort": "ancient-column",
+  "womens-rights-on-a-global-stage": "justice-scale",
+  "drones-cross-a-border": "satellite",
+  "a-smoke-cloud-over-a-city": "city-skyline",
+  "the-cost-of-flying-taxis": "growth-chart",
+  "a-sacred-statue-goes-missing": "ancient-column",
+  "coral-reefs-under-pressure": "wave",
 };
 
 function pickIcon(story: Story): string {
