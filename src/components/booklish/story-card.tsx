@@ -96,9 +96,9 @@ export function StoryCard({ story }: { story: Story }) {
             <span aria-hidden>·</span>
             <span>{story.minutes} {t("common.minutes")}</span>
           </div>
-                    <h3 className="font-serif text-lg leading-snug text-foreground group-hover:text-primary transition-colors">
-            {story.title}
-          </h3>
+                    import { STORY_TITLES_AR } from "@/data/story-titles-ar";
+// ...
+<h3 className="...">{STORY_TITLES_AR[story.slug] ?? story.title}</h3>
           <p className="line-clamp-2 text-sm text-muted-foreground">{story.blurb}</p>
 
           {story.audio && (
