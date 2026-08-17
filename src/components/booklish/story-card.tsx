@@ -3,6 +3,7 @@ import { Headphones } from "lucide-react";
 import type { Story } from "@/lib/types";
 import { useT } from "@/lib/i18n";
 import { STORY_COVER_ICONS } from "@/lib/story-cover-icons";
+import { STORY_TITLES_AR } from "@/data/story-titles-ar";
 
 const COVER_IMAGES: Record<string, string> = {
   "ronaldo-from-poverty-to-glory": "/covers/glory-of-ronaldo.PNG",
@@ -44,6 +45,7 @@ export function StoryCard({ story }: { story: Story }) {
   const navigate = useNavigate();
   const svg = COVERS[story.slug];
   const image = COVER_IMAGES[story.slug] || story.coverImage;
+  const displayTitle = STORY_TITLES_AR[story.slug] ?? story.title;
 
   // 🎨 شارات المستوى — بنفس عائلة الهوية الترابية (نحاسي/زيتوني/طيني)
   // بدل أخضر/أصفر/أحمر القياسية اللي ما لها علاقة بالتصميم
@@ -96,9 +98,7 @@ export function StoryCard({ story }: { story: Story }) {
             <span aria-hidden>·</span>
             <span>{story.minutes} {t("common.minutes")}</span>
           </div>
-                    import { STORY_TITLES_AR } from "@/data/story-titles-ar";
-// ...
-<h3 className="...">{STORY_TITLES_AR[story.slug] ?? story.title}</h3>
+          <h3 className="font-serif text-base font-semibold leading-snug line-clamp-2">{displayTitle}</h3>
           <p className="line-clamp-2 text-sm text-muted-foreground">{story.blurb}</p>
 
           {story.audio && (
