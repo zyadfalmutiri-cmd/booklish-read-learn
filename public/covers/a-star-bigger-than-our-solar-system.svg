@@ -1,0 +1,19 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g_a_star_bigger_than_our_solar_system" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ddd6fe"/><stop offset="100%" stop-color="#d8b4fe"/>
+    </linearGradient>
+    <radialGradient id="g_a_star_bigger_than_our_solar_system_v" cx="50%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/><stop offset="100%" stop-color="#000000" stop-opacity="0.08"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#g_a_star_bigger_than_our_solar_system)"/>
+  <rect width="1200" height="800" fill="url(#g_a_star_bigger_than_our_solar_system_v)"/>
+  <circle cx="150" cy="150" r="110" fill="#ffffff" opacity="0.08"/>
+  <circle cx="1080" cy="680" r="150" fill="#ffffff" opacity="0.08"/>
+  <circle cx="600" cy="340" r="150" fill="#fdf6e9" opacity="0.35"/>
+  <g transform="translate(490.0,230.0) scale(9.167)" fill="none" stroke="#2b2118" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.82"><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873l-6.158 -3.245" /></g>
+  <rect x="0" y="560" width="1200" height="240" fill="#fdf6e9" opacity="0.55"/>
+<text x="600" y="630" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="50" font-weight="700" fill="#2b2118" opacity="0.92">A Star Bigger Than Our</text>
+<text x="600" y="690" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="50" font-weight="700" fill="#2b2118" opacity="0.92">Solar System</text>
+</svg>

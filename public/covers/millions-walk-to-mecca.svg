@@ -1,0 +1,18 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g_millions_walk_to_mecca" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a7f3d0"/><stop offset="100%" stop-color="#86efac"/>
+    </linearGradient>
+    <radialGradient id="g_millions_walk_to_mecca_v" cx="50%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/><stop offset="100%" stop-color="#000000" stop-opacity="0.08"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#g_millions_walk_to_mecca)"/>
+  <rect width="1200" height="800" fill="url(#g_millions_walk_to_mecca_v)"/>
+  <circle cx="150" cy="150" r="110" fill="#ffffff" opacity="0.08"/>
+  <circle cx="1080" cy="680" r="150" fill="#ffffff" opacity="0.08"/>
+  <circle cx="600" cy="340" r="150" fill="#fdf6e9" opacity="0.35"/>
+  <g transform="translate(490.0,230.0) scale(9.167)" fill="none" stroke="#2b2118" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.82"><path d="M3 21h7v-2a2 2 0 1 1 4 0v2h7" /><path d="M4 21v-10" /><path d="M20 21v-10" /><path d="M4 16h3v-3h10v3h3" /><path d="M17 13a5 5 0 0 0 -10 0" /><path d="M21 10.5c0 -.329 -.077 -.653 -.224 -.947l-.776 -1.553l-.776 1.553a2.118 2.118 0 0 0 -.224 .947a.5 .5 0 0 0 .5 .5h1a.5 .5 0 0 0 .5 -.5" /><path d="M5 10.5c0 -.329 -.077 -.653 -.224 -.947l-.776 -1.553l-.776 1.553a2.118 2.118 0 0 0 -.224 .947a.5 .5 0 0 0 .5 .5h1a.5 .5 0 0 0 .5 -.5" /><path d="M12 2a2 2 0 1 0 2 2" /><path d="M12 6v2" /></g>
+  <rect x="0" y="560" width="1200" height="240" fill="#fdf6e9" opacity="0.55"/>
+<text x="600" y="660" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="50" font-weight="700" fill="#2b2118" opacity="0.92">Millions Walk to Mecca</text>
+</svg>

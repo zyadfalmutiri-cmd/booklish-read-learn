@@ -1,0 +1,18 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g_a_fast_train_opens" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e2e8f0"/><stop offset="100%" stop-color="#d1d5db"/>
+    </linearGradient>
+    <radialGradient id="g_a_fast_train_opens_v" cx="50%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/><stop offset="100%" stop-color="#000000" stop-opacity="0.08"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#g_a_fast_train_opens)"/>
+  <rect width="1200" height="800" fill="url(#g_a_fast_train_opens_v)"/>
+  <circle cx="150" cy="150" r="110" fill="#ffffff" opacity="0.08"/>
+  <circle cx="1080" cy="680" r="150" fill="#ffffff" opacity="0.08"/>
+  <circle cx="600" cy="340" r="150" fill="#fdf6e9" opacity="0.35"/>
+  <g transform="translate(490.0,230.0) scale(9.167)" fill="none" stroke="#2b2118" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.82"><path d="M21 13c0 -3.87 -3.37 -7 -10 -7h-8" /><path d="M3 15h16a2 2 0 0 0 2 -2" /><path d="M3 6v5h17.5" /><path d="M3 11v4" /><path d="M8 11v-5" /><path d="M13 11v-4.5" /><path d="M3 19h18" /></g>
+  <rect x="0" y="560" width="1200" height="240" fill="#fdf6e9" opacity="0.55"/>
+<text x="600" y="660" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="50" font-weight="700" fill="#2b2118" opacity="0.92">A Fast Train Opens</text>
+</svg>

@@ -1,0 +1,19 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g_the_cost_of_flying_taxis" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#bae6fd"/><stop offset="100%" stop-color="#67e8f9"/>
+    </linearGradient>
+    <radialGradient id="g_the_cost_of_flying_taxis_v" cx="50%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/><stop offset="100%" stop-color="#000000" stop-opacity="0.08"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#g_the_cost_of_flying_taxis)"/>
+  <rect width="1200" height="800" fill="url(#g_the_cost_of_flying_taxis_v)"/>
+  <circle cx="150" cy="150" r="110" fill="#ffffff" opacity="0.08"/>
+  <circle cx="1080" cy="680" r="150" fill="#ffffff" opacity="0.08"/>
+  <circle cx="600" cy="340" r="150" fill="#fdf6e9" opacity="0.35"/>
+  <g transform="translate(490.0,230.0) scale(9.167)" fill="none" stroke="#2b2118" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.82"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M14.8 9a2 2 0 0 0 -1.8 -1h-2a2 2 0 1 0 0 4h2a2 2 0 1 1 0 4h-2a2 2 0 0 1 -1.8 -1" /><path d="M12 7v10" /></g>
+  <rect x="0" y="560" width="1200" height="240" fill="#fdf6e9" opacity="0.55"/>
+<text x="600" y="630" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="50" font-weight="700" fill="#2b2118" opacity="0.92">The Cost of Flying</text>
+<text x="600" y="690" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="50" font-weight="700" fill="#2b2118" opacity="0.92">Taxis</text>
+</svg>
